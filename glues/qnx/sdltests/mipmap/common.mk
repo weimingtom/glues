@@ -2,6 +2,7 @@
 # The area between QNX Internal Start and QNX Internal End is controlled by
 # the QNX IDE properties.
 
+NAME=sdl_mipmap
 
 ifndef QCONFIG
 QCONFIG=qconfig.mk
@@ -12,17 +13,18 @@ include $(QCONFIG)
 USEFILE=
 
 define PINFO
-PINFO DESCRIPTION=GLU ES MipMap Test
+PINFO DESCRIPTION=SDL GLU ES MipMap Test
 endef
 
-
 #===== EXTRA_INCVPATH - a space-separated list of directories to search for include files.
-EXTRA_INCVPATH+=$(PROJECT_ROOT_gf)/public ../../../../../../source
+EXTRA_INCVPATH+=../../../../../../source /usr/include
+EXTRA_SRCVPATH+=../../../../../../sdltests
 #===== EXTRA_LIBVPATH - a space-separated list of directories to search for library files.
-EXTRA_LIBVPATH+=$(PROJECT_ROOT_gf)/$(CPU)/$(patsubst o%,a%,$(notdir $(CURDIR))) ../../../../../nto/$(CPU)/so ../../../../../nto/$(CPU)/a
+EXTRA_LIBVPATH+=$(PROJECT_ROOT_gf)/$(CPU)/$(patsubst o%,a%,$(notdir $(CURDIR))) ../../../../../nto/$(CPU)/so ../../../../../nto/$(CPU)/a /usr/lib
 #===== LIBS - a space-separated list of library items to be included in the link.
-LIBS+=gf GLES_CM GLUES_CM
+LIBS+=SDL GLUES_CM
 include $(MKFILES_ROOT)/qmacros.mk
+SRCS=../../../../../../sdltests/sdl_mipmap.c
 #QNX internal start
 ifeq ($(filter g, $(VARIANT_LIST)),g)
 DEBUG_SUFFIX=_g
@@ -72,7 +74,6 @@ BUILDNAME_SAR:= $(patsubst %$(IMAGE_SUFF_$(BUILD_TYPE)),%S.a,$(BUILDNAME))
 POST_BUILD:=$($(call EXPRESSION,POST_BUILD))
 #QNX internal end
 include $(MKFILES_ROOT)/qtargets.mk
-
 
 OPTIMIZE_TYPE=$(OPTIMIZE_TYPE_$(filter g, $(VARIANTS)))
 OPTIMIZE_TYPE_g=none

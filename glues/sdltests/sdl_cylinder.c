@@ -1,6 +1,5 @@
 /*                                                              */
-/* This test is based on accumaa.c - by Tom McReynolds, SGI and */
-/* initialization part on QSSL's egl* demo                      */
+/* This test is based on accumaa.c - by Tom McReynolds, SGI     */
 /*                                                              */
 /* // Mike Gorchak, 2009. GLU ES test                           */
 /*                                                              */
@@ -9,30 +8,15 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include <gf/gf.h>
-#include <gf/gf3d.h>
-#include <GLES/gl.h>
-#include <GLES/egl.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengles.h>
 
+#define __USE_SDL_GLES__
 #include "glues.h"
 
-gf_dev_t    gfdev;
-gf_layer_t  layer;
-int         layer_idx;
-
-static EGLDisplay display;
-static EGLSurface surface;
-
-static EGLint attribute_list[]=
-{
-   EGL_NATIVE_VISUAL_ID, 0,
-   EGL_NATIVE_RENDERABLE, EGL_TRUE,
-   EGL_RED_SIZE, 5,
-   EGL_GREEN_SIZE, 5,
-   EGL_BLUE_SIZE, 5,
-   EGL_DEPTH_SIZE, 16,
-   EGL_NONE
-};
+/* screen width, height, and bit depth */
+#define WINDOW_WIDTH  640
+#define WINDOW_HEIGHT 480
 
 GLUquadricObj* cone_fill_smooth;
 GLUquadricObj* cone_fill_flat;
@@ -63,14 +47,16 @@ GLubyte* make_texture(int maxs, int maxt)
    return texture;
 }
 
-
-void init_scene()
+void init_scene(int width, int height)
 {
    static GLfloat lightpos[4]={50.0f, 50.0f, -320.f, 1.0f};
    GLubyte* tex;
 
    /* Clear error */
    glGetError();
+
+   /* Setup our viewport */
+   glViewport(0, 0, (GLint)width, (GLint)height);
 
    /* draw a perspective scene */
    glMatrixMode(GL_PROJECTION);
@@ -344,133 +330,99 @@ void render_scene()
    {
       printf("Oops! I screwed up my OpenGL ES calls somewhere\n");
    }
+
+   glFinish();
 }
 
 int main(int argc, char** argv)
 {
-   gf_3d_target_t      target;
-   gf_display_t        gf_disp;
-   EGLConfig           config;
-   EGLContext          econtext;
-   EGLint              num_config;
-   gf_dev_info_t       info;
-   gf_layer_info_t     linfo;
-   gf_display_info_t   disp_info;
-   GLuint              width, height;
-   GLuint              it;
+   int status;
+   SDL_WindowID window;
+   SDL_GLContext* glcontext=NULL;
+   SDL_Event event;
+   SDL_bool done=SDL_FALSE;
 
-   /* initialize the graphics device */
-   if (gf_dev_attach(&gfdev, NULL, &info)!=GF_ERR_OK)
+   status=SDL_VideoInit(NULL, 0);
+   if (status<0)
    {
-      perror("gf_dev_attach()");
-      return -1;
+      fprintf(stderr, "Can't init default SDL video driver: %s\n", SDL_GetError());
+      exit(-1);
    }
 
-   /* Setup the layer we will use */
-   if (gf_display_attach(&gf_disp, gfdev, 0, &disp_info)!=GF_ERR_OK)
+   /* Select first display */
+   status=SDL_SelectVideoDisplay(0);
+   if (status<0)
    {
-      fprintf(stderr, "gf_display_attach() failed\n");
-      return -1;
+      fprintf(stderr, "Can't attach to first display: %s\n", SDL_GetError());
+      exit(-1);
    }
 
-   layer_idx=disp_info.main_layer_index;
-
-   /* get an EGL display connection */
-   display=eglGetDisplay(gfdev);
-   if (display==EGL_NO_DISPLAY)
+   window=SDL_CreateWindow("SDL GLU ES Cylinder test",
+      SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+      WINDOW_WIDTH, WINDOW_HEIGHT,
+      SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+   if (window==0)
    {
-      fprintf(stderr, "eglGetDisplay() failed\n");
-      return -1;
+      fprintf(stderr, "Can't create window: %s\n", SDL_GetError());
+      exit(-1);
    }
 
-   width=disp_info.xres;
-   height=disp_info.yres;
-
-   if (gf_layer_attach(&layer, gf_disp, layer_idx, 0)!=GF_ERR_OK)
+   glcontext=SDL_GL_CreateContext(window);
+   if (glcontext==NULL)
    {
-      fprintf(stderr, "gf_layer_attach() failed\n");
-      return -1;
+      fprintf(stderr, "Can't create OpenGL ES context: %s\n", SDL_GetError());
+      exit(-1);
    }
 
-   /* initialize the EGL display connection */
-   if (eglInitialize(display, NULL, NULL)!=EGL_TRUE)
+   status=SDL_GL_MakeCurrent(window, glcontext);
+   if (status<0)
    {
-      fprintf(stderr, "eglInitialize: error 0x%x\n", eglGetError());
-      return -1;
+      fprintf(stderr, "Can't set current OpenGL ES context: %s\n", SDL_GetError());
+      exit(-1);
    }
 
-   for (it=0;; it++)
-   {
-      /* Walk through all possible pixel formats for this layer */
-      if (gf_layer_query(layer, it, &linfo)==-1)
-      {
-         fprintf(stderr, "Couldn't find a compatible frame "
-                         "buffer configuration on layer %d\n", layer_idx);
-         return -1;
-      }
-
-      /*
-       * We want the color buffer format to match the layer format,
-       * so request the layer format through EGL_NATIVE_VISUAL_ID.
-       */
-      attribute_list[1]=linfo.format;
-
-      /* Look for a compatible EGL frame buffer configuration */
-      if (eglChooseConfig(display, attribute_list, &config, 1, &num_config)==EGL_TRUE)
-      {
-         if (num_config>0)
-         {
-            break;
-         }
-      }
-   }
-
-   /* create a 3D rendering target */
-   if (gf_3d_target_create(&target, layer, NULL, 0, width, height, linfo.format)!=GF_ERR_OK)
-   {
-      fprintf(stderr, "Unable to create rendering target\n");
-      return -1;
-   }
-
-   gf_layer_set_src_viewport(layer, 0, 0, width-1, height-1);
-   gf_layer_set_dst_viewport(layer, 0, 0, width-1, height-1);
-   gf_layer_enable(layer);
-
-   /*
-    * The layer settings haven't taken effect yet since we haven't
-    * called gf_layer_update() yet.  This is exactly what we want,
-    * since we haven't supplied a valid surface to display yet.
-    * Later, the OpenGL ES library calls will call gf_layer_update()
-    * internally, when  displaying the rendered 3D content.
-    */
-
-   /* create an EGL rendering context */
-   econtext=eglCreateContext(display, config, EGL_NO_CONTEXT, NULL);
-
-   /* create an EGL window surface */
-   surface=eglCreateWindowSurface(display, config, target, NULL);
-
-   if (surface==EGL_NO_SURFACE)
-   {
-      fprintf(stderr, "Create surface failed: 0x%x\n", eglGetError());
-      return -1;
-   }
-
-   /* connect the context to the surface */
-   if (eglMakeCurrent(display, surface, surface, econtext)==EGL_FALSE)
-   {
-      fprintf(stderr, "Make current failed: 0x%x\n", eglGetError());
-      return -1;
-   }
-
-   init_scene();
+   init_scene(WINDOW_WIDTH, WINDOW_HEIGHT);
 
    do {
+      /* handle the events in the queue */
+      while (SDL_PollEvent(&event))
+      {
+         switch(event.type)
+         {
+            case SDL_WINDOWEVENT:
+                 switch (event.window.event)
+                 {
+                    case SDL_WINDOWEVENT_CLOSE:
+                         done=SDL_TRUE;
+                         break;
+                 }
+                 break;
+            case SDL_KEYDOWN:
+                 switch (event.key.keysym.sym)
+                 {
+                    case SDLK_ESCAPE:
+                         done=SDL_TRUE;
+                         break;
+                 }
+                 break;
+            case SDL_QUIT:
+                 done=SDL_TRUE;
+                 break;
+         }
+      }
+
+      if (done==SDL_TRUE)
+      {
+         break;
+      }
+
       render_scene();
-      glFinish();
-      eglWaitGL();
-      eglSwapBuffers(display,surface);
+      SDL_GL_SwapWindow(window);
    } while(1);
+
+   SDL_GL_DeleteContext(glcontext);
+   SDL_DestroyWindow(window);
+   SDL_Quit();
 
    return 0;
 }
