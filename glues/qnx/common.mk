@@ -1,5 +1,5 @@
 NAME=GLUES_CM
-EXTRA_SRCVPATH=../../../../source
+EXTRA_SRCVPATH=../../../../source ../../../../source/libtess
 
 ifndef QCONFIG
 QCONFIG=qconfig.mk
@@ -22,5 +22,5 @@ include $(MKFILES_ROOT)/qtargets.mk
 ifeq ($(origin NDEBUG),undefined)
 CCFLAGS += -O0
 else
-CCFLAGS += -O3 -funroll-all-loops
+CCFLAGS += -O3 -funroll-all-loops -Wall
 endif

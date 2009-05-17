@@ -64,13 +64,16 @@ GLubyte* make_texture(int maxs, int maxt)
 }
 
 
-void init_scene()
+void init_scene(int width, int height)
 {
    static GLfloat lightpos[4]={50.0f, 50.0f, -320.f, 1.0f};
    GLubyte* tex;
 
    /* Clear error */
    glGetError();
+
+   /* Setup display viewport */
+   glViewport(0, 0, (GLint)width, (GLint)height);
 
    /* draw a perspective scene */
    glMatrixMode(GL_PROJECTION);
@@ -168,30 +171,14 @@ void render_scene()
    glNormal3f(0.f, 1.f, 0.f);
 
    /* Fill texture coordinates and vertices arrays */
-   texcoords[0][0]=0;
-   texcoords[0][1]=0;
-   vertices[0][0]=-100.f;
-   vertices[0][1]=-100.f;
-   vertices[0][2]=-320.f;
-
-   texcoords[1][0]=1;
-   texcoords[1][1]=0;
-   vertices[1][0]=100.f;
-   vertices[1][1]=-100.f;
-   vertices[1][2]=-320.f;
-
-   texcoords[3][0]=1;
-   texcoords[3][1]=1;
-   vertices[3][0]=100.f;
-   vertices[3][1]=-100.f;
-   vertices[3][2]=-520.f;
-
-   texcoords[2][0]=0;
-   texcoords[2][1]=1;
-   vertices[2][0]=-100.f;
-   vertices[2][1]=-100.f;
-   vertices[2][2]=-520.f;
-
+   texcoords[0][0]=0; texcoords[0][1]=0;
+   vertices[0][0]=-100.f; vertices[0][1]=-100.f; vertices[0][2]=-320.f;
+   texcoords[1][0]=1; texcoords[1][1]=0;
+   vertices[1][0]=100.f; vertices[1][1]=-100.f; vertices[1][2]=-320.f;
+   texcoords[3][0]=1; texcoords[3][1]=1;
+   vertices[3][0]=100.f; vertices[3][1]=-100.f; vertices[3][2]=-520.f;
+   texcoords[2][0]=0; texcoords[2][1]=1;
+   vertices[2][0]=-100.f; vertices[2][1]=-100.f; vertices[2][2]=-520.f;
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glDisable(GL_TEXTURE_2D);
@@ -204,63 +191,31 @@ void render_scene()
    glEnableClientState(GL_VERTEX_ARRAY);
 
    glNormal3f(1.f, 0.f, 0.f);
-   vertices[0][0]=-100.f;
-   vertices[0][1]=-100.f;
-   vertices[0][2]=-320.f;
-   vertices[1][0]=-100.f;
-   vertices[1][1]=-100.f;
-   vertices[1][2]=-520.f;
-   vertices[3][0]=-100.f;
-   vertices[3][1]=100.f;
-   vertices[3][2]=-520.f;
-   vertices[2][0]=-100.f;
-   vertices[2][1]=100.f;
-   vertices[2][2]=-320.f;
+   vertices[0][0]=-100.f; vertices[0][1]=-100.f; vertices[0][2]=-320.f;
+   vertices[1][0]=-100.f; vertices[1][1]=-100.f; vertices[1][2]=-520.f;
+   vertices[3][0]=-100.f; vertices[3][1]=100.f;  vertices[3][2]=-520.f;
+   vertices[2][0]=-100.f; vertices[2][1]=100.f;  vertices[2][2]=-320.f;
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glNormal3f(-1.f, 0.f, 0.f);
-   vertices[0][0]=100.f;
-   vertices[0][1]=-100.f;
-   vertices[0][2]=-320.f;
-   vertices[1][0]=100.f;
-   vertices[1][1]=100.f;
-   vertices[1][2]=-320.f;
-   vertices[3][0]=100.f;
-   vertices[3][1]=100.f;
-   vertices[3][2]=-520.f;
-   vertices[2][0]=100.f;
-   vertices[2][1]=-100.f;
-   vertices[2][2]=-520.f;
+   vertices[0][0]=100.f; vertices[0][1]=-100.f; vertices[0][2]=-320.f;
+   vertices[1][0]=100.f; vertices[1][1]=100.f;  vertices[1][2]=-320.f;
+   vertices[3][0]=100.f; vertices[3][1]=100.f;  vertices[3][2]=-520.f;
+   vertices[2][0]=100.f; vertices[2][1]=-100.f; vertices[2][2]=-520.f;
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glNormal3f(0.f, -1.f, 0.f);
-   vertices[0][0]=-100.f;
-   vertices[0][1]=100.f;
-   vertices[0][2]=-320.f;
-   vertices[1][0]=-100.f;
-   vertices[1][1]=100.f;
-   vertices[1][2]=-520.f;
-   vertices[3][0]=100.f;
-   vertices[3][1]=100.f;
-   vertices[3][2]=-520.f;
-   vertices[2][0]=100.f;
-   vertices[2][1]=100.f;
-   vertices[2][2]=-320.f;
+   vertices[0][0]=-100.f; vertices[0][1]=100.f; vertices[0][2]=-320.f;
+   vertices[1][0]=-100.f; vertices[1][1]=100.f; vertices[1][2]=-520.f;
+   vertices[3][0]=100.f;  vertices[3][1]=100.f; vertices[3][2]=-520.f;
+   vertices[2][0]=100.f;  vertices[2][1]=100.f; vertices[2][2]=-320.f;
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glNormal3f(0.f, 0.f, 1.f);
-   vertices[0][0]=-100.f;
-   vertices[0][1]=-100.f;
-   vertices[0][2]=-520.f;
-   vertices[1][0]=100.f;
-   vertices[1][1]=-100.f;
-   vertices[1][2]=-520.f;
-   vertices[3][0]=100.f;
-   vertices[3][1]=100.f;
-   vertices[3][2]=-520.f;
-   vertices[2][0]=-100.f;
-   vertices[2][1]=100.f;
-   vertices[2][2]=-520.f;
+   vertices[0][0]=-100.f; vertices[0][1]=-100.f; vertices[0][2]=-520.f;
+   vertices[1][0]=100.f;  vertices[1][1]=-100.f; vertices[1][2]=-520.f;
+   vertices[3][0]=100.f;  vertices[3][1]=100.f;  vertices[3][2]=-520.f;
+   vertices[2][0]=-100.f; vertices[2][1]=100.f;  vertices[2][2]=-520.f;
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glDisableClientState(GL_VERTEX_ARRAY);
@@ -373,6 +328,9 @@ int main(int argc, char** argv)
       return -1;
    }
 
+   width=disp_info.xres;
+   height=disp_info.yres;
+
    layer_idx=disp_info.main_layer_index;
 
    /* get an EGL display connection */
@@ -382,9 +340,6 @@ int main(int argc, char** argv)
       fprintf(stderr, "eglGetDisplay() failed\n");
       return -1;
    }
-
-   width=disp_info.xres;
-   height=disp_info.yres;
 
    if (gf_layer_attach(&layer, gf_disp, layer_idx, 0)!=GF_ERR_OK)
    {
@@ -446,10 +401,14 @@ int main(int argc, char** argv)
 
    /* create an EGL rendering context */
    econtext=eglCreateContext(display, config, EGL_NO_CONTEXT, NULL);
+   if (econtext==EGL_NO_CONTEXT)
+   {
+      fprintf(stderr, "Create context failed: 0x%x\n", eglGetError());
+      return -1;
+   }
 
    /* create an EGL window surface */
    surface=eglCreateWindowSurface(display, config, target, NULL);
-
    if (surface==EGL_NO_SURFACE)
    {
       fprintf(stderr, "Create surface failed: 0x%x\n", eglGetError());
@@ -465,13 +424,13 @@ int main(int argc, char** argv)
 
 //   eglSwapInterval(display, 0);
 
-   init_scene();
+   init_scene(width, height);
 
    do {
       render_scene();
       glFinish();
       eglWaitGL();
-      eglSwapBuffers(display,surface);
+      eglSwapBuffers(display, surface);
    } while(1);
 
    return 0;

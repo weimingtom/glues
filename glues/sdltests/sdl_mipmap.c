@@ -190,11 +190,11 @@ int main(int argc, char** argv)
 {
    int status;
    SDL_WindowID window;
-   SDL_GLContext* glcontext=NULL;
+   SDL_GLContext glcontext=NULL;
    SDL_Event event;
    SDL_bool done=SDL_FALSE;
 
-   status=SDL_VideoInit(NULL, 0);
+   status=SDL_Init(SDL_INIT_VIDEO);
    if (status<0)
    {
       fprintf(stderr, "Can't init default SDL video driver: %s\n", SDL_GetError());
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
    window=SDL_CreateWindow("SDL GLU ES MipMap test",
       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
-      SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
    if (window==0)
    {
       fprintf(stderr, "Can't create window: %s\n", SDL_GetError());
