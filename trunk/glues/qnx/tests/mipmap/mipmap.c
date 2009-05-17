@@ -313,10 +313,14 @@ int main(int argc, char** argv)
 
    /* create an EGL rendering context */
    econtext=eglCreateContext(display, config, EGL_NO_CONTEXT, NULL);
+   if (econtext==EGL_NO_CONTEXT)
+   {
+      fprintf(stderr, "Create context failed: 0x%x\n", eglGetError());
+      return -1;
+   }
 
    /* create an EGL window surface */
    surface=eglCreateWindowSurface(display, config, target, NULL);
-
    if (surface==EGL_NO_SURFACE)
    {
       fprintf(stderr, "Create surface failed: 0x%x\n", eglGetError());
