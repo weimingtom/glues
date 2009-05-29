@@ -248,7 +248,7 @@ GLAPI void APIENTRY gluGetTessProperty(GLUtesselator* tess, GLenum which, GLfloa
                   tess->windingRule==GLU_TESS_WINDING_POSITIVE ||
                   tess->windingRule==GLU_TESS_WINDING_NEGATIVE ||
                   tess->windingRule==GLU_TESS_WINDING_ABS_GEQ_TWO);
-           *value=tess->windingRule;
+           *value=(GLfloat)tess->windingRule;
            break;
       case GLU_TESS_BOUNDARY_ONLY:
            assert(tess->boundaryOnly==TRUE || tess->boundaryOnly==FALSE);

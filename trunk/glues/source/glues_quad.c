@@ -40,7 +40,7 @@
 #define CACHE_SIZE    240
 
 #undef  PI
-#define PI            3.14159265358979323846
+#define PI            3.14159265358979323846f
 
 struct GLUquadric
 {
@@ -199,7 +199,7 @@ GLAPI void APIENTRY gluCylinder(GLUquadric* qobj, GLfloat baseRadius,
 
    /* Compute length (needed for normal calculations) */
    deltaRadius=baseRadius-topRadius;
-   length=sqrt(deltaRadius*deltaRadius+height*height);
+   length=(GLfloat)sqrt(deltaRadius*deltaRadius+height*height);
 
    if (length==0.0)
    {
@@ -233,39 +233,39 @@ GLAPI void APIENTRY gluCylinder(GLUquadric* qobj, GLfloat baseRadius,
 
    for (i=0; i<slices; i++)
    {
-      angle=2*PI*i/slices;
+      angle=2.0f*PI*i/slices;
       if (needCache2)
       {
          if (qobj->orientation==GLU_OUTSIDE)
          {
-            sinCache2[i]=xyNormalRatio*sin(angle);
-            cosCache2[i]=xyNormalRatio*cos(angle);
+            sinCache2[i]=(GLfloat)(xyNormalRatio*sin(angle));
+            cosCache2[i]=(GLfloat)(xyNormalRatio*cos(angle));
          }
          else
          {
-            sinCache2[i]=-xyNormalRatio*sin(angle);
-            cosCache2[i]=-xyNormalRatio*cos(angle);
+            sinCache2[i]=(GLfloat)(-xyNormalRatio*sin(angle));
+            cosCache2[i]=(GLfloat)(-xyNormalRatio*cos(angle));
          }
       }
 
-      sinCache[i]=sin(angle);
-      cosCache[i]=cos(angle);
+      sinCache[i]=(GLfloat)sin(angle);
+      cosCache[i]=(GLfloat)cos(angle);
    }
 
    if (needCache3)
    {
       for (i=0; i<slices; i++)
       {
-         angle=2*PI*(i-0.5)/slices;
+         angle=2.0f*PI*(i-0.5f)/slices;
          if (qobj->orientation==GLU_OUTSIDE)
          {
-            sinCache3[i]=xyNormalRatio*sin(angle);
-            cosCache3[i]=xyNormalRatio*cos(angle);
+            sinCache3[i]=(GLfloat)(xyNormalRatio*sin(angle));
+            cosCache3[i]=(GLfloat)(xyNormalRatio*cos(angle));
          }
          else
          {
-            sinCache3[i]=-xyNormalRatio*sin(angle);
-            cosCache3[i]=-xyNormalRatio*cos(angle);
+            sinCache3[i]=(GLfloat)(-xyNormalRatio*sin(angle));
+            cosCache3[i]=(GLfloat)(-xyNormalRatio*cos(angle));
          }
       }
    }
@@ -646,12 +646,12 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
    deltaRadius=outerRadius-innerRadius;
 
    /* Cache is the vertex locations cache */
-   angleOffset=startAngle/180.0*PI;
+   angleOffset=startAngle/180.0f*PI;
    for (i=0; i<=slices; i++)
    {
-      angle=angleOffset+((PI*sweepAngle)/180.0)*i/slices;
-      sinCache[i]=sin(angle);
-      cosCache[i]=cos(angle);
+      angle=angleOffset+((PI*sweepAngle)/180.0f)*i/slices;
+      sinCache[i]=(GLfloat)sin(angle);
+      cosCache[i]=(GLfloat)cos(angle);
    }
 
    if (sweepAngle==360.0)
@@ -772,8 +772,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
                  {
                     if (qobj->textureCoords)
                     {
-                       texcoords[i*2][0]=texLow*sinCache[i]+0.5;
-                       texcoords[i*2][1]=texLow*cosCache[i]+0.5;
+                       texcoords[i*2][0]=texLow*sinCache[i]+0.5f;
+                       texcoords[i*2][1]=texLow*cosCache[i]+0.5f;
                     }
                     vertices[i*2][0]=radiusLow*sinCache[i];
                     vertices[i*2][1]=radiusLow*cosCache[i];
@@ -781,8 +781,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
 
                     if (qobj->textureCoords)
                     {
-                       texcoords[i*2+1][0]=texHigh*sinCache[i]+0.5;
-                       texcoords[i*2+1][1]=texHigh*cosCache[i]+0.5;
+                       texcoords[i*2+1][0]=texHigh*sinCache[i]+0.5f;
+                       texcoords[i*2+1][1]=texHigh*cosCache[i]+0.5f;
                     }
                     vertices[i*2+1][0]=radiusHigh*sinCache[i];
                     vertices[i*2+1][1]=radiusHigh*cosCache[i];
@@ -792,8 +792,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
                  {
                     if (qobj->textureCoords)
                     {
-                       texcoords[i*2][0]=texHigh*sinCache[i]+0.5;
-                       texcoords[i*2][1]=texHigh*cosCache[i]+0.5;
+                       texcoords[i*2][0]=texHigh*sinCache[i]+0.5f;
+                       texcoords[i*2][1]=texHigh*cosCache[i]+0.5f;
                     }
                     vertices[i*2][0]=radiusHigh*sinCache[i];
                     vertices[i*2][1]=radiusHigh*cosCache[i];
@@ -801,8 +801,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
 
                     if (qobj->textureCoords)
                     {
-                       texcoords[i*2+1][0]=texLow*sinCache[i]+0.5;
-                       texcoords[i*2+1][1]=texLow*cosCache[i]+0.5;
+                       texcoords[i*2+1][0]=texLow*sinCache[i]+0.5f;
+                       texcoords[i*2+1][1]=texLow*cosCache[i]+0.5f;
                     }
                     vertices[i*2+1][0]=radiusLow*sinCache[i];
                     vertices[i*2+1][1]=radiusLow*cosCache[i];
@@ -825,8 +825,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
                  if (qobj->textureCoords)
                  {
                     texLow=radiusLow/outerRadius/2;
-                    texcoords[i][0]=texLow*sinCache[i]+0.5;
-                    texcoords[i][1]=texLow*cosCache[i]+0.5;
+                    texcoords[i][0]=texLow*sinCache[i]+0.5f;
+                    texcoords[i][1]=texLow*cosCache[i]+0.5f;
                  }
                  vertices[i][0]=radiusLow*sintemp;
                  vertices[i][1]=radiusLow*costemp;
@@ -842,8 +842,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
               {
                  if (qobj->textureCoords)
                  {
-                    texcoords[i][0]=sinCache[i]/2+0.5;
-                    texcoords[i][1]=cosCache[i]/2+0.5;
+                    texcoords[i][0]=sinCache[i]/2+0.5f;
+                    texcoords[i][1]=cosCache[i]/2+0.5f;
                  }
                  vertices[i][0]=innerRadius*sinCache[i];
                  vertices[i][1]=innerRadius*cosCache[i];
@@ -865,8 +865,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
               {
                  if (qobj->textureCoords)
                  {
-                    texcoords[i][0]=texLow*sinCache[i]+0.5;
-                    texcoords[i][1]=texLow*cosCache[i]+0.5;
+                    texcoords[i][0]=texLow*sinCache[i]+0.5f;
+                    texcoords[i][1]=texLow*cosCache[i]+0.5f;
                  }
                  vertices[i][0]=radiusLow*sinCache[i];
                  vertices[i][1]=radiusLow*cosCache[i];
@@ -889,8 +889,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
 
                  if (qobj->textureCoords)
                  {
-                    texcoords[j][0]=texLow*sinCache[i]+0.5;
-                    texcoords[j][1]=texLow*cosCache[i]+0.5;
+                    texcoords[j][0]=texLow*sinCache[i]+0.5f;
+                    texcoords[j][1]=texLow*cosCache[i]+0.5f;
                  }
                  vertices[j][0]=radiusLow*sintemp;
                  vertices[j][1]=radiusLow*costemp;
@@ -914,8 +914,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
                     if (qobj->textureCoords)
                     {
                        texLow=radiusLow/outerRadius/2;
-                       texcoords[j][0]=texLow*sinCache[i]+0.5;
-                       texcoords[j][1]=texLow*cosCache[i]+0.5;
+                       texcoords[j][0]=texLow*sinCache[i]+0.5f;
+                       texcoords[j][1]=texLow*cosCache[i]+0.5f;
                     }
                     vertices[j][0]=radiusLow*sintemp;
                     vertices[j][1]=radiusLow*costemp;
@@ -937,8 +937,8 @@ GLAPI void APIENTRY gluPartialDisk(GLUquadric* qobj, GLfloat innerRadius,
               {
                  if (qobj->textureCoords)
                  {
-                    texcoords[i][0]=texLow*sinCache[i]+0.5;
-                    texcoords[i][1]=texLow*cosCache[i]+0.5;
+                    texcoords[i][0]=texLow*sinCache[i]+0.5f;
+                    texcoords[i][1]=texLow*cosCache[i]+0.5f;
                  }
                  vertices[i][0]=radiusLow*sinCache[i];
                  vertices[i][1]=radiusLow*cosCache[i];
@@ -1064,9 +1064,9 @@ GLAPI void APIENTRY gluSphere(GLUquadric* qobj, GLfloat radius, GLint slices, GL
 
    for (i=0; i<slices; i++)
    {
-      angle=2*PI*i/slices;
-      sinCache1a[i]=sin(angle);
-      cosCache1a[i]=cos(angle);
+      angle=2.0f*PI*i/slices;
+      sinCache1a[i]=(GLfloat)sin(angle);
+      cosCache1a[i]=(GLfloat)cos(angle);
       if (needCache2)
       {
          sinCache2a[i] = sinCache1a[i];
@@ -1081,18 +1081,18 @@ GLAPI void APIENTRY gluSphere(GLUquadric* qobj, GLfloat radius, GLint slices, GL
       {
          if (qobj->orientation==GLU_OUTSIDE)
          {
-            sinCache2b[j]=sin(angle);
-            cosCache2b[j]=cos(angle);
+            sinCache2b[j]=(GLfloat)sin(angle);
+            cosCache2b[j]=(GLfloat)cos(angle);
          }
          else
          {
-            sinCache2b[j]=-sin(angle);
-            cosCache2b[j]=-cos(angle);
+            sinCache2b[j]=(GLfloat)-sin(angle);
+            cosCache2b[j]=(GLfloat)-cos(angle);
          }
       }
 
-      sinCache1b[j]=radius*sin(angle);
-      cosCache1b[j]=radius*cos(angle);
+      sinCache1b[j]=(GLfloat)(radius*sin(angle));
+      cosCache1b[j]=(GLfloat)(radius*cos(angle));
    }
 
    /* Make sure it comes to a point */
@@ -1103,22 +1103,22 @@ GLAPI void APIENTRY gluSphere(GLUquadric* qobj, GLfloat radius, GLint slices, GL
    {
       for (i=0; i<slices; i++)
       {
-         angle=2*PI*(i-0.5)/slices;
-         sinCache3a[i]=sin(angle);
-         cosCache3a[i]=cos(angle);
+         angle=2.0f*PI*(i-0.5f)/slices;
+         sinCache3a[i]=(GLfloat)sin(angle);
+         cosCache3a[i]=(GLfloat)cos(angle);
       }
       for (j=0; j<=stacks; j++)
       {
-         angle=PI*(j-0.5)/stacks;
+         angle=PI*(j-0.5f)/stacks;
          if (qobj->orientation==GLU_OUTSIDE)
          {
-            sinCache3b[j]=sin(angle);
-            cosCache3b[j] = cos(angle);
+            sinCache3b[j]=(GLfloat)sin(angle);
+            cosCache3b[j]=(GLfloat)cos(angle);
          }
          else
          {
-            sinCache3b[j]=-sin(angle);
-            cosCache3b[j]=-cos(angle);
+            sinCache3b[j]=(GLfloat)-sin(angle);
+            cosCache3b[j]=(GLfloat)-cos(angle);
          }
       }
    }
