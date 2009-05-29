@@ -58,22 +58,22 @@ gluPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
 {
     GLfloat m[4][4];
     GLfloat sine, cotangent, deltaZ;
-    GLfloat radians = fovy / 2 * __glPi / 180;
+    GLfloat radians=(GLfloat)(fovy/2.0f*__glPi/180.0f);
 
-    deltaZ = zFar - zNear;
-    sine = sin(radians);
-    if ((deltaZ == 0) || (sine == 0) || (aspect == 0))
+    deltaZ=zFar-zNear;
+    sine=(GLfloat)sin(radians);
+    if ((deltaZ==0.0f) || (sine==0.0f) || (aspect==0.0f))
     {
         return;
     }
-    cotangent = cos(radians) / sine;
+    cotangent=(GLfloat)(cos(radians)/sine);
 
     __gluMakeIdentityf(&m[0][0]);
     m[0][0] = cotangent / aspect;
     m[1][1] = cotangent;
     m[2][2] = -(zFar + zNear) / deltaZ;
-    m[2][3] = -1;
-    m[3][2] = -2 * zNear * zFar / deltaZ;
+    m[2][3] = -1.0f;
+    m[3][2] = -2.0f * zNear * zFar / deltaZ;
     m[3][3] = 0;
     glMultMatrixf(&m[0][0]);
 }
@@ -82,15 +82,15 @@ static void normalize(GLfloat v[3])
 {
     GLfloat r;
 
-    r = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-    if (r == 0.0)
+    r=(GLfloat)sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+    if (r==0.0f)
     {
         return;
     }
 
-    v[0] /= r;
-    v[1] /= r;
-    v[2] /= r;
+    v[0]/=r;
+    v[1]/=r;
+    v[2]/=r;
 }
 
 static void cross(GLfloat v1[3], GLfloat v2[3], GLfloat result[3])
@@ -202,7 +202,7 @@ static int __gluInvertMatrixf(const GLfloat m[16], GLfloat invOut[16])
     if (det == 0)
         return GL_FALSE;
 
-    det = 1.0 / det;
+    det=1.0f/det;
 
     for (i = 0; i < 16; i++)
         invOut[i] = inv[i] * det;
@@ -248,17 +248,17 @@ gluProject(GLfloat objx, GLfloat objy, GLfloat objz,
         return(GL_FALSE);
     }
 
-    in[0] /= in[3];
-    in[1] /= in[3];
-    in[2] /= in[3];
+    in[0]/=in[3];
+    in[1]/=in[3];
+    in[2]/=in[3];
     /* Map x, y and z to range 0-1 */
-    in[0] = in[0] * 0.5 + 0.5;
-    in[1] = in[1] * 0.5 + 0.5;
-    in[2] = in[2] * 0.5 + 0.5;
+    in[0]=in[0]*0.5f+0.5f;
+    in[1]=in[1]*0.5f+0.5f;
+    in[2]=in[2]*0.5f+0.5f;
 
     /* Map x,y to viewport */
-    in[0] = in[0] * viewport[2] + viewport[0];
-    in[1] = in[1] * viewport[3] + viewport[1];
+    in[0]=in[0] * viewport[2] + viewport[0];
+    in[1]=in[1] * viewport[3] + viewport[1];
 
     *winx=in[0];
     *winy=in[1];

@@ -35,9 +35,20 @@
 
 #if defined(__USE_SDL_GLES__)
    #include <SDL/SDL_opengles.h>
-   #define GLAPI GL_API
+   #ifndef GLAPI
+      #define GLAPI GL_API
+   #endif
 #elif defined (__QNXNTO__)
    #include <GLES/gl.h>
+#elif defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
+   /* mainly for PowerVR OpenGL ES 1.x win32 emulator */
+   #if defined(GLUES_EXPORTS)
+      #define __GL_EXPORTS
+   #endif
+   #include <GLES\gl.h>
+   #ifndef GLAPI
+      #define GLAPI GL_API
+   #endif
 #else
    #error "Platform is unsupported"
 #endif

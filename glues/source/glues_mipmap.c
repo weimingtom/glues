@@ -385,7 +385,7 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
    halfconvy=convy/2;
    for (i=0; i<heightout; i++)
    {
-      y=convy*(i+0.5);
+      y=convy*(i+0.5f);
       if (heightin>heightout)
       {
          highy=y+halfconvy;
@@ -393,12 +393,12 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
       }
       else
       {
-         highy=y+0.5;
-         lowy=y-0.5;
+         highy=y+0.5f;
+         lowy=y-0.5f;
       }
       for (j=0; j<widthout; j++)
       {
-         x=convx*(j+0.5);
+         x=convx*(j+0.5f);
          if (widthin>widthout)
          {
             highx=x+halfconvx;
@@ -406,8 +406,8 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
          }
          else
          {
-            highx=x+0.5;
-            lowx=x-0.5;
+            highx=x+0.5f;
+            lowx=x-0.5f;
          }
          /*
          ** Ok, now apply box filter to box that goes from (lowx, lowy)
@@ -418,7 +418,7 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
          area = 0.0;
 
          y=lowy;
-         yint=floor(y);
+         yint=(int)floor(y);
          while (y<highy)
          {
             yindex=(yint+heightin) % heightin;
@@ -432,7 +432,7 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
             }
 
             x=lowx;
-            xint=floor(x);
+            xint=(int)floor(x);
 
             while (x<highx)
             {
@@ -455,10 +455,10 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
                }
 
                xint++;
-               x=xint;
+               x=(GLfloat)xint;
             }
             yint++;
-            y=yint;
+            y=(GLfloat)yint;
          }
 
          temp=(j+(i*widthout))*components;
@@ -467,7 +467,7 @@ static void scale_internal(GLint components, GLint widthin, GLint heightin,
             /* totals[] should be rounded in the case of enlarging an RGB
              * ramp when the type is 4444
              */
-            dataout[temp+k]=(totals[k]+0.5)/area;
+            dataout[temp+k]=(GLushort)((totals[k]+0.5f)/area);
          }
       }
    }
@@ -511,9 +511,9 @@ static void scale_internal_ubyte(GLint components, GLint widthin,
 
    convy=(float)heightin/heightout;
    convx=(float)widthin/widthout;
-   convy_int=floor(convy);
+   convy_int=(int)floor(convy);
    convy_float=convy-convy_int;
-   convx_int=floor(convx);
+   convx_int=(int)floor(convx);
    convx_float=convx-convx_int;
 
    area=convx*convy;
@@ -691,7 +691,7 @@ static void scale_internal_ubyte(GLint components, GLint widthin,
          outindex=(j+(i*widthout))*components;
          for (k=0; k<components; k++)
          {
-            dataout[outindex+k]=totals[k]/area;
+            dataout[outindex+k]=(GLubyte)(totals[k]/area);
          }
          lowx_int=highx_int;
          lowx_float=highx_float;
@@ -954,7 +954,7 @@ static int gluBuild2DMipmapLevelsCore(GLenum target, GLint internalFormat,
       groups_per_line=width;
    }
 
-   element_size=bytes_per_element(type);
+   element_size=(GLint)bytes_per_element(type);
    group_size=element_size*cmpts;
    if (element_size==1)
    {
@@ -1437,7 +1437,7 @@ static GLint image_size(GLint width, GLint height, GLenum format, GLenum type)
    assert(height>0);
    components=elements_per_group(format, type);
 
-   bytes_per_row=bytes_per_element(type)*width;
+   bytes_per_row=(int)(bytes_per_element(type)*width);
 
    return bytes_per_row*height*components;
 }
@@ -1476,7 +1476,7 @@ static void fill_image(const PixelStorageModes* psm,
    }
 
    {
-      element_size=bytes_per_element(type);
+      element_size=(GLint)bytes_per_element(type);
       group_size=element_size*components;
       if (element_size==1)
       {
@@ -1591,7 +1591,7 @@ static void empty_image(const PixelStorageModes* psm, GLint width,
    {
       float shoveComponents[4];
 
-      element_size=bytes_per_element(type);
+      element_size=(GLint)bytes_per_element(type);
       group_size=element_size*components;
       if (element_size==1)
       {
@@ -1623,7 +1623,7 @@ static void empty_image(const PixelStorageModes* psm, GLint width,
                case GL_UNSIGNED_SHORT_5_6_5:
                     for (k=0; k<3; k++)
                     {
-                       shoveComponents[k]=*iter2++/65535.0;
+                       shoveComponents[k]=*iter2++/65535.0f;
                     }
                     shove565(shoveComponents, 0, (void*)&widget.us[0]);
                     if (myswap_bytes)
@@ -1639,7 +1639,7 @@ static void empty_image(const PixelStorageModes* psm, GLint width,
                case GL_UNSIGNED_SHORT_4_4_4_4:
                     for (k=0; k<4; k++)
                     {
-                       shoveComponents[k]=*iter2++/65535.0;
+                       shoveComponents[k]=*iter2++/65535.0f;
                     }
                     shove4444(shoveComponents,0,(void *)&widget.us[0]);
                     if (myswap_bytes)
@@ -1655,7 +1655,7 @@ static void empty_image(const PixelStorageModes* psm, GLint width,
                case GL_UNSIGNED_SHORT_5_5_5_1:
                     for (k=0; k<4; k++)
                     {
-                       shoveComponents[k]=*iter2++/65535.0;
+                       shoveComponents[k]=*iter2++/65535.0f;
                     }
                     shove5551(shoveComponents,0,(void *)&widget.us[0]);
                     if (myswap_bytes)
@@ -1716,9 +1716,9 @@ static void extract565(int isSwap, const void* packedPixel, GLfloat extractCompo
    /* 00000111,11100000 == 0x07e0 */
    /* 00000000,00011111 == 0x001f */
 
-   extractComponents[0]=(float)((ushort&0xf800)>>11)/31.0; /* 31 = 2^5-1*/
-   extractComponents[1]=(float)((ushort&0x07e0)>>5)/63.0;  /* 63 = 2^6-1*/
-   extractComponents[2]=(float)((ushort&0x001f))/31.0;
+   extractComponents[0]=(float)((ushort&0xf800)>>11)/31.0f; /* 31 = 2^5-1*/
+   extractComponents[1]=(float)((ushort&0x07e0)>>5)/63.0f;  /* 63 = 2^6-1*/
+   extractComponents[2]=(float)((ushort&0x001f))/31.0f;
 } /* extract565() */
 
 static void shove565(const GLfloat shoveComponents[], int index, void* packedPixel)
@@ -1755,10 +1755,10 @@ static void extract4444(int isSwap,const void* packedPixel, GLfloat extractCompo
    /* 00000000,11110000 == 0x00f0 */
    /* 00000000,00001111 == 0x000f */
 
-   extractComponents[0]=(float)((ushort&0xf000)>>12)/15.0;/* 15=2^4-1 */
-   extractComponents[1]=(float)((ushort&0x0f00)>>8)/15.0;
-   extractComponents[2]=(float)((ushort&0x00f0)>>4)/15.0;
-   extractComponents[3]=(float)((ushort&0x000f))/15.0;
+   extractComponents[0]=(float)((ushort&0xf000)>>12)/15.0f;/* 15=2^4-1 */
+   extractComponents[1]=(float)((ushort&0x0f00)>>8)/15.0f;
+   extractComponents[2]=(float)((ushort&0x00f0)>>4)/15.0f;
+   extractComponents[3]=(float)((ushort&0x000f))/15.0f;
 } /* extract4444() */
 
 static void shove4444(const GLfloat shoveComponents[], int index,void* packedPixel)
@@ -1793,9 +1793,9 @@ static void extract5551(int isSwap,const void* packedPixel, GLfloat extractCompo
    /* 00000000,00111110 == 0x003e */
    /* 00000000,00000001 == 0x0001 */
 
-   extractComponents[0]=(float)((ushort&0xf800)>>11)/31.0;/* 31 = 2^5-1*/
-   extractComponents[1]=(float)((ushort&0x07c0)>>6)/31.0;
-   extractComponents[2]=(float)((ushort&0x003e)>>1)/31.0;
+   extractComponents[0]=(float)((ushort&0xf800)>>11)/31.0f;/* 31 = 2^5-1*/
+   extractComponents[1]=(float)((ushort&0x07c0)>>6)/31.0f;
+   extractComponents[2]=(float)((ushort&0x003e)>>1)/31.0f;
    extractComponents[3]=(float)((ushort&0x0001));
 } /* extract5551() */
 
@@ -1862,9 +1862,9 @@ static void scaleInternalPackedPixel(int components,
    }
    convy=(float)heightIn/heightOut;
    convx=(float)widthIn/widthOut;
-   convy_int=floor(convy);
+   convy_int=(int)floor(convy);
    convy_float=convy-convy_int;
-   convx_int=floor(convx);
+   convx_int=(int)floor(convx);
    convx_float=convx-convx_int;
 
    area=convx*convy;

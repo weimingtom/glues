@@ -36,6 +36,10 @@
 
 #include "glues_registry.h"
 
+#ifdef _WIN32
+   #pragma warning(disable: 4996)
+#endif /* _WIN32 */
+
 static const GLubyte versionString[]="1.3";
 static const GLubyte extensionString[]="";
 
