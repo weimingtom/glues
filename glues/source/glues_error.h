@@ -42,12 +42,13 @@
    #include <GLES/gl.h>
 #elif defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
    /* mainly for PowerVR OpenGL ES 1.x win32 emulator */
-   #if defined(GLUES_EXPORTS)
-      #define __GL_EXPORTS
-   #endif
    #include <GLES\gl.h>
-   #ifndef GLAPI
-      #define GLAPI GL_API
+   #undef APIENTRY
+   #define APIENTRY
+   #if defined(GLUES_EXPORTS)
+      #define GLAPI __declspec(dllexport)
+   #else
+      #define GLAPI __declspec(dllimport)
    #endif
 #else
    #error "Platform is unsupported"
