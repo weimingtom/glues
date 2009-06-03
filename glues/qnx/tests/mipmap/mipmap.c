@@ -34,7 +34,7 @@ static EGLint attribute_list[]=
    EGL_NONE
 };
 
-GLint rotate=0;
+GLfloat rotate=0;
 GLUquadricObj* sphere;
 GLUquadricObj* cone;
 
