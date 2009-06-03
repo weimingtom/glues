@@ -18,7 +18,7 @@
 #define WINDOW_WIDTH  640
 #define WINDOW_HEIGHT 480
 
-GLint rotate=0;
+GLfloat rotate=0;
 GLUquadricObj* sphere;
 GLUquadricObj* cone;
 
