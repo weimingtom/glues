@@ -1,6 +1,6 @@
 /*                                                              */
 /* This test is based on accumaa.c - by Tom McReynolds, SGI and */
-/* initialization part on QSSL's egl* demo                      */
+/* initialization part on PowerVR SDK examples                  */
 /*                                                              */
 /* // Mike Gorchak, 2009. GLU ES test                           */
 /*                                                              */
