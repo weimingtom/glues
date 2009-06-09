@@ -292,7 +292,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
    // Create the eglWindow
    SetRect(&sRect, 0, 0, nWidth, nHeight);
    AdjustWindowRectEx(&sRect, WS_CAPTION | WS_SYSMENU, 0, 0);
-   hWnd=CreateWindow(WINDOW_CLASS, _T("GLU ES Cylinder test"), WS_VISIBLE | WS_SYSMENU, 0, 0, nWidth, nHeight, NULL, NULL, hInstance, NULL);
+   hWnd=CreateWindow(WINDOW_CLASS, _T("GLU ES MipMap test"), WS_VISIBLE | WS_SYSMENU, 0, 0, nWidth, nHeight, NULL, NULL, hInstance, NULL);
    eglWindow=hWnd;
 
    // Get the associated device context
