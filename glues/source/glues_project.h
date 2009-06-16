@@ -27,7 +27,7 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  *
- * OpenGL ES CM 1.0 port of part of GLU by Mike Gorchak <mike@malva.ua>
+ * OpenGL ES CM 1.0 port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef __GLUES_PROJECT_H__

@@ -29,6 +29,8 @@
  */
 /*
 ** Author: Eric Veach, July 1994.
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 **
 */
 
