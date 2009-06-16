@@ -27,7 +27,7 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  *
- * OpenGL ES 1.0 CM port of part of GLU by Mike Gorchak <mike@malva.ua>
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef __glues_h__
@@ -63,6 +63,10 @@
 #endif
 
 /*************************************************************/
+
+/* Extensions */
+#define GLU_EXT_object_space_tess          1
+#define GLU_EXT_nurbs_tessellator          1
 
 /* Boolean */
 #define GLU_FALSE                          0
@@ -104,18 +108,20 @@
 
 /*************************************************************/
 
-
 #ifdef __cplusplus
 class GLUquadric;
 class GLUtesselator;
+class GLUnurbs;
 #else
 typedef struct GLUquadric GLUquadric;
 typedef struct GLUtesselator GLUtesselator;
+typedef struct GLUnurbs GLUnurbs;
 #endif
 
 typedef GLUquadric GLUquadricObj;
 typedef GLUtesselator GLUtesselatorObj;
 typedef GLUtesselator GLUtriangulatorObj;
+typedef GLUnurbs GLUnurbsObj;
 
 /* Internal convenience typedefs */
 typedef void (APIENTRYP _GLUfuncptr)();
@@ -223,6 +229,39 @@ GLAPI void APIENTRY gluTessNormal(GLUtesselator* tess, GLfloat valueX, GLfloat v
 GLAPI void APIENTRY gluTessProperty(GLUtesselator* tess, GLenum which, GLfloat data);
 GLAPI void APIENTRY gluTessVertex(GLUtesselator* tess, GLfloat* location, GLvoid* data);
 
+/* NurbsDisplay */
+/*      GLU_FILL */
+#define GLU_OUTLINE_POLYGON                100240
+#define GLU_OUTLINE_PATCH                  100241
+
+/* NurbsCallback */
+#define GLU_NURBS_ERROR                    100103
+#define GLU_ERROR                          100103
+#define GLU_NURBS_BEGIN                    100164
+#define GLU_NURBS_BEGIN_EXT                100164
+#define GLU_NURBS_VERTEX                   100165
+#define GLU_NURBS_VERTEX_EXT               100165
+#define GLU_NURBS_NORMAL                   100166
+#define GLU_NURBS_NORMAL_EXT               100166
+#define GLU_NURBS_COLOR                    100167
+#define GLU_NURBS_COLOR_EXT                100167
+#define GLU_NURBS_TEXTURE_COORD            100168
+#define GLU_NURBS_TEX_COORD_EXT            100168
+#define GLU_NURBS_END                      100169
+#define GLU_NURBS_END_EXT                  100169
+#define GLU_NURBS_BEGIN_DATA               100170
+#define GLU_NURBS_BEGIN_DATA_EXT           100170
+#define GLU_NURBS_VERTEX_DATA              100171
+#define GLU_NURBS_VERTEX_DATA_EXT          100171
+#define GLU_NURBS_NORMAL_DATA              100172
+#define GLU_NURBS_NORMAL_DATA_EXT          100172
+#define GLU_NURBS_COLOR_DATA               100173
+#define GLU_NURBS_COLOR_DATA_EXT           100173
+#define GLU_NURBS_TEXTURE_COORD_DATA       100174
+#define GLU_NURBS_TEX_COORD_DATA_EXT       100174
+#define GLU_NURBS_END_DATA                 100175
+#define GLU_NURBS_END_DATA_EXT             100175
+
 /* NurbsError */
 #define GLU_NURBS_ERROR1                   100251
 #define GLU_NURBS_ERROR2                   100252
@@ -261,6 +300,53 @@ GLAPI void APIENTRY gluTessVertex(GLUtesselator* tess, GLfloat* location, GLvoid
 #define GLU_NURBS_ERROR35                  100285
 #define GLU_NURBS_ERROR36                  100286
 #define GLU_NURBS_ERROR37                  100287
+
+/* NurbsProperty */
+#define GLU_AUTO_LOAD_MATRIX               100200
+#define GLU_CULLING                        100201
+#define GLU_SAMPLING_TOLERANCE             100203
+#define GLU_DISPLAY_MODE                   100204
+#define GLU_PARAMETRIC_TOLERANCE           100202
+#define GLU_SAMPLING_METHOD                100205
+#define GLU_U_STEP                         100206
+#define GLU_V_STEP                         100207
+#define GLU_NURBS_MODE                     100160
+#define GLU_NURBS_MODE_EXT                 100160
+#define GLU_NURBS_TESSELLATOR              100161
+#define GLU_NURBS_TESSELLATOR_EXT          100161
+#define GLU_NURBS_RENDERER                 100162
+#define GLU_NURBS_RENDERER_EXT             100162
+
+/* NurbsSampling */
+#define GLU_OBJECT_PARAMETRIC_ERROR        100208
+#define GLU_OBJECT_PARAMETRIC_ERROR_EXT    100208
+#define GLU_OBJECT_PATH_LENGTH             100209
+#define GLU_OBJECT_PATH_LENGTH_EXT         100209
+#define GLU_PATH_LENGTH                    100215
+#define GLU_PARAMETRIC_ERROR               100216
+#define GLU_DOMAIN_DISTANCE                100217
+
+/* NurbsTrim */
+#define GLU_MAP1_TRIM_2                    100210
+#define GLU_MAP1_TRIM_3                    100211
+
+GLAPI void APIENTRY gluBeginCurve(GLUnurbs* nurb);
+GLAPI void APIENTRY gluBeginSurface(GLUnurbs* nurb);
+GLAPI void APIENTRY gluBeginTrim(GLUnurbs* nurb);
+GLAPI void APIENTRY gluDeleteNurbsRenderer(GLUnurbs* nurb);
+GLAPI void APIENTRY gluEndCurve(GLUnurbs* nurb);
+GLAPI void APIENTRY gluEndSurface(GLUnurbs* nurb);
+GLAPI void APIENTRY gluEndTrim(GLUnurbs* nurb);
+GLAPI void APIENTRY gluGetNurbsProperty(GLUnurbs* nurb, GLenum property, GLfloat* data);
+GLAPI void APIENTRY gluLoadSamplingMatrices(GLUnurbs* nurb, const GLfloat* model, const GLfloat* perspective, const GLint* view);
+GLAPI GLUnurbs* APIENTRY gluNewNurbsRenderer(void);
+GLAPI void APIENTRY gluNurbsCallback(GLUnurbs* nurb, GLenum which, _GLUfuncptr CallBackFunc);
+GLAPI void APIENTRY gluNurbsCallbackData(GLUnurbs* nurb, GLvoid* userData);
+GLAPI void APIENTRY gluNurbsCallbackDataEXT(GLUnurbs* nurb, GLvoid* userData);
+GLAPI void APIENTRY gluNurbsCurve(GLUnurbs* nurb, GLint knotCount, GLfloat* knots, GLint stride, GLfloat* control, GLint order, GLenum type);
+GLAPI void APIENTRY gluNurbsProperty(GLUnurbs* nurb, GLenum property, GLfloat value);
+GLAPI void APIENTRY gluNurbsSurface(GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type);
+GLAPI void APIENTRY gluPwlCurve(GLUnurbs* nurb, GLint count, GLfloat* data, GLint stride, GLenum type);
 
 #ifdef __cplusplus
 }

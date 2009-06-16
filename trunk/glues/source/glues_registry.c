@@ -27,7 +27,7 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  *
- * OpenGL ES CM 1.0 port of part of GLU by Mike Gorchak <mike@malva.ua>
+ * OpenGL ES CM 1.0 port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #include <stdio.h>
@@ -36,12 +36,8 @@
 
 #include "glues_registry.h"
 
-#ifdef _WIN32
-   #pragma warning(disable: 4996)
-#endif /* _WIN32 */
-
-static const GLubyte versionString[]="1.3";
-static const GLubyte extensionString[]="";
+static const GLubyte versionString[]="1.3 GLU ES-CM";
+static const GLubyte extensionString[]="GLU_EXT_object_space_tess GLU_EXT_nurbs_tessellator";
 
 GLAPI const GLubyte* APIENTRY gluGetString(GLenum name)
 {

@@ -1,5 +1,5 @@
 NAME=GLUES_CM
-EXTRA_SRCVPATH=../../../../source ../../../../source/libtess
+EXTRA_SRCVPATH=../../../../source ../../../../source/libtess ../../../../source/libnurbs/interface ../../../../source/libnurbs/internals ../../../../source/libnurbs/nurbtess
 
 ifndef QCONFIG
 QCONFIG=qconfig.mk
@@ -20,7 +20,7 @@ SO_VERSION=1
 include $(MKFILES_ROOT)/qtargets.mk
 
 ifeq ($(origin NDEBUG),undefined)
-CCFLAGS += -O0
+CCFLAGS += -O0 -DLIBRARYBUILD
 else
-CCFLAGS += -O3 -funroll-all-loops -Wall
+CCFLAGS += -O3 -funroll-all-loops -Wall -DLIBRARYBUILD -DNDEBUG
 endif
