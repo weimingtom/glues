@@ -27,20 +27,19 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * mymath.h
  *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef __glumymath_h_
 #define __glumymath_h_
 
 #ifdef GLBUILD
-#define sqrtf		gl_fsqrt
+   #define sqrtf gl_fsqrt
 #endif
 
-#if defined(GLBUILD) || defined(STANDALONE)
+#if defined(GLBUILD)
 #define M_SQRT2		1.41421356237309504880
 #define ceilf		myceilf
 #define floorf		myfloorf	

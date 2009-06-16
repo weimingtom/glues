@@ -36,10 +36,6 @@
 #ifndef __glumystdio_h_
 #define __glumystdio_h_
 
-#ifdef STANDALONE
-inline void _glu_dprintf(const char *, ...) { }
-#endif
-
 #ifdef LIBRARYBUILD
 #ifndef NDEBUG
 #include <stdio.h>
@@ -54,7 +50,7 @@ inline void _glu_dprintf(const char *, ...) { }
 #endif
 
 #ifndef NULL
-#define NULL 0
+   #define NULL 0
 #endif
 
 #endif /* __glumystdio_h_ */

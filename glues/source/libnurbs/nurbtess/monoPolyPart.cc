@@ -6,15 +6,15 @@
 ** this file except in compliance with the License. You may obtain a copy
 ** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
 ** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
+**
 ** http://oss.sgi.com/projects/FreeB
-** 
+**
 ** Note that, as provided in the License, the Software is distributed on an
 ** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
 ** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
 ** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
 ** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
+**
 ** Original Code. The Original Code is: OpenGL Sample Implementation,
 ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
 ** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
@@ -32,6 +32,11 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
+/*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+ */
+
 /*
  *monoPolyPart.C
  *

@@ -93,15 +93,19 @@ printf("upGridLineIndex=%i, lowGridLineIndex=%i\n", upGridLineIndex, lowGridLine
 #endif
   for(k=0, i=upGridLineIndex; i > lowGridLineIndex; i--, k++)
     {
-      glBegin(GL_QUAD_STRIP);
+// MIKE: TODO
+//      glBegin(GL_QUAD_STRIP);
 
       for(j=leftIndices[k+1]; j<= rightIndices[k+1]; j++)
 	{
-	  glVertex2f(u_values[j], v_values[i]);
-	  glVertex2f(u_values[j], v_values[i-1]);
+// MIKE: TODO
+//	  glVertex2f(u_values[j], v_values[i]);
+// MIKE: TODO
+//	  glVertex2f(u_values[j], v_values[i-1]);
 	}
-      glEnd();
-    }  
+// MIKE: TODO
+//      glEnd();
+    }
 }
 
 
@@ -158,15 +162,15 @@ void rectBlockArray::insert(rectBlock* newBlock)
       //initialization
       for(i=0; i<2*size+1; i++)
 	temp[i] = NULL;
-      
+
       for(i=0; i<n_elements; i++)
 	temp[i] = array[i];
-      
+
       free(array);
       array = temp;
       size = 2*size +  1;
     }
-  
+
   array[n_elements++] = newBlock;
 }
 
@@ -183,13 +187,3 @@ void rectBlockArray::draw(Real* u_values, Real* v_values)
   for(i=0; i<n_elements; i++)
     array[i]->draw(u_values, v_values);
 }
-
-
-
-
-
-
-
-
-
-

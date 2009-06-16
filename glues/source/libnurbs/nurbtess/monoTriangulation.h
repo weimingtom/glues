@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _MONO_TRIANGULATION_H

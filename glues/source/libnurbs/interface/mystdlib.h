@@ -36,13 +36,6 @@
 #ifndef __glumystdlib_h_
 #define __glumystdlib_h_
 
-#ifdef STANDALONE
-typedef unsigned int size_t;
-extern "C" void 	abort( void );
-extern "C" void *	malloc( size_t );
-extern "C" void 	free( void * );
-#endif
-
 #ifdef LIBRARYBUILD
 #include <stdlib.h>
 #endif

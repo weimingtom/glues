@@ -36,14 +36,6 @@
 #ifndef __glumysetjmp_h_
 #define __glumysetjmp_h_
 
-#ifdef STANDALONE
-struct JumpBuffer;
-extern "C" JumpBuffer* newJumpbuffer(void);
-extern "C" void deleteJumpbuffer(JumpBuffer*);
-extern "C" void mylongjmp(JumpBuffer*, int);
-extern "C" int mysetjmp(JumpBuffer*);
-#endif
-
 #ifdef GLBUILD
 #define setjmp  gl_setjmp
 #define longjmp gl_longjmp

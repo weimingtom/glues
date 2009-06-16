@@ -118,11 +118,7 @@ if(surfcount == 1)
 OTN_insert(otn, tempNurb, tempTrim);
 if(surfcount  >= 1)
 {
-#ifdef DEBUG
-printf("write file\n");
-#endif
 OTN_write(otn, "out.otn");
-
 }
 #endif
 

@@ -6,21 +6,21 @@
 ** this file except in compliance with the License. You may obtain a copy
 ** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
 ** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
+**
 ** http://oss.sgi.com/projects/FreeB
-** 
+**
 ** Note that, as provided in the License, the Software is distributed on an
 ** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
 ** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
 ** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
 ** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
+**
 ** Original Code. The Original Code is: OpenGL Sample Implementation,
 ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
 ** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
 ** Copyright in any portions created by third parties is as indicated
 ** elsewhere herein. All Rights Reserved.
-** 
+**
 ** Additional Notice Provisions: The application programming interfaces
 ** established by SGI in conjunction with the Original Code are The
 ** OpenGL(R) Graphics System: A Specification (Version 1.2.1), released
@@ -33,6 +33,8 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include "glues.h"
@@ -46,58 +48,60 @@
 /*******************grid structure****************************/
 void gridWrap::print()
 {
-  printf("n_ulines = %i\n", n_ulines);
-  printf("n_vlines = %i\n", n_vlines);
-  printf("u_min=%f, umax=%f, vmin=%f, vmax=%f\n", u_min, u_max, v_min, v_max);
+   printf("n_ulines = %i\n", n_ulines);
+   printf("n_vlines = %i\n", n_vlines);
+   printf("u_min=%f, umax=%f, vmin=%f, vmax=%f\n", u_min, u_max, v_min, v_max);
 }
 
-gridWrap::gridWrap(Int nUlines, Real* uvals,
-		   Int nVlines, Real* vvals)
+gridWrap::gridWrap(Int nUlines, Real* uvals, Int nVlines, Real* vvals)
 {
-  assert(nUlines>=2);
-  assert(nVlines>=2);
+   Int i;
 
-  is_uniform = 0;
-  n_ulines = nUlines;
-  n_vlines = nVlines;
-  u_min = uvals[0];
-  u_max = uvals[nUlines-1];
-  v_min = vvals[0];
-  v_max = vvals[nVlines-1];
-  u_values = (Real*) malloc(sizeof(Real) * n_ulines);
-  assert(u_values);
-  v_values = (Real*) malloc(sizeof(Real) * n_vlines);
-  assert(v_values);  
-  
-  Int i;
-  for(i=0; i<n_ulines; i++)
-    u_values[i] = uvals[i];
-  for(i=0; i<n_vlines; i++)
-    v_values[i] = vvals[i];
+   assert(nUlines>=2);
+   assert(nVlines>=2);
+
+   is_uniform=0;
+   n_ulines=nUlines;
+   n_vlines=nVlines;
+   u_min=uvals[0];
+   u_max=uvals[nUlines-1];
+   v_min=vvals[0];
+   v_max=vvals[nVlines-1];
+   u_values=(Real*)malloc(sizeof(Real)*n_ulines);
+   assert(u_values);
+   v_values=(Real*)malloc(sizeof(Real)*n_vlines);
+   assert(v_values);
+
+   for (i=0; i<n_ulines; i++)
+   {
+      u_values[i]=uvals[i];
+   }
+   for(i=0; i<n_vlines; i++)
+   {
+      v_values[i]=vvals[i];
+   }
 }
-  
-gridWrap::gridWrap(Int nUlines, Int nVlines,
-		   Real uMin, Real uMax,
-		   Real vMin, Real vMax
-		   )
+
+gridWrap::gridWrap(Int nUlines, Int nVlines, Real uMin, Real uMax,
+                   Real vMin, Real vMax)
 {
-  is_uniform = 1;
-  n_ulines = nUlines;
-  n_vlines = nVlines;
-  u_min = uMin;
-  u_max = uMax;
-  v_min = vMin;
-  v_max = vMax;
-  u_values = (Real*) malloc(sizeof(Real) * n_ulines);
-  assert(u_values);
-  v_values = (Real*) malloc(sizeof(Real) * n_vlines);
-  assert(v_values);
-  
-  Int i;
-  assert(nUlines>=2);
-  assert(nVlines>=2);
-  Real du = (uMax-uMin)/(nUlines-1);
-  Real dv = (vMax-vMin)/(nVlines-1);
+   is_uniform = 1;
+   n_ulines = nUlines;
+   n_vlines = nVlines;
+   u_min = uMin;
+   u_max = uMax;
+   v_min = vMin;
+   v_max = vMax;
+   u_values = (Real*) malloc(sizeof(Real) * n_ulines);
+   assert(u_values);
+   v_values = (Real*) malloc(sizeof(Real) * n_vlines);
+   assert(v_values);
+
+   Int i;
+   assert(nUlines>=2);
+   assert(nVlines>=2);
+   Real du = (uMax-uMin)/(nUlines-1);
+   Real dv = (vMax-vMin)/(nVlines-1);
 
   float tempu=uMin;
   u_values[0] = tempu;
@@ -127,11 +131,18 @@ gridWrap::~gridWrap()
 void gridWrap::draw()
 {
   int i,j;
-  glBegin(GL_POINTS);
+// MIKE: TODO
+//  glBegin(GL_POINTS);
   for(i=0; i<n_ulines; i++)
+  {
     for(j=0; j<n_vlines; j++)
-      glVertex2f(get_u_value(i), get_v_value(j));
-  glEnd();
+    {
+// MIKE: TODO
+//      glVertex2f(get_u_value(i), get_v_value(j));
+    }
+  }
+// MIKE: TODO
+//  glEnd();
 }
 
 void gridWrap::outputFanWithPoint(Int v, Int uleft, Int uright, Real vert[2], primStream* pStream)
@@ -139,7 +150,7 @@ void gridWrap::outputFanWithPoint(Int v, Int uleft, Int uright, Real vert[2], pr
   Int i;
   if(uleft >= uright) 
     return; //no triangles to output.
-    
+
   pStream->begin();
   pStream->insert(vert);
 
@@ -191,7 +202,7 @@ gridBoundaryChain::gridBoundaryChain(
 
   vertices = (Real2*) malloc(sizeof(Real2) * n_vlines);
   assert(vertices);
-  
+
 
 
   Int i;
@@ -199,22 +210,25 @@ gridBoundaryChain::gridBoundaryChain(
     ulineIndices[i] = uline_indices[i];
     innerIndices[i] = inner_indices[i];
   }
-  
+
   for(i=0; i<n_vlines; i++){
     vertices[i][0] = gr->get_u_value(ulineIndices[i]);
     vertices[i][1] = gr->get_v_value(first_vline_index-i);
   }
 }
-  
+
 void gridBoundaryChain::draw()
 {
   Int i;
-  glBegin(GL_LINE_STRIP);
+// MIKE: TODO
+//  glBegin(GL_LINE_STRIP);
   for(i=0; i<nVlines; i++)
     {
-      glVertex2fv(vertices[i]);
+// MIKE: TODO
+//      glVertex2fv(vertices[i]);
     }
-  glEnd();
+// MIKE: TODO
+//  glEnd();
 }
 
 void gridBoundaryChain::drawInner()
@@ -222,13 +236,17 @@ void gridBoundaryChain::drawInner()
   Int i;
   for(i=1; i<nVlines; i++)
     {
-      glBegin(GL_LINE_STRIP);
-      glVertex2f(grid->get_u_value(innerIndices[i]), get_v_value(i-1) );
-      glVertex2f(grid->get_u_value(innerIndices[i]), get_v_value(i) );
-      glEnd();
+// MIKE: TODO
+//      glBegin(GL_LINE_STRIP);
+// MIKE: TODO
+//      glVertex2f(grid->get_u_value(innerIndices[i]), get_v_value(i-1) );
+// MIKE: TODO
+//      glVertex2f(grid->get_u_value(innerIndices[i]), get_v_value(i) );
+// MIKE: TODO
+//      glEnd();
     }
 }
-  
+
 Int gridBoundaryChain::lookfor(Real v, Int i1, Int i2)
 {
   Int mid;

@@ -27,10 +27,9 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * glsurfeval.h
  *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef __gluglsurfeval_h_
@@ -39,65 +38,65 @@
 #include "basicsurfeval.h"
 #include "bezierPatchMesh.h" //in case output triangles
 
-#include <glues.h>
+#include "glues.h"
 
 class SurfaceMap;
 class OpenGLSurfaceEvaluator;
 class StoredVertex;
 
-#define TYPECOORD	1
-#define TYPEPOINT	2
+#define TYPECOORD 1
+#define TYPEPOINT 2
 
 /* Cache up to 3 vertices from tmeshes */
-#define VERTEX_CACHE_SIZE	3
+#define VERTEX_CACHE_SIZE 3
 
-/*for internal evaluator callback stuff*/
+/* for internal evaluator callback stuff */
 #ifndef IN_MAX_BEZIER_ORDER
-#define IN_MAX_BEZIER_ORDER 40 /*XXX should be bigger than machine order*/
+    #define IN_MAX_BEZIER_ORDER 40 /* should be bigger than machine order */
 #endif
-			
+
 #ifndef IN_MAX_DIMENSION
-#define IN_MAX_DIMENSION 4 
+    #define IN_MAX_DIMENSION 4
 #endif
 
-typedef struct surfEvalMachine{
-  REAL uprime;//cached previusly evaluated uprime.
-  REAL vprime;
-  int k; /*the dimension*/
-  REAL u1;
-  REAL u2;
-  int ustride;
-  int uorder;
-  REAL v1;
-  REAL v2;
-  int vstride;
-  int vorder;
-  REAL ctlPoints[IN_MAX_BEZIER_ORDER*IN_MAX_BEZIER_ORDER*IN_MAX_DIMENSION];
-  REAL ucoeff[IN_MAX_BEZIER_ORDER]; /*cache the polynomial values*/
-  REAL vcoeff[IN_MAX_BEZIER_ORDER];
-  REAL ucoeffDeriv[IN_MAX_BEZIER_ORDER]; /*cache the polynomial derivatives*/
-  REAL vcoeffDeriv[IN_MAX_BEZIER_ORDER];
+typedef struct surfEvalMachine
+{
+   REAL uprime; /* cached previusly evaluated uprime. */
+   REAL vprime;
+   int k;       /* the dimension */
+   REAL u1;
+   REAL u2;
+   int ustride;
+   int uorder;
+   REAL v1;
+   REAL v2;
+   int vstride;
+   int vorder;
+   REAL ctlPoints[IN_MAX_BEZIER_ORDER*IN_MAX_BEZIER_ORDER*IN_MAX_DIMENSION];
+   REAL ucoeff[IN_MAX_BEZIER_ORDER]; /* cache the polynomial values */
+   REAL vcoeff[IN_MAX_BEZIER_ORDER];
+   REAL ucoeffDeriv[IN_MAX_BEZIER_ORDER]; /* cache the polynomial derivatives */
+   REAL vcoeffDeriv[IN_MAX_BEZIER_ORDER];
 } surfEvalMachine;
-  
-  
 
-class StoredVertex {
-public:
-    		StoredVertex() { type = 0; }
-		~StoredVertex(void) {}
-    void	saveEvalCoord(REAL x, REAL y) 
-		    {coord[0] = x; coord[1] = y; type = TYPECOORD; }
-    void	saveEvalPoint(long x, long y)
-		    {point[0] = x; point[1] = y; type = TYPEPOINT; }
-    void	invoke(OpenGLSurfaceEvaluator *eval);
-
-private:
-    int		type;
-    REAL	coord[2];
-    long	point[2];
+class StoredVertex
+{
+   public:
+      StoredVertex() {type=0;}
+      ~StoredVertex(void) {}
+      void saveEvalCoord(REAL x, REAL y)
+                        {coord[0]=x; coord[1]=y; type=TYPECOORD;}
+      void saveEvalPoint(long x, long y)
+                        {point[0]=x; point[1]=y; type=TYPEPOINT;}
+      void invoke(OpenGLSurfaceEvaluator* eval);
+   private:
+      int  type;
+      REAL coord[2];
+      long point[2];
 };
 
-class OpenGLSurfaceEvaluator : public BasicSurfaceEvaluator {
+class OpenGLSurfaceEvaluator: public BasicSurfaceEvaluator
+{
 public:
 			OpenGLSurfaceEvaluator();
     			virtual ~OpenGLSurfaceEvaluator( void );
@@ -383,22 +382,22 @@ void inBPMListEvalEM(bezierPatchMesh* list);
 /*-------------end for surfEvalMachine -------------*/
 
 
-   /*************end for internal evaluators*****************/
-		       
+/*************end for internal evaluators*****************/
 };
 
-inline void StoredVertex::invoke(OpenGLSurfaceEvaluator *eval)
+inline void StoredVertex::invoke(OpenGLSurfaceEvaluator* eval)
 {
-    switch(type) {
+   switch(type)
+   {
       case TYPECOORD:
-	eval->coord2f(coord[0], coord[1]);
-	break;
+           eval->coord2f(coord[0], coord[1]);
+           break;
       case TYPEPOINT:
-	eval->point2i(point[0], point[1]);
-	break;
+           eval->point2i(point[0], point[1]);
+           break;
       default:
-	break;
-    }
+           break;
+   }
 }
 
 #endif /* __gluglsurfeval_h_ */

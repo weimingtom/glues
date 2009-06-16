@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _DIRECTEDLINE_H
@@ -38,134 +40,131 @@
 
 enum {INCREASING, DECREASING};
 
-class directedLine {
-  short direction; /*INCREASING or DECREASING*/
-  sampledLine* sline;
-  directedLine* next; /*double linked list*/
-  directedLine* prev; /*double linked list*/
+class directedLine
+{
+   int direction;    /* INCREASING or DECREASING */
+   sampledLine* sline;
+   directedLine* next; /* double linked list */
+   directedLine* prev; /* double linked list */
 
-  /*in case we need a list of polygons each 
-   *consisting of a double linked list
-   */
-  directedLine* nextPolygon; 
+   /* in case we need a list of polygons each 
+    * consisting of a double linked list
+    */
+   directedLine* nextPolygon; 
 
-  /*optimization make cutoff polygon faster*/
-/*  directedLine* prevPolygon;*/
+   /* optimization make cutoff polygon faster */
+   /* directedLine* prevPolygon; */
 
-  Int rootBit; /*1 if this is a root of the polygon, set by setRootBit*/
+   Int rootBit; /*1 if this is a root of the polygon, set by setRootBit*/
                /*and reset by resetRootBit()*/
 
-  directedLine* rootLink; /*fast root-finding*/
+   directedLine* rootLink; /*fast root-finding*/
 
 
 
-public:
-  directedLine(short dir, sampledLine* sl);
-  directedLine();
-  ~directedLine();
+   public:
+      directedLine(int dir, sampledLine* sl);
+      directedLine();
+      ~directedLine();
 
-  void init(short dir, sampledLine* sl);
-  
-  Real* head(); /*points[0] if INCREASING, points[n-1] otherwise*/
-  Real* tail(); /*points[n-1] if INCREASING, points[0] otherwise*/
-  Real* getVertex(Int i); /*points[i] if INCREASING, points[n-1-i] otherwise*/
-  Int get_npoints() {return sline->get_npoints();}
-  directedLine* getPrev() {return prev;}
-  directedLine* getNext() {return next;}
-  directedLine* getNextPolygon()  {return nextPolygon;}
-  sampledLine*  getSampledLine()  {return sline;}
+      void init(int dir, sampledLine* sl);
 
-  short getDirection(){return direction;}
-  void putDirection(short dir) {direction = dir;}
-  void putPrev(directedLine *p) {prev = p;}
-  void putNext(directedLine *p) {next = p;}
+      Real* head(); /* points[0] if INCREASING, points[n-1] otherwise */
+      Real* tail(); /* points[n-1] if INCREASING, points[0] otherwise */
+      Real* getVertex(Int i); /* points[i] if INCREASING, points[n-1-i] otherwise */
+      Int get_npoints() {return sline->get_npoints();}
+      directedLine* getPrev() {return prev;}
+      directedLine* getNext() {return next;}
+      directedLine* getNextPolygon() {return nextPolygon;}
+      sampledLine*  getSampledLine() {return sline;}
 
-  /*insert a new line between prev and this*/
-  void insert(directedLine* nl);
+      int getDirection(){return direction;}
+      void putDirection(int dir) {direction = dir;}
+      void putPrev(directedLine* p) {prev = p;}
+      void putNext(directedLine* p) {next = p;}
 
-  /*delete all the polygons following the link: nextPolygon.
-   *notice that sampledLine is not deleted. The caller is
-   *responsible for that
-   */
-  void  deletePolygonList();
-  void  deleteSinglePolygon();
+      /*insert a new line between prev and this*/
+      void insert(directedLine* nl);
 
-  void  deleteSinglePolygonWithSline(); //also delete sanmpled line
-  void  deletePolygonListWithSline(); //also delete sanmpled line
+      /* delete all the polygons following the link: nextPolygon.
+       * notice that sampledLine is not deleted. The caller is
+       * responsible for that
+       */
+      void deletePolygonList();
+      void deleteSinglePolygon();
 
-  void deleteSingleLine(directedLine* dline);
-  directedLine* deleteDegenerateLines();
-  directedLine* deleteDegenerateLinesAllPolygons();
-  directedLine* cutIntersectionAllPoly(int& cutOccur);
+      void deleteSinglePolygonWithSline(); // also delete sanmpled line
+      void deletePolygonListWithSline();   // also delete sanmpled line
 
-  /*check to see if the list forms a closed polygon
-   *return 1 if yes
-   */
-  short isPolygon(); 
-  
-  Int compInY(directedLine* nl);
-  Int compInX(directedLine* nl);
+      void deleteSingleLine(directedLine* dline);
+      directedLine* deleteDegenerateLines();
+      directedLine* deleteDegenerateLinesAllPolygons();
+      directedLine* cutIntersectionAllPoly(int& cutOccur);
 
-  /*return an array of pointers.
-   *the 
-   */
-  directedLine** sortAllPolygons();
+      /*check to see if the list forms a closed polygon
+       *return 1 if yes
+       */
+      int isPolygon(); 
 
-  Int numEdges();
-  Int numEdgesAllPolygons();
-  Int numPolygons();
+      Int compInY(directedLine* nl);
+      Int compInX(directedLine* nl);
 
-  /*check if the head of this edge is connected to 
-   *the tail of the prev
-   */
-  short isConnected();
+      /* return an array of pointers.
+       * the
+       */
+      directedLine** sortAllPolygons();
 
-  Real polyArea();
+      Int numEdges();
+      Int numEdgesAllPolygons();
+      Int numPolygons();
 
-  void printSingle();
-  void printList();
-  void printAllPolygons();
-  void writeAllPolygons(char* filename);
-  
+      /* check if the head of this edge is connected to 
+       * the tail of the prev
+       */
+      int isConnected();
 
-  /*insert a polygon: using nextPolygon*/
-  directedLine* insertPolygon(directedLine* newpolygon);
-  directedLine* cutoffPolygon(directedLine *p);
+      Real polyArea();
 
-  Int toArraySinglePolygon(directedLine** array, Int index);
-  directedLine** toArrayAllPolygons(Int& total_num_edges);
+      void printSingle();
+      void printList();
+      void printAllPolygons();
+      void writeAllPolygons(char* filename);
 
-  void connectDiagonal(directedLine* v1, directedLine* v2, 
-			   directedLine** ret_p1, 
-			   directedLine** ret_p2,
-			   sampledLine** generatedLine, directedLine* list);
+      /* insert a polygon: using nextPolygon */
+      directedLine* insertPolygon(directedLine* newpolygon);
+      directedLine* cutoffPolygon(directedLine* p);
 
-  /*generate two slines
-   */
-  void connectDiagonal_2slines(directedLine* v1, directedLine* v2, 
-			   directedLine** ret_p1, 
-			   directedLine** ret_p2,
-			   directedLine* list);
+      Int toArraySinglePolygon(directedLine** array, Int index);
+      directedLine** toArrayAllPolygons(Int& total_num_edges);
 
-  Int samePolygon(directedLine* v1, directedLine* v2);
-  void setRootBit() {rootBit = 1;}
-  void resetRootBit() {rootBit = 0;}
-  directedLine* findRoot();
+      void connectDiagonal(directedLine* v1, directedLine* v2,
+                           directedLine** ret_p1, directedLine** ret_p2,
+                           sampledLine** generatedLine, directedLine* list);
 
-  void rootLinkSet(directedLine* r) {rootLink = r;}
-  directedLine* rootLinkFindRoot();
+      /* generate two slines
+       */
+      void connectDiagonal_2slines(directedLine* v1, directedLine* v2,
+                                   directedLine** ret_p1, directedLine** ret_p2,
+                                   directedLine* list);
 
-  //the chain from begin to end is deleted (the space is deallocated)
-  //and a new edge(which connectes the head of begin and the tail of end)
-  // is inserted. The new polygon is returned.
-  //notice that "this" is arbitrary
-  directedLine* deleteChain(directedLine* begin, directedLine* end);
+      Int samePolygon(directedLine* v1, directedLine* v2);
+      void setRootBit() {rootBit = 1;}
+      void resetRootBit() {rootBit = 0;}
+      directedLine* findRoot();
+
+      void rootLinkSet(directedLine* r) {rootLink = r;}
+      directedLine* rootLinkFindRoot();
+
+      // the chain from begin to end is deleted (the space is deallocated)
+      // and a new edge(which connectes the head of begin and the tail of end)
+      // is inserted. The new polygon is returned.
+      // notice that "this" is arbitrary
+      directedLine* deleteChain(directedLine* begin, directedLine* end);
 };
 
-directedLine*  readAllPolygons(char* filename);
+directedLine* readAllPolygons(char* filename);
 
 extern Int compV2InY(Real A[2], Real B[2]);
 extern Int compV2InX(Real A[2], Real B[2]);
 
-#endif
-
+#endif /* _DIRECTEDLINE_H */

@@ -27,34 +27,29 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * mystdio.h
  *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef __glumystdio_h_
 #define __glumystdio_h_
 
-#ifdef STANDALONE
-inline void _glu_dprintf(char*, ...) { }
-#endif
-
 #ifdef LIBRARYBUILD
-#ifndef NDEBUG
-#include <stdio.h>
-#define _glu_dprintf printf
-#else
-inline void _glu_dprintf(char *, ...) { }
-#endif
-#endif
+   #ifndef NDEBUG
+      #include <stdio.h>
+      #define _glu_dprintf printf
+   #else
+      inline void _glu_dprintf(char *, ...) { }
+   #endif /* NDEBUG */
+#endif /* LIBRARYBUILD */
 
 #ifdef GLBUILD
-inline void _glu_dprintf(char *, ...) { }
+   inline void _glu_dprintf(char *, ...) { }
 #endif
 
 #ifndef NULL
-#define NULL 0
+   #define NULL 0
 #endif
 
 #endif /* __glumystdio_h_ */

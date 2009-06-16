@@ -28,6 +28,11 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+ */
+
+/*
  *partitionY.h:
  *partition a polygon into a Y-monotone polygon:
  * A polygon is Y-monotone if the boundary can be split into two polygon chains

@@ -33,6 +33,8 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include <stdlib.h>
@@ -282,7 +284,7 @@ void directedLine::deletePolygonList()
 
 
 /*a loop by itself*/
-directedLine::directedLine(short dir, sampledLine* sl)
+directedLine::directedLine(int dir, sampledLine* sl)
 {
   direction = dir;
   sline = sl;
@@ -296,7 +298,7 @@ directedLine::directedLine(short dir, sampledLine* sl)
 
 }
 
-void directedLine::init(short dir, sampledLine* sl)
+void directedLine::init(int dir, sampledLine* sl)
 {
   direction = dir;
   sline = sl;
@@ -366,7 +368,7 @@ Int directedLine::numEdgesAllPolygons()
 
 /*return 1 if the double linked list forms a polygon.
  */
-short directedLine::isPolygon()
+int directedLine::isPolygon()
 {
   directedLine* temp;
 
@@ -386,7 +388,7 @@ short directedLine::isPolygon()
 /*check if the head of this edge is connected to
  *the tail of the prev
  */
-short directedLine::isConnected()
+int directedLine::isConnected()
 {
   if( (head()[0] == prev->tail()[0]) && (head()[1] == prev->tail()[1]))
     return 1;

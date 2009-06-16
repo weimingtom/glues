@@ -47,6 +47,7 @@
 #include "glsurfeval.h"
 #include "nurbsconsts.h"
 #include "bezierPatchMesh.h"
+#include "gles_evaluator.h"
 
 
 //extern int surfcount;
@@ -211,8 +212,11 @@ OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, R
       global_grid_nv = nv;
     }
   else
-    glMapGrid2d((GLint) nu, (GLdouble) u0, (GLdouble) u1, (GLint) nv,
-	    (GLdouble) v0, (GLdouble) v1);
+  {
+// MIKE: TODO
+//    glMapGrid2d((GLint) nu, (GLdouble) u0, (GLdouble) u1, (GLint) nv,
+//	    (GLdouble) v0, (GLdouble) v1);
+   }
 
 #endif
 }
@@ -225,14 +229,16 @@ OpenGLSurfaceEvaluator::polymode(long style)
       switch(style) {
       default:
       case N_MESHFILL:
-        
-	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_FILL);
+// MIKE: TODO
+//	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_FILL);
 	break;
       case N_MESHLINE:
-	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_LINE);
+// MIKE: TODO
+//	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_LINE);
 	break;
       case N_MESHPOINT:
-	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_POINT);
+// MIKE: TODO
+//	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_POINT);
 	break;
       }
     }
@@ -242,18 +248,28 @@ void
 OpenGLSurfaceEvaluator::bgnline(void)
 {
   if(output_triangles)
+  {
     bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
+  }
   else
-    glBegin((GLenum) GL_LINE_STRIP);
+  {
+// MIKE: TODO
+//    glBegin((GLenum) GL_LINE_STRIP);
+  }
 }
 
 void
 OpenGLSurfaceEvaluator::endline(void)
 {
   if(output_triangles)
+  {
     bezierPatchMeshEndStrip(global_bpm);
+  }
   else
-    glEnd();
+  {
+// MIKE: TODO
+//    glEnd();
+  }
 }
 
 void
@@ -270,23 +286,29 @@ void
 OpenGLSurfaceEvaluator::bgnclosedline(void)
 {
   if(output_triangles)
+  {
     bezierPatchMeshBeginStrip(global_bpm, GL_LINE_LOOP);
+  }
   else
-    glBegin((GLenum) GL_LINE_LOOP);
+  {
+// MIKE: TODO
+//    glBegin((GLenum) GL_LINE_LOOP);
+  }
 }
 
 void
 OpenGLSurfaceEvaluator::endclosedline(void)
 {
   if(output_triangles)
+  {
     bezierPatchMeshEndStrip(global_bpm);
+  }
   else
-    glEnd();
+  {
+// MIKE: TODO
+//    glEnd();
+  }
 }
-
-
-
-
 
 void
 OpenGLSurfaceEvaluator::bgntmesh(void)
@@ -297,9 +319,14 @@ OpenGLSurfaceEvaluator::bgntmesh(void)
     vcount = 0;
 
     if(output_triangles)
+    {
       bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLES);
+    }
     else
-      glBegin((GLenum) GL_TRIANGLES);
+    {
+// MIKE: TODO
+//      glBegin((GLenum) GL_TRIANGLES);
+    }
 
 }
 
@@ -319,7 +346,10 @@ OpenGLSurfaceEvaluator::endtmesh(void)
     if(output_triangles)
       bezierPatchMeshEndStrip(global_bpm);
     else
-      glEnd();
+    {
+// MIKE: TODO
+//      glEnd();
+    }
 }
 
 void
@@ -327,18 +357,28 @@ OpenGLSurfaceEvaluator::bgntfan(void)
 {
 
   if(output_triangles)
+  {
     bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLE_FAN);
+  }
   else
-    glBegin((GLenum) GL_TRIANGLE_FAN);
-
+  {
+// MIKE: TODO
+//    glBegin((GLenum) GL_TRIANGLE_FAN);
+  }
 }
+
 void
 OpenGLSurfaceEvaluator::endtfan(void)
 {
   if(output_triangles)
-	bezierPatchMeshEndStrip(global_bpm);
+  {
+    bezierPatchMeshEndStrip(global_bpm);
+  }
   else
-    glEnd();
+  {
+// MIKE: TODO
+//    glEnd();
+  }
 }
 
 void
@@ -714,9 +754,15 @@ void
 OpenGLSurfaceEvaluator::bgnqstrip(void)
 {
   if(output_triangles)
-    bezierPatchMeshBeginStrip(global_bpm, GL_QUAD_STRIP);
+  {
+// MIKE: TODO
+//    bezierPatchMeshBeginStrip(global_bpm, GL_QUAD_STRIP);
+  }
   else
-    glBegin((GLenum) GL_QUAD_STRIP);
+  {
+// MIKE: TODO
+//    glBegin((GLenum) GL_QUAD_STRIP);
+  }
 
 #ifdef STATISTICS
 	STAT_num_of_quad_strips++;
@@ -727,10 +773,15 @@ void
 OpenGLSurfaceEvaluator::endqstrip(void)
 {
   if(output_triangles)
-    bezierPatchMeshEndStrip(global_bpm);
+  {
+// MIKE: TODO
+//    bezierPatchMeshEndStrip(global_bpm);
+  }
   else
-    glEnd();
-
+  {
+// MIKE: TODO
+//    glEnd();
+  }
 }
 
 /*-------------------------------------------------------------------------
@@ -781,16 +832,20 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
       else
 	auto_normal_flag = 0;
 	*/
-	  glPushAttrib((GLbitfield) GL_EVAL_BIT);
+
+// MIKE: TODO
+//	  glPushAttrib((GLbitfield) GL_EVAL_BIT);
 
     }
   else
     {
-      glPushAttrib((GLbitfield) GL_EVAL_BIT);
+// MIKE: TODO
+//      glPushAttrib((GLbitfield) GL_EVAL_BIT);
 
       /*to avoid side effect, we restor the opengl state for GL_POLYGON_MODE
-       */       
-      glGetIntegerv(GL_POLYGON_MODE, gl_polygon_mode);
+       */
+// MIKE: TODO
+//      glGetIntegerv(GL_POLYGON_MODE, gl_polygon_mode);
     }
 
 }
@@ -814,8 +869,6 @@ OpenGLSurfaceEvaluator::endmap2f(void)
       //if(surfcount == 8) exit(0);
 
       inBPMListEvalEM(global_bpm);
-
-
 
 /*
     global_bpm = bezierPatchMeshListReverse(global_bpm);
@@ -844,12 +897,14 @@ OpenGLSurfaceEvaluator::endmap2f(void)
     bezierPatchMeshListDelete(global_bpm);
     global_bpm = NULL;
 #endif
-	glPopAttrib();
+// MIKE: TODO
+//	glPopAttrib();
   }
 else
   {
 #ifndef USE_LOD
-    glPopAttrib();
+// MIKE: TODO
+//    glPopAttrib();
 #endif
 
 #ifdef STATISTICS
@@ -859,8 +914,10 @@ else
     /*to restore the gl_polygon_mode
      */
 #ifndef USE_LOD
-    glPolygonMode( GL_FRONT, (GLenum) gl_polygon_mode[0]);
-    glPolygonMode( GL_BACK,  (GLenum) gl_polygon_mode[1]);
+// MIKE: TODO
+//    glPolygonMode( GL_FRONT, (GLenum) gl_polygon_mode[0]);
+// MIKE: TODO
+//    glPolygonMode( GL_BACK,  (GLenum) gl_polygon_mode[1]);
 #endif
 }
 
@@ -930,10 +987,11 @@ OpenGLSurfaceEvaluator::map2f(
      }
    else /*not output triangles*/
      {
-       glMap2f((GLenum) _type, (GLfloat) _ulower, (GLfloat) _uupper,
-	       (GLint) _ustride, (GLint) _uorder, (GLfloat) _vlower,
-	       (GLfloat) _vupper, (GLint) _vstride, (GLint) _vorder,
-	       (const GLfloat *) pts);
+// MIKE: TODO
+//       glMap2f((GLenum) _type, (GLfloat) _ulower, (GLfloat) _uupper,
+//	       (GLint) _ustride, (GLint) _uorder, (GLfloat) _vlower,
+//	       (GLfloat) _vupper, (GLint) _vstride, (GLint) _vorder,
+//	       (const GLfloat *) pts);
      }
 
 #endif
@@ -1015,16 +1073,19 @@ else
     switch(style) {
     default:
     case N_MESHFILL:
-	glEvalMesh2((GLenum) GL_FILL, (GLint) umin, (GLint) umax,
-		(GLint) vmin, (GLint) vmax);
+// MIKE: TODO
+//	glEvalMesh2((GLenum) GL_FILL, (GLint) umin, (GLint) umax,
+//		(GLint) vmin, (GLint) vmax);
 	break;
     case N_MESHLINE:
-	glEvalMesh2((GLenum) GL_LINE, (GLint) umin, (GLint) umax,
-		(GLint) vmin, (GLint) vmax);
+// MIKE: TODO
+//	glEvalMesh2((GLenum) GL_LINE, (GLint) umin, (GLint) umax,
+//		(GLint) vmin, (GLint) vmax);
 	break;
     case N_MESHPOINT:
-	glEvalMesh2((GLenum) GL_POINT, (GLint) umin, (GLint) umax,
-		(GLint) vmin, (GLint) vmax);
+// MIKE: TODO
+//	glEvalMesh2((GLenum) GL_POINT, (GLint) umin, (GLint) umax,
+//		(GLint) vmin, (GLint) vmax);
 	break;
     }
   }
@@ -1091,7 +1152,10 @@ if(output_triangles)
   coord2f(fu,fv);
 }
 else
-    glEvalPoint2((GLint) u, (GLint) v);
+{
+// MIKE: TODO
+//    glEvalPoint2((GLint) u, (GLint) v);
+}
 
 
 #endif
@@ -1117,9 +1181,14 @@ return;
 
 
 if(output_triangles)
+{
     bezierPatchMeshInsertUV(global_bpm, u,v);
+}
 else
-    glEvalCoord2f((GLfloat) u, (GLfloat) v);
+{
+// MIKE: TODO
+//    glEvalCoord2f((GLfloat) u, (GLfloat) v);
+}
 
 
 #endif
@@ -1289,7 +1358,3 @@ OpenGLSurfaceEvaluator::texcoordCallBack(const GLfloat *texcoord, void* data)
   else if(texcoordCallBackN)
     texcoordCallBackN(texcoord);
 }
-
-
-
-

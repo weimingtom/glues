@@ -172,7 +172,7 @@ void sampleTopRightWithGridLine(Real* topVertex,
     return;
   }
 
-  Int segIndexSmall, segIndexLarge;
+  Int segIndexSmall=0, segIndexLarge=0;
   findTopRightSegment(rightChain,
                       rightStart,
                       rightEnd,
