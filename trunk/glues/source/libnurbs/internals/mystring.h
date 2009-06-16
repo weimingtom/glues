@@ -36,21 +36,15 @@
 #ifndef __glumystring_h_
 #define __glumystring_h_
 
-#ifdef STANDALONE
-typedef unsigned int size_t;
-extern "C" void *	memcpy(void *, const void *, size_t);
-extern "C" void *	memset(void *, int, size_t);
-#endif
-
 #ifdef GLBUILD
-#define memcpy(a,b,c)	bcopy(b,a,c)
-#define memset(a,b,c)	bzero(a,c)
-extern "C" void		bcopy(const void *, void *, int);
-extern "C" void		bzero(void *, int);
+   #define memcpy(a,b,c) bcopy(b,a,c)
+   #define memset(a,b,c) bzero(a,c)
+   extern "C" void bcopy(const void*, void*, int);
+   extern "C" void bzero(void*, int);
 #endif
 
 #ifdef LIBRARYBUILD
-#include <string.h>
+   #include <string.h>
 #endif
 
 #endif /* __glumystring_h_ */

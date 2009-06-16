@@ -57,8 +57,6 @@
 
 #define ZERO 0.00001
 
-//#define  MYDEBUG
-
 //#define SHORTEN_GRID_LINE
 //see work/newtess/internal/test/problems
 
@@ -317,32 +315,48 @@ void drawCorners(
   Real botGridV = leftGridChain->get_v_value(gridIndex2);
   Real botGridU1 = leftGridChain->get_u_value(gridIndex2);
   Real botGridU2 = rightGridChain->get_u_value(gridIndex2);
-  
-  glBegin(GL_LINE_STRIP);
-  glVertex2fv(leftCornerV);
-  glVertex2f(topGridU1, topGridV);
-  glEnd();
 
-  glBegin(GL_LINE_STRIP);
-  glVertex2fv(rightCornerV);
-  glVertex2f(topGridU2, topGridV);
-  glEnd();
+// MIKE: TODO
+//  glBegin(GL_LINE_STRIP);
+// MIKE: TODO
+//  glVertex2fv(leftCornerV);
+// MIKE: TODO
+//  glVertex2f(topGridU1, topGridV);
+// MIKE: TODO
+//  glEnd();
 
-  glBegin(GL_LINE_STRIP);
-  glVertex2fv(bot_leftCornerV);
-  glVertex2f(botGridU1, botGridV);
-  glEnd();
+// MIKE: TODO
+//  glBegin(GL_LINE_STRIP);
+// MIKE: TODO
+//  glVertex2fv(rightCornerV);
+// MIKE: TODO
+//  glVertex2f(topGridU2, topGridV);
+// MIKE: TODO
+//  glEnd();
 
-  glBegin(GL_LINE_STRIP);
-  glVertex2fv(bot_rightCornerV);
-  glVertex2f(botGridU2, botGridV);
-  glEnd();
+// MIKE: TODO
+//  glBegin(GL_LINE_STRIP);
+// MIKE: TODO
+//  glVertex2fv(bot_leftCornerV);
+// MIKE: TODO
+//  glVertex2f(botGridU1, botGridV);
+// MIKE: TODO
+//  glEnd();
+
+// MIKE: TODO
+//  glBegin(GL_LINE_STRIP);
+// MIKE: TODO
+//  glVertex2fv(bot_rightCornerV);
+// MIKE: TODO
+//  glVertex2f(botGridU2, botGridV);
+// MIKE: TODO
+//  glEnd();
 
 
 }
-		 
+
 void toVertexArrays(directedLine* topV, directedLine* botV, vertexArray& leftChain, vertexArray& rightChain)
-{  
+{
   Int i;
   directedLine* tempV;
   for(i=1; i<=topV->get_npoints()-2; i++) { /*the first vertex is the top vertex which doesn't belong to inc_chain*/
@@ -351,9 +365,9 @@ void toVertexArrays(directedLine* topV, directedLine* botV, vertexArray& leftCha
   for(tempV = topV->getNext(); tempV != botV; tempV = tempV->getNext())
     {
       for(i=0; i<=tempV->get_npoints()-2; i++){
-	leftChain.appendVertex(tempV->getVertex(i));
+        leftChain.appendVertex(tempV->getVertex(i));
       }
-    }  
+    }
 
   for(tempV = topV->getPrev(); tempV != botV; tempV = tempV->getPrev())
     {
@@ -437,16 +451,6 @@ void findDownCorners(Real *botVertex,
 		   Int& ret_rightCornerIndex /*useful when ret_leftCornerWhere == 0 or 2*/
 		   )
 {
-#ifdef MYDEBUG
-printf("*************enter find donw corner\n");
-printf("finddownCorner: v=%f, uleft=%f, uright=%f\n", v, uleft, uright);
-printf("(%i,%i,%i,%i)\n", leftChainStartIndex, leftChainEndIndex,rightChainStartIndex, rightChainEndIndex); 
-printf("left chain is\n");
-leftChain->print();
-printf("right chain is\n");
-rightChain->print();
-#endif
-
   assert(v > botVertex[1]);
   Real leftGridPoint[2];
   leftGridPoint[0] = uleft;
@@ -658,10 +662,6 @@ void findUpCorners(Real *topVertex,
 		   Int& ret_rightCornerIndex /*useful when ret_leftCornerWhere == 0 or 2*/
 		   )
 {
-#ifdef MYDEBUG
-printf("***********enter findUpCorners\n");
-#endif
-
   assert(v < topVertex[1]);
   Real leftGridPoint[2];
   leftGridPoint[0] = uleft;
@@ -839,9 +839,6 @@ printf("***********enter findUpCorners\n");
 	    }
 	}
     }
-#ifdef MYDEBUG
-printf("***********leave findUpCorners\n");
-#endif
 }
 
 //return 1 if neck exists, 0 othewise
@@ -853,13 +850,6 @@ Int findNeckF(vertexArray *leftChain, Int botLeftIndex,
 	      Int& neckLeft, 
 	      Int& neckRight)
 {
-/*
-printf("enter findNeckF, botleft, botright=%i,%i,gstartindex=%i\n",botLeftIndex,botRightIndex,gridStartIndex);
-printf("leftChain is\n");
-leftChain->print();
-printf("rightChain is\n");
-rightChain->print();
-*/
 
   Int lowerGridIndex; //the grid below leftChain and rightChian vertices
   Int i;
@@ -868,17 +858,14 @@ rightChain->print();
   if(botLeftIndex >= leftChain->getNumElements() ||
      botRightIndex >= rightChain->getNumElements())
     return 0; //no neck exists
-     
+
   v=min(leftChain->getVertex(botLeftIndex)[1], rightChain->getVertex(botRightIndex)[1]);  
-
- 
-
 
   for(i=gridStartIndex; i<n_vlines; i++)
     if(leftGridChain->get_v_value(i) <= v && 
        leftGridChain->getUlineIndex(i)<= rightGridChain->getUlineIndex(i))
       break;
-  
+
   lowerGridIndex = i;
 
   if(lowerGridIndex == n_vlines) //the two trm vertex are higher than all gridlines
@@ -886,18 +873,8 @@ rightChain->print();
   else 
     {
       Int botLeft2, botRight2;
-/*
-printf("leftGridChain->get_v_)value=%f\n",leftGridChain->get_v_value(lowerGridIndex), botLeftIndex); 
-printf("leftChain->get_vertex(0)=(%f,%f)\n", leftChain->getVertex(0)[0],leftChain->getVertex(0)[1]);
-printf("leftChain->get_vertex(1)=(%f,%f)\n", leftChain->getVertex(1)[0],leftChain->getVertex(1)[1]);
-printf("leftChain->get_vertex(2)=(%f,%f)\n", leftChain->getVertex(2)[0],leftChain->getVertex(2)[1]);
-*/
-      botLeft2 = leftChain->findIndexFirstAboveEqualGen(leftGridChain->get_v_value(lowerGridIndex), botLeftIndex, leftChain->getNumElements()-1) -1 ;
 
-/*
-printf("botLeft2=%i\n", botLeft2);
-printf("leftChain->getNumElements=%i\n", leftChain->getNumElements());
-*/
+      botLeft2 = leftChain->findIndexFirstAboveEqualGen(leftGridChain->get_v_value(lowerGridIndex), botLeftIndex, leftChain->getNumElements()-1) -1 ;
 
       botRight2 = rightChain->findIndexFirstAboveEqualGen(leftGridChain->get_v_value(lowerGridIndex), botRightIndex, rightChain->getNumElements()-1) -1;
       if(botRight2 < botRightIndex) botRight2=botRightIndex;
@@ -1537,9 +1514,6 @@ else
 	 botRightIndex == rightChain->getNumElements())
 	 */
 	{
-#ifdef MYDEBUG
-	  printf("neck NOT exists, botRightIndex=%i\n", botRightIndex);
-#endif
 
 	  tempBotVertex =  botVertex;
 	  nextTopVertex = botVertex;
@@ -1548,24 +1522,6 @@ else
 	}
       else /*neck exists*/
 	{
-#ifdef MYDEBUG
-	  printf("neck exists\n");
-#endif
-
-          /*
-	  findNeck(leftChain, botLeftIndex,
-		   rightChain, botRightIndex,
-		   neckLeftIndex,
-		   neckRightIndex);
-		   */
-#ifdef MYDEBUG
-printf("neck is found, neckLeftIndex=%i, neckRightIndex=%i\n", neckLeftIndex, neckRightIndex);
-glBegin(GL_LINES);
-glVertex2fv(leftChain->getVertex(neckLeftIndex));
-glVertex2fv(rightChain->getVertex(neckRightIndex));
-glEnd();
-#endif
-
 	  if(leftChain->getVertex(neckLeftIndex)[1] <= rightChain->getVertex(neckRightIndex)[1])
 	    {
 	      tempBotVertex = leftChain->getVertex(neckLeftIndex);
@@ -1610,33 +1566,7 @@ glEnd();
 		      down_leftCornerWhere,
 		      down_leftCornerIndex,
 		      down_rightCornerWhere,
-		      down_rightCornerIndex);	      
-#ifdef MYDEBUG
-      printf("find corners done, down_leftwhere=%i, down_righwhere=%i,\n",down_leftCornerWhere, down_rightCornerWhere );
-      printf("find corners done, up_leftwhere=%i, up_righwhere=%i,\n",up_leftCornerWhere, up_rightCornerWhere );
-      printf("find corners done, up_leftindex=%i, up_righindex=%i,\n",up_leftCornerIndex, up_rightCornerIndex );
-      printf("find corners done, down_leftindex=%i, down_righindex=%i,\n",down_leftCornerIndex, down_rightCornerIndex );
-#endif
-
-/*
-      drawCorners(topVertex,
-		  tempBotVertex,
-		  leftChain,
-		  rightChain,
-		  leftGridChain,
-		  rightGridChain,
-		  index1,
-		  index2,
-		  up_leftCornerWhere,
-		  up_leftCornerIndex,
-		  up_rightCornerWhere,
-		  up_rightCornerIndex,
-		  down_leftCornerWhere,
-		  down_leftCornerIndex,
-		  down_rightCornerWhere,
-		  down_rightCornerIndex);
-*/
-
+		      down_rightCornerIndex);
 
       sampleConnectedComp(topVertex, tempBotVertex,
 			  leftChain, 
@@ -1699,7 +1629,7 @@ void sampleLeftStrip(vertexArray* leftChain,
   Real *upperVert, *lowerVert; /*the end points of the first trim edge*/
   upperVert = leftChain->getVertex(topLeftIndex);
   lowerVert = leftChain->getVertex(topLeftIndex+1);
-  
+
   Int index = leftGridChainStartIndex;
   while(leftGridChain->get_v_value(index) >= lowerVert[1]){
     index++;
@@ -1707,7 +1637,7 @@ void sampleLeftStrip(vertexArray* leftChain,
       break;
   }
   index--;
-  
+
   sampleLeftSingleTrimEdgeRegion(upperVert, lowerVert,
 				 leftGridChain,
 				 leftGridChainStartIndex,

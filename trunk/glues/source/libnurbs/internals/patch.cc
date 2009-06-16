@@ -436,13 +436,6 @@ Patch::getstepsize( void )
 	}
     }
 
-#ifdef DEBUG
-    _glu_dprintf( "sidesteps %g %g %g %g, stepsize %g %g\n",
-	pspec[0].sidestep[0], pspec[0].sidestep[1],
-	pspec[1].sidestep[0], pspec[1].sidestep[1],
-	pspec[0].stepsize, pspec[1].stepsize );
-#endif
-
     if( mapdesc->minsavings != N_NOSAVINGSSUBDIVISION ) {
 	REAL savings = 1./(pspec[0].stepsize * pspec[1].stepsize) ;
 	savings-= (2./( pspec[0].sidestep[0] + pspec[0].sidestep[1] )) * 

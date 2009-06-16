@@ -204,10 +204,6 @@ void bezierPatchListDraw(bezierPatch *list, int u_reso, int v_reso)
    glEnable(GL_NORMALIZE);
    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
-#ifdef DEBUG
-   printf("mapmap\n");
-#endif
-
    for(temp=list; temp!=NULL; temp=temp->next)
    {
       bezierPatchDraw(temp, u_reso, v_reso);

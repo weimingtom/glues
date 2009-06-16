@@ -6,21 +6,21 @@
 ** this file except in compliance with the License. You may obtain a copy
 ** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
 ** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
+**
 ** http://oss.sgi.com/projects/FreeB
-** 
+**
 ** Note that, as provided in the License, the Software is distributed on an
 ** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
 ** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
 ** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
 ** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
+**
 ** Original Code. The Original Code is: OpenGL Sample Implementation,
 ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
 ** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
 ** Copyright in any portions created by third parties is as indicated
 ** elsewhere herein. All Rights Reserved.
-** 
+**
 ** Additional Notice Provisions: The application programming interfaces
 ** established by SGI in conjunction with the Original Code are The
 ** OpenGL(R) Graphics System: A Specification (Version 1.2.1), released
@@ -43,6 +43,8 @@
 #include <assert.h>
 
 #include "glsurfeval.h"
+
+#include "gles_evaluator.h"
 
 //extern int surfcount;
 
@@ -273,9 +275,6 @@ if(  global_ev_u1 ==2 &&   global_ev_u2 == 3
 {
 REAL vertex[4];
 REAL normal[4];
-#ifdef DEBUG
-printf("***number 1\n");
-#endif
 
 beginCallBack(GL_QUAD_STRIP, NULL);
 inEvalCoord2f(3.0, 3.0);
@@ -295,27 +294,9 @@ endCallBack(NULL);
 
 }
 
-/*
-if(  global_ev_u1 ==2 &&   global_ev_u2 == 3
-  && global_ev_v1 ==1 &&   global_ev_v2 == 2)
-{
-#ifdef DEBUG
-printf("***number 2\n");
-#endif
-beginCallBack(GL_QUAD_STRIP);
-inEvalCoord2f(2.0, 2.0);
-inEvalCoord2f(2.0, 1.0);
-inEvalCoord2f(3.0, 2.0);
-inEvalCoord2f(3.0, 1.0);
-endCallBack();
-}
-*/
 if(  global_ev_u1 ==1 &&   global_ev_u2 == 2
   && global_ev_v1 ==2 &&   global_ev_v2 == 3)
 {
-#ifdef DEBUG
-printf("***number 3\n");
-#endif
 beginCallBack(GL_QUAD_STRIP, NULL);
 inEvalCoord2f(2.0, 3.0);
 inEvalCoord2f(1.0, 3.0);
@@ -596,22 +577,11 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2(REAL u, REAL v,
     break;
   }
   /*output this vertex*/
-/*  inMeshStreamInsert(global_ms, retPoint, retNormal);*/
 
-
-
-  glNormal3fv(retNormal);
-  glVertex3fv(retPoint);
-
-
-
-
-  #ifdef DEBUG
-  printf("vertex(%f,%f,%f)\n", retPoint[0],retPoint[1],retPoint[2]);
-  #endif
-  
-
-
+// MIKE: TODO
+//  glNormal3fv(retNormal);
+// MIKE: TODO
+//  glVertex3fv(retPoint);
 }
 
 /*Compute point and normal
@@ -1228,12 +1198,16 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
           if(j<n_lower-1) /*at least two vertices in lower*/
             {
               bgntfan();
-	      glNormal3fv(leftMostNormal);
-              glVertex3fv(leftMostXYZ);
+// MIKE: TODO
+//	      glNormal3fv(leftMostNormal);
+// MIKE: TODO
+//              glVertex3fv(leftMostXYZ);
 
               while(j<n_lower){
-		glNormal3fv(lowerNormal[j]);
-		glVertex3fv(lowerXYZ[j]);
+// MIKE: TODO
+//		glNormal3fv(lowerNormal[j]);
+// MIKE: TODO
+//		glVertex3fv(lowerXYZ[j]);
 		j++;
 
               }
@@ -1246,13 +1220,17 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
           if(i<n_upper-1) /*at least two vertices in upper*/
             {
               bgntfan();
-	      glNormal3fv(leftMostNormal);
-	      glVertex3fv(leftMostXYZ);
+// MIKE: TODO
+//	      glNormal3fv(leftMostNormal);
+// MIKE: TODO
+//	      glVertex3fv(leftMostXYZ);
 	      
               for(k=n_upper-1; k>=i; k--) /*reverse order for two-side lighting*/
 		{
-		  glNormal3fv(upperNormal[k]);
-		  glVertex3fv(upperXYZ[k]);
+// MIKE: TODO
+//		  glNormal3fv(upperNormal[k]);
+// MIKE: TODO
+//		  glVertex3fv(upperXYZ[k]);
 		}
 
               endtfan();
@@ -1265,8 +1243,10 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
             {
 	      bgntfan();
 
-	      glNormal3fv(lowerNormal[j]);
-	      glVertex3fv(lowerXYZ[j]);
+// MIKE: TODO
+//	      glNormal3fv(lowerNormal[j]);
+// MIKE: TODO
+//	      glVertex3fv(lowerXYZ[j]);
 
               /*find the last k>=i such that 
                *upperverts[k][0] <= lowerverts[j][0]
@@ -1285,12 +1265,16 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
               for(l=k; l>=i; l--)/*the reverse is for two-side lighting*/
                 {
-		  glNormal3fv(upperNormal[l]);
-		  glVertex3fv(upperXYZ[l]);
+// MIKE: TODO
+//		  glNormal3fv(upperNormal[l]);
+// MIKE: TODO
+//		  glVertex3fv(upperXYZ[l]);
 
                 }
-	      glNormal3fv(leftMostNormal);
-	      glVertex3fv(leftMostXYZ);
+// MIKE: TODO
+//	      glNormal3fv(leftMostNormal);
+// MIKE: TODO
+//	      glVertex3fv(leftMostXYZ);
 
               endtfan();
 
@@ -1306,11 +1290,15 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
           else /*upperVerts[i][0] > lowerVerts[j][0]*/
             {
 	      bgntfan();
-	      glNormal3fv(upperNormal[i]);
-	      glVertex3fv(upperXYZ[i]);
+// MIKE: TODO
+//	      glNormal3fv(upperNormal[i]);
+// MIKE: TODO
+//	      glVertex3fv(upperXYZ[i]);
 	      
-              glNormal3fv(leftMostNormal);
-	      glVertex3fv(leftMostXYZ);
+// MIKE: TODO
+//              glNormal3fv(leftMostNormal);
+// MIKE: TODO
+//	      glVertex3fv(leftMostXYZ);
 	      
 
               /*find the last k>=j such that
@@ -1321,8 +1309,10 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
                 {
                   if(lower_val[k] >= upper_val[i])
                     break;
-		  glNormal3fv(lowerNormal[k]);
-		  glVertex3fv(lowerXYZ[k]);
+// MIKE: TODO
+//		  glNormal3fv(lowerNormal[k]);
+// MIKE: TODO
+//		  glVertex3fv(lowerXYZ[k]);
 
                   k++;
                 }
@@ -1418,12 +1408,16 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
           if(j<n_right-1) /*at least two vertices in right*/
             {
               bgntfan();
-	      glNormal3fv(botMostNormal);
-              glVertex3fv(botMostXYZ);
+// MIKE: TODO
+//	      glNormal3fv(botMostNormal);
+// MIKE: TODO
+//              glVertex3fv(botMostXYZ);
 
               while(j<n_right){
-		glNormal3fv(rightNormal[j]);
-		glVertex3fv(rightXYZ[j]);
+// MIKE: TODO
+//		glNormal3fv(rightNormal[j]);
+// MIKE: TODO
+//		glVertex3fv(rightXYZ[j]);
 		j++;
 
               }
@@ -1436,13 +1430,17 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
           if(i<n_left-1) /*at least two vertices in left*/
             {
               bgntfan();
-	      glNormal3fv(botMostNormal);
-	      glVertex3fv(botMostXYZ);
+// MIKE: TODO
+//	      glNormal3fv(botMostNormal);
+// MIKE: TODO
+//	      glVertex3fv(botMostXYZ);
 	      
               for(k=n_left-1; k>=i; k--) /*reverse order for two-side lighting*/
 		{
-		  glNormal3fv(leftNormal[k]);
-		  glVertex3fv(leftXYZ[k]);
+// MIKE: TODO
+//		  glNormal3fv(leftNormal[k]);
+// MIKE: TODO
+//		  glVertex3fv(leftXYZ[k]);
 		}
 
               endtfan();
@@ -1455,8 +1453,10 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
             {
 	      bgntfan();
 
-	      glNormal3fv(rightNormal[j]);
-	      glVertex3fv(rightXYZ[j]);
+// MIKE: TODO
+//	      glNormal3fv(rightNormal[j]);
+// MIKE: TODO
+//	      glVertex3fv(rightXYZ[j]);
 
               /*find the last k>=i such that 
                *leftverts[k][0] <= rightverts[j][0]
@@ -1475,12 +1475,16 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
               for(l=k; l>=i; l--)/*the reverse is for two-side lighting*/
                 {
-		  glNormal3fv(leftNormal[l]);
-		  glVertex3fv(leftXYZ[l]);
+// MIKE: TODO
+//		  glNormal3fv(leftNormal[l]);
+// MIKE: TODO
+//		  glVertex3fv(leftXYZ[l]);
 
                 }
-	      glNormal3fv(botMostNormal);
-	      glVertex3fv(botMostXYZ);
+// MIKE: TODO
+//	      glNormal3fv(botMostNormal);
+// MIKE: TODO
+//	      glVertex3fv(botMostXYZ);
 
               endtfan();
 
@@ -1496,11 +1500,15 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
           else /*left_val[i] > right_val[j])*/
             {
 	      bgntfan();
-	      glNormal3fv(leftNormal[i]);
-	      glVertex3fv(leftXYZ[i]);
+// MIKE: TODO
+//	      glNormal3fv(leftNormal[i]);
+// MIKE: TODO
+//	      glVertex3fv(leftXYZ[i]);
 	      
-              glNormal3fv(botMostNormal);
-	      glVertex3fv(botMostXYZ);
+// MIKE: TODO
+//              glNormal3fv(botMostNormal);
+// MIKE: TODO
+//	      glVertex3fv(botMostXYZ);
 	      
 
               /*find the last k>=j such that
@@ -1511,8 +1519,10 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
                 {
                   if(right_val[k] >= left_val[i])
                     break;
-		  glNormal3fv(rightNormal[k]);
-		  glVertex3fv(rightXYZ[k]);
+// MIKE: TODO
+//		  glNormal3fv(rightNormal[k]);
+// MIKE: TODO
+//		  glVertex3fv(rightXYZ[k]);
 
                   k++;
                 }
@@ -1965,9 +1975,6 @@ if(  bpm->bpatch->umin == 2 &&   bpm->bpatch->umax == 3
 {
 REAL vertex[4];
 REAL normal[4];
-#ifdef DEBUG
-printf("***number ****1\n");
-#endif
 
 beginCallBack(GL_QUAD_STRIP, NULL);
 inDoEvalCoord2EM(3.0, 3.0);
@@ -1988,9 +1995,6 @@ endCallBack(NULL);
 if(  bpm->bpatch->umin == 1 &&   bpm->bpatch->umax == 2
   && bpm->bpatch->vmin ==2 &&    bpm->bpatch->vmax == 3)
 {
-#ifdef DEBUG
-printf("***number 3\n");
-#endif
 beginCallBack(GL_QUAD_STRIP, NULL);
 inDoEvalCoord2EM(2.0, 3.0);
 inDoEvalCoord2EM(1.0, 3.0);

@@ -170,9 +170,7 @@ void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
       inDoDomain1(&em_texcoord, u, temp_texcoord);
       texcoordCallBack(temp_texcoord, userData);
     }
-#ifdef DEBUG
-printf("color_flag = %i\n", color_flag);
-#endif
+
   if(color_flag) //there is a color map
     {
       inDoDomain1(&em_color, u, temp_color);

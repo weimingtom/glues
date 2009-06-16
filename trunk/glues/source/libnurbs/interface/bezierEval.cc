@@ -39,20 +39,21 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
+
 #include "bezierEval.h"
 
 #ifdef __WATCOMC__
-#pragma warning 14  10
+   #pragma warning 14  10
 #endif
 
 #define TOLERANCE 0.0001
 
 #ifndef MAX_ORDER
-#define MAX_ORDER 16
+   #define MAX_ORDER 16
 #endif
 
 #ifndef MAX_DIMENSION
-#define MAX_DIMENSION 4
+   #define MAX_DIMENSION 4
 #endif
 
 static void normalize(float vec[3]);
@@ -237,9 +238,6 @@ static void normalize(float vec[3])
 
   if(size < TOLERANCE)
     {
-#ifdef DEBUG
-      fprintf(stderr, "Warning: in oglBSpline.c normal is 0\n");
-#endif
       return;
     }
   else {

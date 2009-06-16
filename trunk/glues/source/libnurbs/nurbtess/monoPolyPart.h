@@ -28,12 +28,13 @@
  * Silicon Graphics, Inc.
  */
 /*
- *monoPolyPart.h
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef _MONO_POLY_PART_H
 #define _MONO_POLY_PART_H
- 
+
 class directedLine;
 
 directedLine* monoPolyPart(directedLine* polygon);

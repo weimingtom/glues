@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _MONO_CHAIN_H
@@ -38,8 +40,9 @@
 
 class monoChain;
 
-class monoChain{
-  directedLine* chainHead;
+class monoChain
+{
+directedLine* chainHead;
   directedLine* chainTail;
   monoChain* next;
   monoChain* prev;

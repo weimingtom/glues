@@ -27,31 +27,23 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * mystdlib.h
  *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 #ifndef __glumystdlib_h_
 #define __glumystdlib_h_
 
-#ifdef STANDALONE
-typedef unsigned int size_t;
-extern "C" void  abort(void);
-extern "C" void* malloc(size_t);
-extern "C" void  free(void*);
-#endif
-
 #ifdef LIBRARYBUILD
-#include <stdlib.h>
+   #include <stdlib.h>
 #endif
 
 #ifdef GLBUILD
-typedef unsigned int size_t;
-extern "C" void  abort(void);
-extern "C" void* malloc(size_t);
-extern "C" void  free(void*);
+   typedef unsigned int size_t;
+   extern "C" void  abort(void);
+   extern "C" void* malloc(size_t);
+   extern "C" void  free(void*);
 #endif
 
 #endif /* __glumystdlib_h_ */

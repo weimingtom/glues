@@ -173,18 +173,22 @@ void primStream::draw()
     {
       switch(types[i]){
       case PRIMITIVE_STREAM_FAN:
-	glBegin(GL_TRIANGLE_FAN);
+// MIKE: TODO
+//	glBegin(GL_TRIANGLE_FAN);
 	break;
       case PRIMITIVE_STREAM_STRIP:
-	glBegin(GL_TRIANGLE_STRIP);
+// MIKE: TODO
+//	glBegin(GL_TRIANGLE_STRIP);
 	break;
       }
       
       for(j=0; j<lengths[i]; j++){
-	glVertex2fv(vertices+k);
+// MIKE: TODO
+//	glVertex2fv(vertices+k);
 	k += 2;
       }
-      glEnd();
+// MIKE: TODO
+//      glEnd();
     }
 }
 

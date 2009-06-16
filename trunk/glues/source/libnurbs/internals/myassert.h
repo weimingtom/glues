@@ -36,10 +36,6 @@
 #ifndef __glumyassert_h_
 #define __glumyassert_h_
 
-#ifdef STANDALONE
-   #define assert(EX) ((void)0)
-#endif
-
 #ifdef LIBRARYBUILD
    #include <assert.h>
 #endif

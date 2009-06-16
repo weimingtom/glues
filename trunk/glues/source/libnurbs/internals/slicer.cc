@@ -117,10 +117,7 @@ static int is_U_monotone(Arc_ptr loop)
       cur_sign = compV2InX(temp->head(), temp->tail());
       if(cur_sign != prev_sign)
        {
-#ifdef DEBUG
-	 printf("***change signe\n");
-#endif
-	 n_changes++;
+         n_changes++;
        }
     }
   if(n_changes == 2) return 1;

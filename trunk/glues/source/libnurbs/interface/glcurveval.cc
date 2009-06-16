@@ -31,10 +31,9 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 */
-
 /*
- * glcurveval.c++
  *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
  */
 
 /* Polynomial Evaluator Interface */
@@ -45,65 +44,63 @@
 #include "glrenderer.h"
 #include "glcurveval.h"
 #include "nurbsconsts.h"
- 
-OpenGLCurveEvaluator::OpenGLCurveEvaluator(void) 
+
+OpenGLCurveEvaluator::OpenGLCurveEvaluator(void)
 {
-  //no default callback functions
-  beginCallBackN = NULL;
-  endCallBackN = NULL;
-  vertexCallBackN = NULL;
-  normalCallBackN = NULL;
-  colorCallBackN = NULL;
-  texcoordCallBackN = NULL;
-  beginCallBackData = NULL;
-  endCallBackData = NULL;
-  vertexCallBackData = NULL;
-  normalCallBackData = NULL;
-  colorCallBackData = NULL;
-  texcoordCallBackData = NULL;
+   // no default callback functions
+   beginCallBackN=NULL;
+   endCallBackN=NULL;
+   vertexCallBackN=NULL;
+   normalCallBackN=NULL;
+   colorCallBackN=NULL;
+   texcoordCallBackN=NULL;
+   beginCallBackData=NULL;
+   endCallBackData=NULL;
+   vertexCallBackData=NULL;
+   normalCallBackData=NULL;
+   colorCallBackData=NULL;
+   texcoordCallBackData=NULL;
 
-  userData = NULL;
-  
-  vertex_flag = 0;
-  normal_flag = 0;
-  color_flag = 0;
-  texcoord_flag = 0;
+   userData=NULL;
 
-  em_vertex.uprime = -1.0;
-  em_normal.uprime = -1.0;
-  em_color.uprime = -1.0;
-  em_texcoord.uprime = -1.0;
-  output_triangles = 0; // don't output triangles by default
+   vertex_flag=0;
+   normal_flag=0;
+   color_flag=0;
+   texcoord_flag=0;
+
+   em_vertex.uprime=-1.0;
+   em_normal.uprime=-1.0;
+   em_color.uprime=-1.0;
+   em_texcoord.uprime=-1.0;
+
+   // don't output triangles by default
+   output_triangles=0;
 }
 
 OpenGLCurveEvaluator::~OpenGLCurveEvaluator(void) 
-{ 
+{
 }
 
 /* added nonsense to avoid the warning messages at compile time */
-void
-OpenGLCurveEvaluator::addMap(CurveMap *m)
+void OpenGLCurveEvaluator::addMap(CurveMap* m)
 {
-	m = m;
+   m=m;
 }
 
-void
-OpenGLCurveEvaluator::range1f(long type, REAL *from, REAL *to)
+void OpenGLCurveEvaluator::range1f(long type, REAL* from, REAL* to)
 {
-	type = type;
-	from = from;
-	to = to;
+   type=type;
+   from=from;
+   to=to;
 }
 
-void
-OpenGLCurveEvaluator::domain1f(REAL ulo, REAL uhi)
+void OpenGLCurveEvaluator::domain1f(REAL ulo, REAL uhi)
 {
-	ulo = ulo;
-	uhi = uhi;
+   ulo=ulo;
+   uhi=uhi;
 }
 
-void
-OpenGLCurveEvaluator::bgnline(void)
+void OpenGLCurveEvaluator::bgnline(void)
 {
    if (output_triangles)
    {
@@ -117,8 +114,7 @@ OpenGLCurveEvaluator::bgnline(void)
    }
 }
 
-void
-OpenGLCurveEvaluator::endline(void)
+void OpenGLCurveEvaluator::endline(void)
 {
    if (output_triangles)
    {
@@ -146,8 +142,7 @@ void OpenGLCurveEvaluator::disable(long type)
  * enable - turn on a curve map
  *---------------------------------------------------------------------------
  */
-void
-OpenGLCurveEvaluator::enable(long type)
+void OpenGLCurveEvaluator::enable(long type)
 {
 // MIKE: TODO
 //    glEnable((GLenum) type);
@@ -180,12 +175,12 @@ void OpenGLCurveEvaluator::bgnmap1f(long)
 {
    if (output_triangles)
    {
-      //initialized so that no maps are set initially
+      // initialized so that no maps are set initially
       vertex_flag=0;
       normal_flag=0;
       color_flag=0;
       texcoord_flag=0;
-      //no need to worry about gl states when doing callback
+      // no need to worry about gl states when doing callback
    }
    else
    {
@@ -214,61 +209,60 @@ void OpenGLCurveEvaluator::endmap1f(void)
  * map1f - pass a desription of a curve map
  *-------------------------------------------------------------------------
  */
-void
-OpenGLCurveEvaluator::map1f(
-    long type,		 	/* map type */
-    REAL ulo,			/* lower parametric bound */
-    REAL uhi,			/* upper parametric bound */
-    long stride, 		/* distance to next point in REALS */
-    long order,			/* parametric order */
-    REAL *pts 			/* control points */
-)
+void OpenGLCurveEvaluator::map1f(
+     long  type,        /* map type */
+     REAL  ulo,         /* lower parametric bound */
+     REAL  uhi,         /* upper parametric bound */
+     long  stride,      /* distance to next point in REALS */
+     long  order,       /* parametric order */
+     REAL* pts)         /* control points */
 {
-  if(output_triangles)
-    {
-      int dimension = 0;
-      int which = 0;
-      switch(type){
-      case GL_MAP1_VERTEX_3:
-	which = 0;
-	dimension = 3;
-	break;
-      case GL_MAP1_VERTEX_4:
-	which=0;
-	dimension = 4;
-	break;
-      case GL_MAP1_INDEX:
-	which=2;
-	dimension = 1;
-	break;
-      case GL_MAP1_COLOR_4:
-	which=2;
-	dimension = 4;
-	break;
-      case GL_MAP1_NORMAL:
-	which=1;
-	dimension = 3;
-	break;
-      case GL_MAP1_TEXTURE_COORD_1:
-	which=3;
-	dimension = 1;
-	break;
-      case GL_MAP1_TEXTURE_COORD_2:
-	which=3;
-	dimension = 2;
-	break;
-	
-      case GL_MAP1_TEXTURE_COORD_3:
-	which=3;
-	dimension = 3;
-	break;
-      case GL_MAP1_TEXTURE_COORD_4:
-	which=3;
-	dimension = 4;
-	break;	
+   if(output_triangles)
+   {
+      int dimension=0;
+      int which=0;
+
+      switch(type)
+      {
+         case GL_MAP1_VERTEX_3:
+              which=0;
+              dimension=3;
+              break;
+         case GL_MAP1_VERTEX_4:
+              which=0;
+              dimension=4;
+              break;
+         case GL_MAP1_INDEX:
+              which=2;
+              dimension=1;
+              break;
+         case GL_MAP1_COLOR_4:
+              which=2;
+              dimension=4;
+              break;
+         case GL_MAP1_NORMAL:
+              which=1;
+              dimension=3;
+              break;
+         case GL_MAP1_TEXTURE_COORD_1:
+              which=3;
+              dimension=1;
+              break;
+         case GL_MAP1_TEXTURE_COORD_2:
+              which=3;
+              dimension=2;
+              break;
+         case GL_MAP1_TEXTURE_COORD_3:
+              which=3;
+              dimension=3;
+              break;
+         case GL_MAP1_TEXTURE_COORD_4:
+              which=3;
+              dimension=4;
+              break;
       }
-      inMap1f(which, dimension, ulo, uhi, stride, order, pts); 	      
-    }       
+      inMap1f(which, dimension, ulo, uhi, stride, order, pts);
+   }
    else
    {
 // MIKE: TODO
@@ -283,25 +277,26 @@ OpenGLCurveEvaluator::map1f(
  */
 void OpenGLCurveEvaluator::mapmesh1f(long style, long from, long to)
 {
-  if(output_triangles)
-    {
-      inMapMesh1f((int) from, (int) to);      
-    }
-  else
-    {
-      switch(style) {
-      default:
-      case N_MESHFILL:
-      case N_MESHLINE:
+   if(output_triangles)
+   {
+      inMapMesh1f((int)from, (int)to);
+   }
+   else
+   {
+      switch(style)
+      {
+         default:
+         case N_MESHFILL:
+         case N_MESHLINE:
 // MIKE: TODO
-//	glEvalMesh1((GLenum) GL_LINE, (GLint) from, (GLint) to);
-	break;
-      case N_MESHPOINT:
+//      glEvalMesh1((GLenum) GL_LINE, (GLint) from, (GLint) to);
+              break;
+         case N_MESHPOINT:
 // MIKE: TODO
-//	glEvalMesh1((GLenum) GL_POINT, (GLint) from, (GLint) to);
-	break;
+//      glEvalMesh1((GLenum) GL_POINT, (GLint) from, (GLint) to);
+              break;
       }
-    }
+   }
 }
 
 /*-------------------------------------------------------------------------
@@ -331,63 +326,75 @@ OpenGLCurveEvaluator::putCallBack(GLenum which, void (GLAPIENTRY *fn)())
 OpenGLCurveEvaluator::putCallBack(GLenum which, _GLUfuncptr fn)
 #endif
 {
-  switch(which)
-  {
-    case GLU_NURBS_BEGIN:
-      beginCallBackN = (void (APIENTRY *) (GLenum)) fn;
-      break;
-    case GLU_NURBS_END:
-      endCallBackN = (void (APIENTRY *) (void)) fn;
-      break;
-    case GLU_NURBS_VERTEX:
-      vertexCallBackN = (void (APIENTRY *) (const GLfloat*)) fn;
-      break;
-    case GLU_NURBS_NORMAL:
-      normalCallBackN = (void (APIENTRY *) (const GLfloat*)) fn;
-      break;
-    case GLU_NURBS_COLOR:
-      colorCallBackN = (void (APIENTRY *) (const GLfloat*)) fn;
-      break;
-    case GLU_NURBS_TEXTURE_COORD:
-      texcoordCallBackN = (void (APIENTRY *) (const GLfloat*)) fn;
-      break;
-    case GLU_NURBS_BEGIN_DATA:
-      beginCallBackData = (void (APIENTRY *) (GLenum, void*)) fn;
-      break;
-    case GLU_NURBS_END_DATA:
-      endCallBackData = (void (APIENTRY *) (void*)) fn;
-      break;
-    case GLU_NURBS_VERTEX_DATA:
-      vertexCallBackData = (void (APIENTRY *) (const GLfloat*, void*)) fn;
-      break;
-    case GLU_NURBS_NORMAL_DATA:
-      normalCallBackData = (void (APIENTRY *) (const GLfloat*, void*)) fn;
-      break;
-    case GLU_NURBS_COLOR_DATA:
-      colorCallBackData = (void (APIENTRY *) (const GLfloat*, void*)) fn;
-      break;
-    case GLU_NURBS_TEXTURE_COORD_DATA:
-      texcoordCallBackData = (void (APIENTRY *) (const GLfloat*, void*)) fn;
-      break;
-  }
+   switch(which)
+   {
+      case GLU_NURBS_BEGIN:
+           beginCallBackN=(void (APIENTRY*)(GLenum))fn;
+           break;
+      case GLU_NURBS_END:
+           endCallBackN=(void (APIENTRY*)(void))fn;
+           break;
+      case GLU_NURBS_VERTEX:
+           vertexCallBackN=(void (APIENTRY*)(const GLfloat*))fn;
+           break;
+      case GLU_NURBS_NORMAL:
+           normalCallBackN=(void (APIENTRY*)(const GLfloat*))fn;
+           break;
+      case GLU_NURBS_COLOR:
+           colorCallBackN=(void (APIENTRY *)(const GLfloat*))fn;
+           break;
+      case GLU_NURBS_TEXTURE_COORD:
+           texcoordCallBackN=(void (APIENTRY*)(const GLfloat*))fn;
+           break;
+      case GLU_NURBS_BEGIN_DATA:
+           beginCallBackData=(void (APIENTRY*)(GLenum, void*))fn;
+           break;
+      case GLU_NURBS_END_DATA:
+           endCallBackData=(void (APIENTRY*)(void*))fn;
+           break;
+      case GLU_NURBS_VERTEX_DATA:
+           vertexCallBackData=(void (APIENTRY*)(const GLfloat*, void*))fn;
+           break;
+      case GLU_NURBS_NORMAL_DATA:
+           normalCallBackData=(void (APIENTRY*)(const GLfloat*, void*))fn;
+           break;
+      case GLU_NURBS_COLOR_DATA:
+           colorCallBackData=(void (APIENTRY*)(const GLfloat*, void*))fn;
+           break;
+      case GLU_NURBS_TEXTURE_COORD_DATA:
+           texcoordCallBackData=(void (APIENTRY*)(const GLfloat*, void*))fn;
+           break;
+   }
 }
 
-void
-OpenGLCurveEvaluator::beginCallBack(GLenum which, void *data)
+void OpenGLCurveEvaluator::beginCallBack(GLenum which, void* data)
 {
-  if(beginCallBackData)
-    beginCallBackData(which, data);
-  else if(beginCallBackN)
-    beginCallBackN(which);
+   if (beginCallBackData)
+   {
+      beginCallBackData(which, data);
+   }
+   else
+   {
+      if (beginCallBackN)
+      {
+         beginCallBackN(which);
+      }
+   }
 }
 
-void
-OpenGLCurveEvaluator::endCallBack(void *data)
+void OpenGLCurveEvaluator::endCallBack(void* data)
 {
-  if(endCallBackData)
-    endCallBackData(data);
-  else if(endCallBackN)
-    endCallBackN();
+   if (endCallBackData)
+   {
+      endCallBackData(data);
+   }
+   else
+   {
+      if (endCallBackN)
+      {
+         endCallBackN();
+      }
+   }
 }
 
 void
