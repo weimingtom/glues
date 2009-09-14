@@ -33,29 +33,28 @@
 #ifndef _SEARCHTREE_H
 #define _SEARCHTREE_H
 
-typedef struct treeNode{
-  void *key;
-  struct treeNode* parent;
-  struct treeNode* left; /*children*/
-  struct treeNode* right; 
+typedef struct treeNode
+{
+   void* key;
+   struct treeNode* parent;
+   struct treeNode* left;   /* children */
+   struct treeNode* right; 
 } treeNode;
 
-treeNode* TreeNodeMake(void *key);
+treeNode* TreeNodeMake(void* key);
 void TreeNodeDeleteSingleNode(treeNode* node);
 void TreeNodeDeleteWholeTree(treeNode* node);
-void TreeNodePrint(treeNode* node, 
-		   void (*keyPrint) (void*));
+void TreeNodePrint(treeNode* node, void (*keyPrint)(void*));
 int TreeNodeDepth(treeNode* root);
 treeNode* TreeNodeMinimum(treeNode* node);
 treeNode* TreeNodeMaximum(treeNode* node);
 treeNode* TreeNodePredecessor(treeNode* node);
 treeNode* TreeNodeSuccessor(treeNode* node);
 treeNode* TreeNodeFind(treeNode* tree, void* key,
-		       int (*compkey) (void*, void*));
+                       int (*compkey) (void*, void*));
 
 treeNode* TreeNodeInsert(treeNode* root, treeNode* newnode,
-		    int (*comp) (void *, void *));
+                         int (*comp) (void *, void *));
 treeNode* TreeNodeDeleteSingleNode(treeNode* tree, treeNode* node);
 
-
-#endif
+#endif /* _SEARCHTREE_H */
