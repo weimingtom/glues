@@ -49,19 +49,13 @@
 #include "bezierPatchMesh.h"
 #include "gles_evaluator.h"
 
-
-//extern int surfcount;
-//int surfcount=0;
-
-/*#define USE_INTERNAL_EVAL*/ //use internal evaluator
+//use internal evaluator
+#define USE_INTERNAL_EVAL
 
 /*whether do evaluation or not*/
 /*#define NO_EVALUATION*/
 
 //#define USE_LOD //for LOD test, have to turn on USE_LOD in insurfeval.c++ too
-
-/*for output triangles*/
-/*#define OUTPUT_TRIANGLES*/
 
 /**************begin for LOD_eval_list***********/
 void OpenGLSurfaceEvaluator::LOD_eval_list(int level)
@@ -83,8 +77,9 @@ OpenGLSurfaceEvaluator::OpenGLSurfaceEvaluator()
 {
     int i;
 
-    for (i=0; i<VERTEX_CACHE_SIZE; i++) {
-	vertexCache[i] = new StoredVertex;
+    for (i=0; i<VERTEX_CACHE_SIZE; i++)
+    {
+        vertexCache[i] = new StoredVertex;
     }
     tmeshing = 0;
     which = 0;
@@ -101,7 +96,7 @@ OpenGLSurfaceEvaluator::OpenGLSurfaceEvaluator()
     global_uorder_BV = 0;
     global_vorder_BV = 0;
     global_baseData = NULL;
-        
+
     global_bpm = NULL;
     output_triangles = 0; //don't output triangles by default
 

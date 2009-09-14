@@ -294,7 +294,7 @@ void sampleTopLeftWithGridLine(Real* topVertex,
                                 primStream* pStream
                                 )
 {
-  Int segIndexSmall, segIndexLarge;
+  Int segIndexSmall=0, segIndexLarge=0;
   //if left chain is empty, then there is only one top vertex with one grid 
   //  line
   if(leftEnd < leftStart) {

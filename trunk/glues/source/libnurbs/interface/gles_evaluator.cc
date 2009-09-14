@@ -34,4 +34,9 @@
  *
  */
 
+#include "glues.h"
 #include "gles_evaluator.h"
+
+GLAPI void APIENTRY gluEnable(GLenum cap)
+{
+}

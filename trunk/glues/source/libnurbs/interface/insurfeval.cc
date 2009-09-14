@@ -46,8 +46,6 @@
 
 #include "gles_evaluator.h"
 
-//extern int surfcount;
-
 #define AVOID_ZERO_NORMAL
 
 #ifdef AVOID_ZERO_NORMAL
