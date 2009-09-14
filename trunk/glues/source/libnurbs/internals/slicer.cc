@@ -82,49 +82,8 @@ Int num_quads = 0;
 #define ZERO 0.00001 /*determing whether a loop is a rectngle or not*/
 #define equalRect(a,b) ((glu_abs(a-b) <= ZERO)? 1:0) //only used in tessellating a rectangle
 
-#if 0 // UNUSED
-static Int is_Convex(Arc_ptr loop)
-{
-  if(area(loop->tail(), loop->head(), loop->next->head()) <0 )
-    return 0;
-  for(Arc_ptr jarc = loop->next; jarc != loop; jarc = jarc->next)
-    {
-      if(area(jarc->tail(), jarc->head(), jarc->next->head()) < 0)
-	return 0;
-    }
-  return 1;
-}
-#endif
-
 /******triangulate a monotone polygon**************/
 #include "monoTriangulation.h"
-#if 0 // UNUSED
-static int is_U_monotone(Arc_ptr loop)
-{
-  int n_changes=0;
-  int prev_sign;
-  int cur_sign;
-  Arc_ptr temp;
-
-  cur_sign = compV2InX(loop->head(), loop->tail());
-
-  n_changes  = (compV2InX(loop->prev->head(), loop->prev->tail())
-		!= cur_sign);
-
-  for(temp=loop->next; temp != loop; temp = temp->next)
-    {
-      prev_sign = cur_sign;
-      cur_sign = compV2InX(temp->head(), temp->tail());
-      if(cur_sign != prev_sign)
-       {
-         n_changes++;
-       }
-    }
-  if(n_changes == 2) return 1;
-  else
-    return 0;
-}
-#endif
 
 inline int compInY(REAL a[2], REAL b[2])
 {

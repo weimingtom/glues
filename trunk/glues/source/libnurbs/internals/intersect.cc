@@ -51,11 +51,7 @@
 enum i_result { INTERSECT_VERTEX, INTERSECT_EDGE };
 
 /* local functions */
-#ifndef NDEBUG  // for asserts only
-static int		arc_classify( Arc_ptr, int, REAL );
-#endif
 static enum i_result	pwlarc_intersect( PwlArc *, int, REAL, int, int[3] );
-
 
 void
 Subdivider::partition( Bin & bin, Bin & left, Bin & intersections, 
@@ -399,47 +395,6 @@ pwlarc_intersect(
  * arc_classify - determine which side of a line a jarc lies 
  *----------------------------------------------------------------------------
  */
-
-#ifndef NDEBUG  // for asserts only
-static int
-arc_classify( Arc_ptr jarc, int param, REAL value )
-{
-    REAL tdiff, hdiff;
-    if( param == 0 ) {
-	tdiff = jarc->tail()[0] - value;
-	hdiff = jarc->head()[0] - value;
-    } else {
-	tdiff = jarc->tail()[1] - value;
-	hdiff = jarc->head()[1] - value;
-    }
-
-    if( tdiff > 0.0 ) {
-	if( hdiff > 0.0 ) {
-	    return 0x11;
-	} else if( hdiff == 0.0 ) {
-	    return 0x12;
-	} else {
-	    return 0x10;
-	}
-    } else if( tdiff == 0.0 ) {
-	if( hdiff > 0.0 ) {
-	    return 0x21;
-	} else if( hdiff == 0.0 ) {
-	    return 0x22;
-	} else {
-	    return 0x20;
-	}
-    } else {
-	if( hdiff > 0.0 ) {
-	    return 0x01;
-	} else if( hdiff == 0.0 ) {
-	    return 0x02;
-	} else {
-	    return 0;
-	}
-    }
-}
-#endif
 
 void
 Subdivider::classify_tailonleft_s( Bin& bin, Bin& in, Bin& out, REAL val )

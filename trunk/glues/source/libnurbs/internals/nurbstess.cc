@@ -76,33 +76,21 @@ NurbsTessellator::resetObjects( void )
 void
 NurbsTessellator::makeobj( int )
 {
-#ifndef NDEBUG
-   _glu_dprintf( "makeobj\n" );
-#endif
 }
 
 void
 NurbsTessellator::closeobj( void )
 {
-#ifndef NDEBUG
-   _glu_dprintf( "closeobj\n" );
-#endif
 }
 
 void
 NurbsTessellator::bgnrender( void )
 {
-#ifndef NDEBUG
-   _glu_dprintf( "bgnrender\n" );
-#endif
 }
 
 void
 NurbsTessellator::endrender( void )
 {
-#ifndef NDEBUG
-    _glu_dprintf( "endrender\n" );
-#endif
 }
 
 /*-----------------------------------------------------------------------------

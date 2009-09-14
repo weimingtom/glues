@@ -47,123 +47,71 @@
 
 void BasicSurfaceEvaluator::domain2f(REAL, REAL, REAL, REAL)
 {
-#ifndef NDEBUG
-   _glu_dprintf("domain2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::polymode(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("polymode\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::range2f(long type, REAL* from, REAL* to)
 {
-#ifndef NDEBUG
-   _glu_dprintf("range2f type %ld, from (%g,%g), to (%g,%g)\n",
-                type, from[0], from[1], to[0], to[1]);
-#endif
 }
 
 void BasicSurfaceEvaluator::enable(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf( "enable\n" );
-#endif
 }
 
 void BasicSurfaceEvaluator::disable(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("disable\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::bgnmap2f(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgnmap2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::endmap2f(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endmap2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::map2f(long, REAL, REAL, long, long,
                                   REAL, REAL, long, long, REAL*)
 {
-#ifndef NDEBUG
-   _glu_dprintf("map2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::mapgrid2f(long, REAL, REAL, long, REAL, REAL)
 {
-#ifndef NDEBUG
-   _glu_dprintf("mapgrid2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::mapmesh2f(long, long, long, long, long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("mapmesh2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::evalcoord2f(long, REAL, REAL)
 {
-#ifndef NDEBUG
-   _glu_dprintf("evalcoord2f\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::evalpoint2i(long, long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("evalpoint2i\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::bgnline(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgnline\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::endline(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endline\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::bgnclosedline(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgnclosedline\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::endclosedline(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endclosedline\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::bgntfan(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgntfan\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::endtfan(void)
@@ -173,35 +121,20 @@ void BasicSurfaceEvaluator::endtfan(void)
 
 void BasicSurfaceEvaluator::bgntmesh(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgntmesh\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::swaptmesh(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("swaptmesh\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::endtmesh(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endtmesh\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::bgnqstrip(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgnqstrip\n");
-#endif
 }
 
 void BasicSurfaceEvaluator::endqstrip(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endqstrip\n");
-#endif
 }

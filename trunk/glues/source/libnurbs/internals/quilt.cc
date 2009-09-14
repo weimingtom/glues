@@ -63,15 +63,8 @@ void
 Quilt::deleteMe( Pool& p )
 {
     for( Quiltspec *q=qspec; q != eqspec; q++ ) {
-#if 1
-	if( q->breakpoints) delete[] q->breakpoints;  q->breakpoints = 0;
-#else
-	if( q->breakpoints) {
-	   delete[] q->breakpoints;  
-	   q->breakpoints = 0;
-printf("in here\n");
-        }
-#endif
+	if( q->breakpoints) delete[] q->breakpoints;
+        q->breakpoints = 0;
     }
     if( cpts ) delete[] cpts;  
     cpts = 0;
@@ -81,21 +74,6 @@ printf("in here\n");
 void
 Quilt::show( void )
 {
-#ifndef NDEBUG
-    int nc = mapdesc->getNcoords();
-    REAL *ps  = cpts; 
-    ps += qspec[0].offset;
-    ps += qspec[1].offset;
-    for( int i=0; i!= qspec[0].order * qspec[0].width; i++ ) {
-	for( int j = 0; j!= qspec[1].order * qspec[1].width; j++ ) {
-	    for( int k=0; k < nc; k++ )
-		_glu_dprintf(  "%g ", ps[i*qspec[0].stride + j*qspec[1].stride + k] );
-	    _glu_dprintf(  "\n" );
-	}
-	_glu_dprintf(  "\n" );
-    }
-    _glu_dprintf( "\n" );
-#endif
 }
 
 /*--------------------------------------------------------------------------

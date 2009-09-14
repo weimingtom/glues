@@ -60,21 +60,6 @@
 extern Int isCusp(directedLine *v);
 extern Int deleteRepeatDiagonals(Int num_diagonals, directedLine** diagonal_vertices, directedLine** new_vertices);
 
-//for debug purpose only
-#if 0 // UNUSED
-static void drawDiagonals(Int num_diagonals, directedLine** diagonal_vertices)
-{
-  Int i;
-  for(i=0; i<num_diagonals; i++)
-    {
-      glBegin(GL_LINE);
-      glVertex2fv(diagonal_vertices[2*i]->head());
-      glVertex2fv(diagonal_vertices[2*i+1]->head());
-      glEnd();
-    }
-}
-#endif
-
 /*given (x_1, y_1) and (x_2, y_2), and y
  *return x such that (x,y) is on the line
  */

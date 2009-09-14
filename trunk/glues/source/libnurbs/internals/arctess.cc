@@ -80,31 +80,6 @@ void ArcTessellator::bezier(Arc* arc, REAL s1, REAL s2, REAL t1, REAL t2)
    assert(arc!=0);
    assert(!arc->isTessellated());
 
-#ifndef NDEBUG
-   switch (arc->getside())
-   {
-      case arc_left:
-           assert(s1==s2);
-           assert(t2<t1);
-           break;
-      case arc_right:
-           assert(s1==s2);
-           assert(t1<t2);
-           break;
-      case arc_top:
-           assert(t1==t2);
-           assert(s2<s1);
-           break;
-      case arc_bottom:
-           assert(t1==t2);
-           assert(s1<s2);
-           break;
-      case arc_none:
-           (void) abort();
-           break;
-   }
-#endif
-
    TrimVertex* p=trimvertexpool.get(2);
    arc->pwlArc=new(pwlarcpool) PwlArc(2, p);
    p[0].param[0]=s1;

@@ -125,13 +125,6 @@ void Bin::adopt()
 
 void Bin::show(char* name)
 {
-#ifndef NDEBUG
-   _glu_dprintf("%s\n", name);
-   for (Arc_ptr jarc=firstarc(); jarc; jarc=nextarc())
-   {
-      jarc->show();
-   }
-#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -159,14 +152,6 @@ void Bin::listBezier(void)
       if (jarc->isbezier())
       {
          assert(jarc->pwlArc->npts==2);
-#ifndef NDEBUG
-         TrimVertex* pts=jarc->pwlArc->pts;
-         REAL s1=pts[0].param[0];
-         REAL t1=pts[0].param[1];
-         REAL s2=pts[1].param[0];
-         REAL t2=pts[1].param[1];
-         _glu_dprintf("arc (%g,%g) (%g,%g)\n", s1, t1, s2, t2);
-#endif
       }
    }
 }

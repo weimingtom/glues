@@ -350,8 +350,8 @@ surfEvalMachine em_normal;
 surfEvalMachine em_color;
 surfEvalMachine em_texcoord;
 
-int auto_normal_flag; //whether to output normla or not in callback
-                      //determined by GL_AUTO_NORMAL and callback_auto_normal
+int auto_normal_flag; //whether to output normal or not in callback
+                      //determined by GLU_AUTO_NORMAL and callback_auto_normal
 int callback_auto_normal; //GLU_CALLBACK_AUTO_NORMAL_EXT
 int vertex_flag;
 int normal_flag;

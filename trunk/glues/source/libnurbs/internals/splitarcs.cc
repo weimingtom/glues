@@ -63,11 +63,6 @@ Subdivider::split( Bin& bin, Bin& left, Bin& right, int param, REAL value )
 
     int	count = intersections.numarcs();
     if( count % 2 ) {
-#ifndef NDEBUG
-	left.show( "left" );
-	intersections.show( "intersections" );
-	right.show( "right" );
-#endif
 	::mylongjmp( jumpbuffer, 29 );
     }
 
@@ -130,16 +125,10 @@ Subdivider::check_s( Arc_ptr jarc1, Arc_ptr jarc2 )
     /* XXX - if these assertions fail, it is due to user error or
 	     undersampling */
     if( ! ( jarc1->tail()[0] < (jarc1)->head()[0] ) ) {
-#ifndef NDEBUG
-	_glu_dprintf( "s difference %f\n",  (jarc1)->tail()[0] - (jarc1)->head()[0] );
-#endif
 	::mylongjmp( jumpbuffer, 28 );
     }
 
     if( ! ( jarc2->tail()[0] > (jarc2)->head()[0] ) ) { 
-#ifndef NDEBUG
-	_glu_dprintf( "s difference %f\n",  (jarc2)->tail()[0] - (jarc2)->head()[0] );
-#endif
 	::mylongjmp( jumpbuffer, 28 );
     }
 }
@@ -229,16 +218,10 @@ Subdivider::check_t( Arc_ptr jarc1, Arc_ptr jarc2 )
     /* XXX - if these assertions fail, it is due to user error or
 	     undersampling */
     if( ! ( jarc1->tail()[1] < (jarc1)->head()[1] ) ) {
-#ifndef NDEBUG
-	_glu_dprintf( "t difference %f\n",  jarc1->tail()[1] - (jarc1)->head()[1] );
-#endif
 	::mylongjmp( jumpbuffer, 28 );
     }
 
     if( ! ( jarc2->tail()[1] > (jarc2)->head()[1] ) ) { 
-#ifndef NDEBUG
-	_glu_dprintf( "t difference %f\n",  jarc2->tail()[1] - (jarc2)->head()[1] );
-#endif
 	::mylongjmp( jumpbuffer, 28 );
     }
 }
