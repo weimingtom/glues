@@ -43,65 +43,89 @@
 
 #define max(a,b) ((a>b)? a:b)
 
-treeNode* TreeNodeMake(void *key)
+treeNode* TreeNodeMake(void* key)
 {
-  treeNode *ret = (treeNode*) malloc(sizeof(treeNode));
-  assert(ret);
-  ret->key = key;
-  ret->parent = NULL;
-  ret->left = NULL;
-  ret->right = NULL;
-  return ret;
+   treeNode* ret=(treeNode*)malloc(sizeof(treeNode));
+
+   assert(ret);
+
+   ret->key=key;
+   ret->parent=NULL;
+   ret->left=NULL;
+   ret->right=NULL;
+
+   return ret;
 }
 
 void TreeNodeDeleteSingleNode(treeNode* node)
 {
-  free(node);
+   free(node);
 }
 
 void TreeNodeDeleteWholeTree(treeNode* node)
 {
-  if(node == NULL) return;
-  TreeNodeDeleteWholeTree(node->left);
-  TreeNodeDeleteWholeTree(node->right);
-  TreeNodeDeleteSingleNode(node);
+   if (node==NULL)
+   {
+      return;
+   }
+   TreeNodeDeleteWholeTree(node->left);
+   TreeNodeDeleteWholeTree(node->right);
+   TreeNodeDeleteSingleNode(node);
 }
 
-void TreeNodePrint(treeNode* node, 
-		   void (*keyPrint) (void*))
+void TreeNodePrint(treeNode* node, void (*keyPrint)(void*))
 {
-  if(node ==NULL) return;
-  TreeNodePrint(node->left, keyPrint);
-  keyPrint(node->key);
-  TreeNodePrint(node->right, keyPrint);  
+   if (node==NULL)
+   {
+      return;
+   }
+
+   TreeNodePrint(node->left, keyPrint);
+   keyPrint(node->key);
+   TreeNodePrint(node->right, keyPrint);  
 }
 
 int TreeNodeDepth(treeNode* root)
 {
-  if(root == NULL) return 0;
-  else{
-    int leftdepth = TreeNodeDepth(root->left);
-    int rightdepth = TreeNodeDepth(root->right);  
-    return 1 + max(leftdepth, rightdepth);
-  }
+   if (root==NULL)
+   {
+      return 0;
+   }
+   else
+   {
+      int leftdepth = TreeNodeDepth(root->left);
+      int rightdepth = TreeNodeDepth(root->right);  
+
+      return 1 + max(leftdepth, rightdepth);
+   }
 }
 
 /*return the node with the key.
  *NULL is returned if not found
  */
 treeNode* TreeNodeFind(treeNode* tree, void* key,
-		       int (*compkey) (void*, void*)) 	       
+                       int (*compkey) (void*, void*))
 {
-  if(tree == NULL) 
-    return NULL;
-  if(key == tree->key)
-    return tree;
-  else if(compkey(key, tree->key) < 0)
-    return TreeNodeFind(tree->left, key, compkey);
-  else 
-    return TreeNodeFind(tree->right, key, compkey);    
+   if (tree==NULL)
+   {
+      return NULL;
+   }
+   if (key==tree->key)
+   {
+      return tree;
+   }
+   else
+   {
+      if (compkey(key, tree->key)<0)
+      {
+         return TreeNodeFind(tree->left, key, compkey);
+      }
+      else
+      {
+         return TreeNodeFind(tree->right, key, compkey);    
+      }
+   }
 }
-
 
 treeNode* TreeNodeInsert(treeNode* root, treeNode* newnode,
 		    int (*compkey) (void *, void *))
