@@ -42,9 +42,9 @@
 
 #ifdef GLBUILD
 typedef unsigned int size_t;
-extern "C" void 	abort( void );
-extern "C" void *	malloc( size_t );
-extern "C" void 	free( void * );
+extern "C" void  abort(void);
+extern "C" void* malloc(size_t);
+extern "C" void  free(void*);
 #endif
 
 #endif /* __glumystdlib_h_ */

@@ -348,6 +348,30 @@ GLAPI void APIENTRY gluNurbsProperty(GLUnurbs* nurb, GLenum property, GLfloat va
 GLAPI void APIENTRY gluNurbsSurface(GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type);
 GLAPI void APIENTRY gluPwlCurve(GLUnurbs* nurb, GLint count, GLfloat* data, GLint stride, GLenum type);
 
+/* OpenGL emulation layer */
+#define GLU_AUTO_NORMAL                         0x0D80
+
+#define GLU_MAP1_COLOR_4                        0x0D90
+#define GLU_MAP1_INDEX                          0x0D91
+#define GLU_MAP1_NORMAL                         0x0D92
+#define GLU_MAP1_TEXTURE_COORD_1                0x0D93
+#define GLU_MAP1_TEXTURE_COORD_2                0x0D94
+#define GLU_MAP1_TEXTURE_COORD_3                0x0D95
+#define GLU_MAP1_TEXTURE_COORD_4                0x0D96
+#define GLU_MAP1_VERTEX_3                       0x0D97
+#define GLU_MAP1_VERTEX_4                       0x0D98
+#define GLU_MAP2_COLOR_4                        0x0DB0
+#define GLU_MAP2_INDEX                          0x0DB1
+#define GLU_MAP2_NORMAL                         0x0DB2
+#define GLU_MAP2_TEXTURE_COORD_1                0x0DB3
+#define GLU_MAP2_TEXTURE_COORD_2                0x0DB4
+#define GLU_MAP2_TEXTURE_COORD_3                0x0DB5
+#define GLU_MAP2_TEXTURE_COORD_4                0x0DB6
+#define GLU_MAP2_VERTEX_3                       0x0DB7
+#define GLU_MAP2_VERTEX_4                       0x0DB8
+
+GLAPI void APIENTRY gluEnable(GLenum cap);
+
 #ifdef __cplusplus
 }
 #endif
