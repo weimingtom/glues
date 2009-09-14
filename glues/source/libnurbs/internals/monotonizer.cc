@@ -70,12 +70,6 @@ Subdivider::decompose( Bin& bin, REAL geo_stepsize )
 	monotonize( jarc, bin );
     }
 
-#ifndef NDEBUG
-    for( jarc=bin.firstarc(); jarc; jarc=bin.nextarc() ) {
-	assert( isMonotone( jarc ) != 0 );
-    }
-#endif
-
     return 0;
 }
 

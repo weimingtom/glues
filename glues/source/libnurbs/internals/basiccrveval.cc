@@ -43,84 +43,48 @@
 
 void BasicCurveEvaluator::domain1f(REAL, REAL)
 {
-#ifndef NDEBUG
-   _glu_dprintf("domain1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::range1f(long , REAL*, REAL*)
 {
-#ifndef NDEBUG
-   _glu_dprintf("range1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::enable(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("enable\n");
-#endif
 }
 
 void BasicCurveEvaluator::disable(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("disable\n");
-#endif
 }
 
 void BasicCurveEvaluator::bgnmap1f(long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgnmap1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::map1f(long, REAL, REAL, long, long, REAL*)
 {
-#ifndef NDEBUG
-   _glu_dprintf("map1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::mapgrid1f(long, REAL, REAL)
 {
-#ifndef NDEBUG
-   _glu_dprintf("mapgrid1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::mapmesh1f(long, long, long)
 {
-#ifndef NDEBUG
-   _glu_dprintf("mapmesh1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::evalcoord1f(long, REAL)
 {
-#ifndef NDEBUG
-   _glu_dprintf( "evalcoord1f\n" );
-#endif
 }
 
 void BasicCurveEvaluator::endmap1f(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endmap1f\n");
-#endif
 }
 
 void BasicCurveEvaluator::bgnline(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("bgnline\n");
-#endif
 }
 
 void BasicCurveEvaluator::endline(void)
 {
-#ifndef NDEBUG
-   _glu_dprintf("endline\n");
-#endif
 }

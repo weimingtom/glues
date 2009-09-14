@@ -385,17 +385,12 @@ Int DBG_rayIntersectPoly(Real v0[2], Real dx, Real dy, directedLine* poly)
   for(temp=poly->getNext(); temp != poly; temp = temp->getNext())
     if(DBG_rayIntersectEdge(v0, dx, dy, temp->getPrev()->head(), temp->head(), temp->tail()))
       count++;
-/*printf("ray intersect poly: count=%i\n", count);*/
+
   return count;
 }
 
 Int DBG_pointInsidePoly(Real v[2], directedLine* poly)
 {
-/*
-printf("enter pointInsidePoly , v=(%f,%f)\n", v[0], v[1]);
-printf("the polygon is\n");
-poly->printList();
-*/
   /*for debug purpose*/
   assert( (DBG_rayIntersectPoly(v,1,0,poly) % 2 )
 	 == (DBG_rayIntersectPoly(v,1,Real(0.1234), poly) % 2 )
@@ -413,21 +408,12 @@ Int DBG_enclosingPolygons(directedLine* poly, directedLine* list)
 {
   directedLine* temp;
   Int count=0;
-/*
-printf("%i\n", DBG_pointInsidePoly(poly->head(),
-				   list->getNextPolygon()
-				   ->getNextPolygon()
-				   ->getNextPolygon()
-				   ->getNextPolygon()
-));
-*/
 
   for(temp = list; temp != NULL; temp = temp->getNextPolygon())
     {
       if(poly != temp)
 	if(DBG_pointInsidePoly(poly->head(), temp))
 	  count++;
-/*	printf("count=%i\n", count);*/
     }
   return count;
 }
@@ -617,64 +603,6 @@ directedLine* DBG_cutIntersectionPoly(directedLine *polygon, int& cutOccur)
     }
   return begin;
 }
-
-//given a polygon, cut the edges off and finally obtain a
-//a polygon without intersections. The cut-off edges are
-//dealloated. The new polygon is returned.
-#if 0 // UNUSED
-static directedLine* DBG_cutIntersectionPoly_notwork(directedLine *polygon)
-{
-  directedLine *crt;//current polygon
-  directedLine *begin;
-  directedLine *end;
-  directedLine *temp;
-  crt = polygon;
-  int find=0;
-  while(1)
-    {
-//printf("loop\n");
-      //if there are less than 3 edges, we should stop
-      if(crt->getPrev()->getPrev() == crt)
-	return NULL;
-
-      if(DBG_edgesIntersect(crt, crt->getNext()) ||
-	(crt->head()[0] == crt->getNext()->tail()[0] &&
-	crt->head()[1] == crt->getNext()->tail()[1])
-	 )
-	{
-	  find = 1;
-	  crt=crt->deleteChain(crt, crt->getNext());
-	}
-      else
-	{
-	  //now we know crt and crt->getNext do not intersect
-	  begin = crt;
-	  end = crt->getNext();
-//printf("begin=(%f,%f)\n", begin->head()[0], begin->head()[1]);
-//printf("end=(%f,%f)\n", end->head()[0], end->head()[1]);
-	  for(temp=end->getNext(); temp!=begin; temp= temp->getNext())
-	    {
-//printf("temp=(%f,%f)\n", temp->head()[0], temp->head()[1]);
-	       directedLine *intersect = DBG_edgeIntersectChainD(temp, begin, end);
-	       if(intersect != NULL)
-		{
-		  crt = crt->deleteChain(intersect, temp);
-		  find=1;
-		  break; //the for loop
-		}
-	      else
-		{
-		  end = temp;
-		}
-	    }
-	}
-      if(find == 0)
-	return crt;
-      else
-	find = 0;    //go to next loop
-}
-}
-#endif
 
 directedLine* DBG_cutIntersectionAllPoly(directedLine* list)
 {

@@ -71,10 +71,6 @@ Maplist::add( long type, int israt, int ncoords )
 void 
 Maplist::define( long type, int israt, int ncoords )
 {
-#ifndef NDEBUG // to avoid warning
-    Mapdesc *m = locate( type );
-    assert( m == NULL || ( m->isrational == israt && m->ncoords == ncoords ) );
-#endif
     add( type, israt, ncoords );
 }
 

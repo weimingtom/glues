@@ -177,12 +177,12 @@ void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso)
    if (bpatch->dimension==3)
    {
 // MIKE: TODO
-//      glMap2f(GL_MAP2_VERTEX_3, bpatch->umin, bpatch->umax, 3*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*) bpatch->ctlpoints);
+//      glMap2f(GLU_MAP2_VERTEX_3, bpatch->umin, bpatch->umax, 3*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*) bpatch->ctlpoints);
    }
    else
    {
 // MIKE: TODO
-//      glMap2f(GL_MAP2_VERTEX_4, bpatch->umin, bpatch->umax, 4*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*) bpatch->ctlpoints);
+//      glMap2f(GLU_MAP2_VERTEX_4, bpatch->umin, bpatch->umax, 4*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*) bpatch->ctlpoints);
    }
 
 // MIKE: TODO
@@ -198,9 +198,9 @@ void bezierPatchListDraw(bezierPatch *list, int u_reso, int v_reso)
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
 // MIKE: TODO
-//   glEnable(GL_MAP2_VERTEX_3);
+//   glEnable(GLU_MAP2_VERTEX_3);
 // MIKE: TODO
-//   glEnable(GL_AUTO_NORMAL);
+//   glEnable(GLU_AUTO_NORMAL);
    glEnable(GL_NORMALIZE);
    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 

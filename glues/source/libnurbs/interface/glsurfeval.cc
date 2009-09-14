@@ -60,28 +60,8 @@
 
 //#define USE_LOD //for LOD test, have to turn on USE_LOD in insurfeval.c++ too
 
-/*for statistics*/
-//#define STATISTICS
-#ifdef STATISTICS
-static int STAT_num_of_triangles=0;
-static int STAT_num_of_eval_vertices=0;
-static int STAT_num_of_quad_strips=0;
-#endif
-
 /*for output triangles*/
 /*#define OUTPUT_TRIANGLES*/
-
-
-/*#define FOR_CHRIS*/
-#ifdef FOR_CHRIS
-extern "C"  {  void                evalUStripExt(int n_upper, REAL v_upper, REAL* upper_val,
-				   int n_lower, REAL v_lower, REAL* lower_val);}
-
-extern "C" {   void                evalVStripExt(int n_left, REAL u_left, REAL* left_val,
-				   int n_right, REAL u_right, REAL* right_val);
-	     }
-#endif
-
 
 /**************begin for LOD_eval_list***********/
 void OpenGLSurfaceEvaluator::LOD_eval_list(int level)
@@ -388,13 +368,6 @@ OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, i
   inEvalUStrip(n_upper, v_upper, upper_val,
 	n_lower, v_lower, lower_val);
 #else
-
-#ifdef FOR_CHRIS
-  evalUStripExt(n_upper, v_upper, upper_val,
-		 n_lower, v_lower, lower_val);
-  return;
-
-#endif
   int i,j,k,l;
   REAL leftMostV[2];
 
@@ -575,14 +548,6 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	inEvalVStrip(n_left, u_left, left_val,
 	n_right, u_right, right_val);
 #else
-
-#ifdef FOR_CHRIS
-	evalVStripExt(n_left, u_left, left_val,
-		      n_right, u_right, right_val);
-	return;
-
-#endif
-
   int i,j,k,l;
   REAL botMostV[2];
   /*
@@ -763,10 +728,6 @@ OpenGLSurfaceEvaluator::bgnqstrip(void)
 // MIKE: TODO
 //    glBegin((GLenum) GL_QUAD_STRIP);
   }
-
-#ifdef STATISTICS
-	STAT_num_of_quad_strips++;
-#endif
 }
 
 void
@@ -824,25 +785,15 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
       color_flag = 0;
       texcoord_flag = 0;
 
-      /*
-      if(glIsEnabled(GL_AUTO_NORMAL) == GL_TRUE)
-	auto_normal_flag = 1;
-      else if (callback_auto_normal == 1)
-	auto_normal_flag = 1;
-      else
-	auto_normal_flag = 0;
-	*/
-
 // MIKE: TODO
 //	  glPushAttrib((GLbitfield) GL_EVAL_BIT);
-
     }
   else
     {
 // MIKE: TODO
 //      glPushAttrib((GLbitfield) GL_EVAL_BIT);
 
-      /*to avoid side effect, we restor the opengl state for GL_POLYGON_MODE
+      /*to avoid side effect, we restore the opengl state for GL_POLYGON_MODE
        */
 // MIKE: TODO
 //      glGetIntegerv(GL_POLYGON_MODE, gl_polygon_mode);
@@ -860,37 +811,7 @@ OpenGLSurfaceEvaluator::endmap2f(void)
 
   if(output_triangles)
     {
-      //bezierPatchMeshListDelDeg(global_bpm);
-
-      //    bezierPatchMeshListEval(global_bpm);
-
-      //surfcount++;
-      //printf("surfcount=%i\n", surfcount);
-      //if(surfcount == 8) exit(0);
-
       inBPMListEvalEM(global_bpm);
-
-/*
-    global_bpm = bezierPatchMeshListReverse(global_bpm);
-    {
-      float *vertex_array;
-      float *normal_array;
-      int *length_array;
-      int *type_array;
-      int num_strips;
-      bezierPatchMeshListCollect(global_bpm, &vertex_array, &normal_array, &length_array, &type_array, &num_strips);
-      drawStrips(vertex_array, normal_array, length_array, type_array, num_strips);
-      free(vertex_array);
-      free(normal_array);
-      free(length_array);
-      free(type_array);
-    }
-*/
-
-    //bezierPatchMeshListPrint(global_bpm);
-    //bezierPatchMeshListDraw(global_bpm);
-
-//	  printf("num triangles=%i\n", bezierPatchMeshListNumTriangles(global_bpm));
 
 #ifdef USE_LOD
 #else
@@ -905,10 +826,6 @@ else
 #ifndef USE_LOD
 // MIKE: TODO
 //    glPopAttrib();
-#endif
-
-#ifdef STATISTICS
-    fprintf(stderr, "num_vertices=%i,num_triangles=%i,num_quads_strips=%i\n", STAT_num_of_eval_vertices,STAT_num_of_triangles,STAT_num_of_quad_strips);
 #endif
 
     /*to restore the gl_polygon_mode
@@ -955,19 +872,19 @@ OpenGLSurfaceEvaluator::map2f(
 	 global_bpm = bezierPatchMeshMake2(10,10);
        if(
 	  (global_bpm->bpatch == NULL &&
-	  (_type == GL_MAP2_VERTEX_3 || _type == GL_MAP2_VERTEX_4))
+	  (_type == GLU_MAP2_VERTEX_3 || _type == GLU_MAP2_VERTEX_4))
 	  ||
 	  (global_bpm->bpatch_normal == NULL &&
-	   (_type == GL_MAP2_NORMAL))
+	   (_type == GLU_MAP2_NORMAL))
 	  ||
 	  (global_bpm->bpatch_color == NULL &&
-	   (_type == GL_MAP2_INDEX || _type == GL_MAP2_COLOR_4))
+	   (_type == GLU_MAP2_INDEX || _type == GLU_MAP2_COLOR_4))
 	  ||
 	  (global_bpm->bpatch_texcoord == NULL &&
-	   (_type == GL_MAP2_TEXTURE_COORD_1 ||
-	    _type == GL_MAP2_TEXTURE_COORD_2 ||
-	    _type == GL_MAP2_TEXTURE_COORD_3 ||
-	    _type == GL_MAP2_TEXTURE_COORD_4 )
+	   (_type == GLU_MAP2_TEXTURE_COORD_1 ||
+	    _type == GLU_MAP2_TEXTURE_COORD_2 ||
+	    _type == GLU_MAP2_TEXTURE_COORD_3 ||
+	    _type == GLU_MAP2_TEXTURE_COORD_4 )
 	   ))
 	 {
 	   bezierPatchMeshPutPatch(global_bpm, (int) _type, _ulower, _uupper,(int)  _ustride,(int) _uorder,_vlower, _vupper, (int) _vstride, (int) _vorder, pts);
@@ -1091,10 +1008,6 @@ else
   }
 
 #endif
-
-#ifdef STATISTICS
-	STAT_num_of_quad_strips += (umax-umin)*(vmax-vmin);
-#endif
 }
 
 /*-------------------------------------------------------------------------
@@ -1109,7 +1022,6 @@ OpenGLSurfaceEvaluator::evalcoord2f(long, REAL u, REAL v)
 #ifdef NO_EVALUATION
 return;
 #endif
-
 
     newtmeshvert(u, v);
 }
@@ -1160,10 +1072,6 @@ else
 
 #endif
 
-#ifdef STATISTICS
-  STAT_num_of_eval_vertices++;
-#endif
-
 #endif
 
 }
@@ -1191,11 +1099,6 @@ else
 }
 
 
-#endif
-
-
-#ifdef STATISTICS
-  STAT_num_of_eval_vertices++;
 #endif
 
 #endif

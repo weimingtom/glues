@@ -101,10 +101,6 @@ inline Arc_ptr Bin::nextarc(void)
 {
    Arc_ptr jarc=current;
 
-#ifdef DEBUG
-   assert(jarc->check()!=0);
-#endif
-
    if (jarc)
    {
       current=jarc->link;

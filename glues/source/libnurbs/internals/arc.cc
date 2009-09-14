@@ -153,13 +153,6 @@ void Arc::getextrema(Arc_ptr extrema[4])
 
 void Arc::show()
 {
-#ifndef NDEBUG
-   _glu_dprintf("\tPWLARC NP: %d FL: 1\n", pwlArc->npts);
-   for (int i=0; i<pwlArc->npts; i++)
-   {
-      _glu_dprintf("\t\tVERTEX %f %f\n", pwlArc->pts[i].param[0], pwlArc->pts[i].param[1]);
-   }
-#endif
 }
 
 /*-------------------------------------------------------------------------
@@ -171,16 +164,10 @@ void Arc::print(void)
 {
    Arc_ptr jarc=this;
 
-#ifndef NDEBUG
-   _glu_dprintf("BGNTRIM\n");
-#endif
    do {
       jarc->show();
       jarc=jarc->next;
    } while (jarc!=this);
-#ifndef NDEBUG
-   _glu_dprintf("ENDTRIM\n");
-#endif
 }
 
 /*-------------------------------------------------------------------------
@@ -205,10 +192,6 @@ int Arc::isDisconnected(void)
    if (((p0[0]-p1[0])>ZERO) || ((p1[0]-p0[0])>ZERO) ||
        ((p0[1]-p1[1])>ZERO) || ((p1[1]-p0[1])>ZERO))
    {
-#ifndef NDEBUG
-      _glu_dprintf("x coord = %f %f %f\n", p0[0], p1[0], p0[0]-p1[0]);
-      _glu_dprintf("y coord = %f %f %f\n", p0[1], p1[1], p0[1]-p1[1]);
-#endif
       return 1;
    }
    else
@@ -252,46 +235,24 @@ int Arc::check(void)
 
       if (jarc->prev==0 || jarc->next==0)
       {
-#ifndef NDEBUG
-         _glu_dprintf("checkjarc:null next/prev pointer\n");
-         jarc->print();
-#endif
          return 0;
       }
 
       if (jarc->next->prev!=jarc)
       {
-#ifndef NDEBUG
-         _glu_dprintf("checkjarc: pointer linkage screwed up\n");
-         jarc->print();
-#endif
          return 0;
       }
 
       if (jarc->pwlArc)
       {
-#ifndef NDEBUG
-         assert(jarc->pwlArc->npts>=1);
-         assert(jarc->pwlArc->npts<100000);
-#endif
          if (jarc->prev->pwlArc)
          {
             if (jarc->tail()[1]!=jarc->prev->rhead()[1])
             {
-#ifndef NDEBUG
-               _glu_dprintf("checkjarc: geometric linkage screwed up 1\n");
-               jarc->prev->show();
-               jarc->show();
-#endif
                return 0;
             }
             if (jarc->tail()[0]!=jarc->prev->rhead()[0])
             {
-#ifndef NDEBUG
-               _glu_dprintf("checkjarc: geometric linkage screwed up 2\n");
-               jarc->prev->show();
-               jarc->show();
-#endif
                return 0;
             }
          }
@@ -300,20 +261,10 @@ int Arc::check(void)
          {
             if (jarc->next->tail()[0]!=jarc->rhead()[0])
             {
-#ifndef NDEBUG
-               _glu_dprintf("checkjarc: geometric linkage screwed up 3\n");
-               jarc->show();
-               jarc->next->show();
-#endif
                return 0;
             }
             if (jarc->next->tail()[1]!=jarc->rhead()[1])
             {
-#ifndef NDEBUG
-               _glu_dprintf("checkjarc: geometric linkage screwed up 4\n");
-               jarc->show();
-               jarc->next->show();
-#endif
                return 0;
             }
          }

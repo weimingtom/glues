@@ -224,39 +224,39 @@ void OpenGLCurveEvaluator::map1f(
 
       switch(type)
       {
-         case GL_MAP1_VERTEX_3:
+         case GLU_MAP1_VERTEX_3:
               which=0;
               dimension=3;
               break;
-         case GL_MAP1_VERTEX_4:
+         case GLU_MAP1_VERTEX_4:
               which=0;
               dimension=4;
               break;
-         case GL_MAP1_INDEX:
+         case GLU_MAP1_INDEX:
               which=2;
               dimension=1;
               break;
-         case GL_MAP1_COLOR_4:
+         case GLU_MAP1_COLOR_4:
               which=2;
               dimension=4;
               break;
-         case GL_MAP1_NORMAL:
+         case GLU_MAP1_NORMAL:
               which=1;
               dimension=3;
               break;
-         case GL_MAP1_TEXTURE_COORD_1:
+         case GLU_MAP1_TEXTURE_COORD_1:
               which=3;
               dimension=1;
               break;
-         case GL_MAP1_TEXTURE_COORD_2:
+         case GLU_MAP1_TEXTURE_COORD_2:
               which=3;
               dimension=2;
               break;
-         case GL_MAP1_TEXTURE_COORD_3:
+         case GLU_MAP1_TEXTURE_COORD_3:
               which=3;
               dimension=3;
               break;
-         case GL_MAP1_TEXTURE_COORD_4:
+         case GLU_MAP1_TEXTURE_COORD_4:
               which=3;
               dimension=4;
               break;

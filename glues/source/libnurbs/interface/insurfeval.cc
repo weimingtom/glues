@@ -48,8 +48,6 @@
 
 //extern int surfcount;
 
-//#define CRACK_TEST
-
 #define AVOID_ZERO_NORMAL
 
 #ifdef AVOID_ZERO_NORMAL
@@ -66,26 +64,30 @@
 static void LOD_interpolate(REAL A[2], REAL B[2], REAL C[2], int j, int k, int pow2_level,
 			    REAL& u, REAL& v)
 {
-  REAL a,a1,b,b1;
+   REAL a, a1, b, b1;
 
-  a = ((REAL) j) / ((REAL) pow2_level);
-  a1 = 1-a;
+   a=((REAL)j)/((REAL)pow2_level);
+   a1=1-a;
 
-  if(j != 0)
-    {
-      b = ((REAL) k) / ((REAL)j);
-      b1 = 1-b;
-    }
-  REAL x,y,z;
-  x = a1;
-  if(j==0)
-    {
-      y=0; z=0;
-    }
-  else{
-    y = b1*a;
-    z = b *a;
-  }
+   if(j != 0)
+   {
+      b=((REAL)k)/((REAL)j);
+      b1=1-b;
+   }
+
+   REAL x, y, z;
+   x=a1;
+
+   if (j==0)
+   {
+      y=0;
+      z=0;
+   }
+   else
+   {
+      y=b1*a;
+      z=b*a;
+   }
 
   u = x*A[0] + y*B[0] + z*C[0];
   v = x*A[1] + y*B[1] + z*C[1];
@@ -177,65 +179,7 @@ void OpenGLSurfaceEvaluator::LOD_eval(int num_vert, REAL* verts, int type,
   }
 }
 	
-
-#endif //USE_LOD
-
-//#define  GENERIC_TEST
-#ifdef GENERIC_TEST
-extern float xmin, xmax, ymin, ymax, zmin, zmax; /*bounding box*/
-extern int temp_signal;
-
-static void gTessVertexSphere(float u, float v, float temp_normal[3], float temp_vertex[3])
-{
-  float r=2.0;
-  float Ox = 0.5*(xmin+xmax);
-  float Oy = 0.5*(ymin+ymax);
-  float Oz = 0.5*(zmin+zmax);
-  float nx = cos(v) * sin(u);
-  float ny = sin(v) * sin(u);
-  float nz = cos(u);
-  float x= Ox+r * nx;
-  float y= Oy+r * ny;
-  float z= Oz+r * nz;
-
-  temp_normal[0] = nx;
-  temp_normal[1] = ny;
-  temp_normal[2] =  nz;
-  temp_vertex[0] = x;
-  temp_vertex[1] = y;
-  temp_vertex[2] = z;
-
-//  glNormal3f(nx,ny,nz);
-//  glVertex3f(x,y,z);
-}
-
-static void gTessVertexCyl(float u, float v, float temp_normal[3], float temp_vertex[3])
-{
-   float r=2.0;
-  float Ox = 0.5*(xmin+xmax);
-  float Oy = 0.5*(ymin+ymax);
-  float Oz = 0.5*(zmin+zmax);
-  float nx = cos(v);
-  float ny = sin(v);
-  float nz = 0;
-  float x= Ox+r * nx;
-  float y= Oy+r * ny;
-  float z= Oz - 2*u;
-
-  temp_normal[0] = nx;
-  temp_normal[1] = ny;
-  temp_normal[2] =  nz;
-  temp_vertex[0] = x;
-  temp_vertex[1] = y;
-  temp_vertex[2] = z;
-
-/*  
-  glNormal3f(nx,ny,nz);
-  glVertex3f(x,y,z);
-*/
-}
-
-#endif //GENERIC_TEST
+#endif // USE_LOD
 
 void OpenGLSurfaceEvaluator::inBPMListEval(bezierPatchMesh* list)
 {
@@ -254,7 +198,7 @@ void OpenGLSurfaceEvaluator::inBPMEval(bezierPatchMesh* bpm)
   int ustride = bpm->bpatch->dimension * bpm->bpatch->vorder;
   int vstride = bpm->bpatch->dimension;
   inMap2f( 
-	  (bpm->bpatch->dimension == 3)? GL_MAP2_VERTEX_3 : GL_MAP2_VERTEX_4,
+	  (bpm->bpatch->dimension == 3)? GLU_MAP2_VERTEX_3 : GLU_MAP2_VERTEX_4,
 	  bpm->bpatch->umin,
 	  bpm->bpatch->umax,
 	  ustride,
@@ -269,52 +213,6 @@ void OpenGLSurfaceEvaluator::inBPMEval(bezierPatchMesh* bpm)
   assert(bpm->vertex_array);
   bpm->normal_array = (float*) malloc(sizeof(float)* (bpm->index_UVarray/2) * 3);
   assert(bpm->normal_array);
-#ifdef CRACK_TEST
-if(  global_ev_u1 ==2 &&   global_ev_u2 == 3
-  && global_ev_v1 ==2 &&   global_ev_v2 == 3)
-{
-REAL vertex[4];
-REAL normal[4];
-
-beginCallBack(GL_QUAD_STRIP, NULL);
-inEvalCoord2f(3.0, 3.0);
-inEvalCoord2f(2.0, 3.0);
-inEvalCoord2f(3.0, 2.7);
-inEvalCoord2f(2.0, 2.7);
-inEvalCoord2f(3.0, 2.0);
-inEvalCoord2f(2.0, 2.0);
-endCallBack(NULL);
-
-
-beginCallBack(GL_TRIANGLE_STRIP, NULL);
-inEvalCoord2f(2.0, 3.0);
-inEvalCoord2f(2.0, 2.0);
-inEvalCoord2f(2.0, 2.7);
-endCallBack(NULL);
-
-}
-
-if(  global_ev_u1 ==1 &&   global_ev_u2 == 2
-  && global_ev_v1 ==2 &&   global_ev_v2 == 3)
-{
-beginCallBack(GL_QUAD_STRIP, NULL);
-inEvalCoord2f(2.0, 3.0);
-inEvalCoord2f(1.0, 3.0);
-inEvalCoord2f(2.0, 2.3);
-inEvalCoord2f(1.0, 2.3);
-inEvalCoord2f(2.0, 2.0);
-inEvalCoord2f(1.0, 2.0);
-endCallBack(NULL);
-
-beginCallBack(GL_TRIANGLE_STRIP, NULL);
-inEvalCoord2f(2.0, 2.3);
-inEvalCoord2f(2.0, 2.0);
-inEvalCoord2f(2.0, 3.0);
-endCallBack(NULL);
-
-}
-return;
-#endif
 
   k=0;
   l=0;
@@ -438,8 +336,8 @@ void OpenGLSurfaceEvaluator::inMap2f(int k,
   
 
 
-  if(k == GL_MAP2_VERTEX_3) k=3;
-  else if (k==GL_MAP2_VERTEX_4) k =4;
+  if(k == GLU_MAP2_VERTEX_3) k=3;
+  else if (k==GLU_MAP2_VERTEX_4) k =4;
   else {
     printf("error in inMap2f, maptype=%i is wrong, k,map is not updated\n", k);
     return;
@@ -1848,7 +1746,7 @@ void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
       ustride = p->dimension * p->vorder;
       vstride = p->dimension;
 
-      glMap2f( (p->dimension == 3)? GL_MAP2_VERTEX_3 : GL_MAP2_VERTEX_4,
+      glMap2f( (p->dimension == 3)? GLU_MAP2_VERTEX_3 : GLU_MAP2_VERTEX_4,
 	      p->umin,
 	      p->umax,
 	      ustride,
@@ -1969,51 +1867,6 @@ void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
     
 #else //undef  USE_LOD
 
-#ifdef CRACK_TEST
-if(  bpm->bpatch->umin == 2 &&   bpm->bpatch->umax == 3
-  && bpm->bpatch->vmin ==2 &&    bpm->bpatch->vmax == 3)
-{
-REAL vertex[4];
-REAL normal[4];
-
-beginCallBack(GL_QUAD_STRIP, NULL);
-inDoEvalCoord2EM(3.0, 3.0);
-inDoEvalCoord2EM(2.0, 3.0);
-inDoEvalCoord2EM(3.0, 2.7);
-inDoEvalCoord2EM(2.0, 2.7);
-inDoEvalCoord2EM(3.0, 2.0);
-inDoEvalCoord2EM(2.0, 2.0);
-endCallBack(NULL);
-
-beginCallBack(GL_TRIANGLE_STRIP, NULL);
-inDoEvalCoord2EM(2.0, 3.0);
-inDoEvalCoord2EM(2.0, 2.0);
-inDoEvalCoord2EM(2.0, 2.7);
-endCallBack(NULL);
-
-}
-if(  bpm->bpatch->umin == 1 &&   bpm->bpatch->umax == 2
-  && bpm->bpatch->vmin ==2 &&    bpm->bpatch->vmax == 3)
-{
-beginCallBack(GL_QUAD_STRIP, NULL);
-inDoEvalCoord2EM(2.0, 3.0);
-inDoEvalCoord2EM(1.0, 3.0);
-inDoEvalCoord2EM(2.0, 2.3);
-inDoEvalCoord2EM(1.0, 2.3);
-inDoEvalCoord2EM(2.0, 2.0);
-inDoEvalCoord2EM(1.0, 2.0);
-endCallBack(NULL);
-
-beginCallBack(GL_TRIANGLE_STRIP, NULL);
-inDoEvalCoord2EM(2.0, 2.3);
-inDoEvalCoord2EM(2.0, 2.0);
-inDoEvalCoord2EM(2.0, 3.0);
-endCallBack(NULL);
-
-}
-return;
-#endif //CRACK_TEST
-
       beginCallBack(bpm->type_array[i], userData);
 
       for(j=0; j<bpm->length_array[i]; j++)
@@ -2024,28 +1877,7 @@ return;
           LOD_EVAL_COORD(u,v);
 //	  glEvalCoord2f(u,v);
 #else
-
-#ifdef  GENERIC_TEST
-          float temp_normal[3];
-          float temp_vertex[3];
-          if(temp_signal == 0)
-	    {
-	      gTessVertexSphere(u,v, temp_normal, temp_vertex);
-//printf("normal=(%f,%f,%f)\n", temp_normal[0], temp_normal[1], temp_normal[2])//printf("veretx=(%f,%f,%f)\n", temp_vertex[0], temp_vertex[1], temp_vertex[2]);
-              normalCallBack(temp_normal, userData);
-	      vertexCallBack(temp_vertex, userData);
-	    }
-          else if(temp_signal == 1)
-	    {
-	      gTessVertexCyl(u,v, temp_normal, temp_vertex);
-//printf("normal=(%f,%f,%f)\n", temp_normal[0], temp_normal[1], temp_normal[2])//printf("veretx=(%f,%f,%f)\n", temp_vertex[0], temp_vertex[1], temp_vertex[2]);
-              normalCallBack(temp_normal, userData);
-	      vertexCallBack(temp_vertex, userData);
-	    }
-	  else
-#endif //GENERIC_TEST
-
-	    inDoEvalCoord2EM(u,v);
+          inDoEvalCoord2EM(u,v);
      
 #endif //USE_LOD
 

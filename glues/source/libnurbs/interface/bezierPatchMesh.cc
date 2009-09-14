@@ -102,7 +102,7 @@ bezierPatchMesh* bezierPatchMeshListReverse(bezierPatchMesh* list)
  return ret;
 }
 
-/*maptype is either GL_MAP2_VERTEX_3 or GL_MAP2_VERTEX_4
+/*maptype is either GLU_MAP2_VERTEX_3 or GLU_MAP2_VERTEX_4
  */
 bezierPatchMesh* bezierPatchMeshMake(int maptype, float umin, float umax, int ustride, int uorder, float vmin, float vmax, int vstride, int vorder, float* ctlpoints,  int size_UVarray, int size_length_array)
 {
@@ -111,13 +111,13 @@ bezierPatchMesh* bezierPatchMeshMake(int maptype, float umin, float umax, int us
    int the_ustride;
    int the_vstride;
 
-   if (maptype==GL_MAP2_VERTEX_3)
+   if (maptype==GLU_MAP2_VERTEX_3)
    {
       dimension=3;
    }
    else
    {
-      if (maptype==GL_MAP2_VERTEX_4)
+      if (maptype==GLU_MAP2_VERTEX_4)
       {
          dimension = 4;
       }
@@ -200,31 +200,31 @@ bezierPatchMesh *bezierPatchMeshMake2(int size_UVarray, int size_length_array)
 void bezierPatchMeshPutPatch(bezierPatchMesh *bpm, int maptype, float umin, float umax, int ustride, int uorder, float vmin, float vmax, int vstride, int vorder, float *ctlpoints)
 {
   switch(maptype){
-  case GL_MAP2_VERTEX_3:
+  case GLU_MAP2_VERTEX_3:
     bpm->bpatch = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 3, ustride, vstride, ctlpoints);
     break;
-  case GL_MAP2_VERTEX_4:
+  case GLU_MAP2_VERTEX_4:
     bpm->bpatch = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 4,ustride, vstride, ctlpoints );
     break;
-  case GL_MAP2_NORMAL:
+  case GLU_MAP2_NORMAL:
     bpm->bpatch_normal = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 3, ustride, vstride, ctlpoints);
     break;
-  case GL_MAP2_INDEX:
+  case GLU_MAP2_INDEX:
     bpm->bpatch_color = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 1, ustride, vstride, ctlpoints);
     break;
-  case GL_MAP2_COLOR_4:
+  case GLU_MAP2_COLOR_4:
     bpm->bpatch_color = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 4, ustride, vstride, ctlpoints);
     break;
-  case GL_MAP2_TEXTURE_COORD_1:
+  case GLU_MAP2_TEXTURE_COORD_1:
     bpm->bpatch_texcoord = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 1, ustride, vstride, ctlpoints);
     break;
-  case GL_MAP2_TEXTURE_COORD_2:
+  case GLU_MAP2_TEXTURE_COORD_2:
     bpm->bpatch_texcoord = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 2, ustride, vstride, ctlpoints);
     break;    
-  case GL_MAP2_TEXTURE_COORD_3:
+  case GLU_MAP2_TEXTURE_COORD_3:
     bpm->bpatch_texcoord = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 3, ustride, vstride, ctlpoints);
     break;    
-  case GL_MAP2_TEXTURE_COORD_4:
+  case GLU_MAP2_TEXTURE_COORD_4:
     bpm->bpatch_texcoord = bezierPatchMake2(umin, vmin, umax, vmax, uorder, vorder, 4, ustride, vstride, ctlpoints);
     break;    
   default:

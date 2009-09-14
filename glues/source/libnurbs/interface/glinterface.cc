@@ -204,10 +204,10 @@ gluNurbsSurface(GLUnurbs *r, GLint sknot_count, GLfloat *sknot,
   {
     int dimension;
     switch(type){
-    case GL_MAP2_VERTEX_3:
+    case GLU_MAP2_VERTEX_3:
       dimension = 3;
       break;
-    case GL_MAP2_VERTEX_4:
+    case GLU_MAP2_VERTEX_4:
       dimension = 4;
       break;
     default:
@@ -253,10 +253,10 @@ gluNurbsProperty(GLUnurbs *r, GLenum property, GLfloat value)
 	} else {
 	    nurbsValue = N_NOCULLING;
 	}
-	r->setnurbsproperty(GL_MAP2_VERTEX_3, N_CULLING, nurbsValue);
-	r->setnurbsproperty(GL_MAP2_VERTEX_4, N_CULLING, nurbsValue);
-	r->setnurbsproperty(GL_MAP1_VERTEX_3, N_CULLING, nurbsValue);
-	r->setnurbsproperty(GL_MAP1_VERTEX_4, N_CULLING, nurbsValue);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_3, N_CULLING, nurbsValue);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_4, N_CULLING, nurbsValue);
+	r->setnurbsproperty(GLU_MAP1_VERTEX_3, N_CULLING, nurbsValue);
+	r->setnurbsproperty(GLU_MAP1_VERTEX_4, N_CULLING, nurbsValue);
         return;
 
       case GLU_SAMPLING_METHOD:
@@ -281,24 +281,24 @@ gluNurbsProperty(GLUnurbs *r, GLenum property, GLfloat value)
             return;
         }
 
-	r->setnurbsproperty(GL_MAP2_VERTEX_3, N_SAMPLINGMETHOD, nurbsValue);
-	r->setnurbsproperty(GL_MAP2_VERTEX_4, N_SAMPLINGMETHOD, nurbsValue);
-	r->setnurbsproperty(GL_MAP1_VERTEX_3, N_SAMPLINGMETHOD, nurbsValue);
-	r->setnurbsproperty(GL_MAP1_VERTEX_4, N_SAMPLINGMETHOD, nurbsValue);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_3, N_SAMPLINGMETHOD, nurbsValue);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_4, N_SAMPLINGMETHOD, nurbsValue);
+	r->setnurbsproperty(GLU_MAP1_VERTEX_3, N_SAMPLINGMETHOD, nurbsValue);
+	r->setnurbsproperty(GLU_MAP1_VERTEX_4, N_SAMPLINGMETHOD, nurbsValue);
 	return;
 
       case GLU_SAMPLING_TOLERANCE:
-	r->setnurbsproperty(GL_MAP2_VERTEX_3, N_PIXEL_TOLERANCE, value);
-	r->setnurbsproperty(GL_MAP2_VERTEX_4, N_PIXEL_TOLERANCE, value);
-	r->setnurbsproperty(GL_MAP1_VERTEX_3, N_PIXEL_TOLERANCE, value);
-	r->setnurbsproperty(GL_MAP1_VERTEX_4, N_PIXEL_TOLERANCE, value);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_3, N_PIXEL_TOLERANCE, value);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_4, N_PIXEL_TOLERANCE, value);
+	r->setnurbsproperty(GLU_MAP1_VERTEX_3, N_PIXEL_TOLERANCE, value);
+	r->setnurbsproperty(GLU_MAP1_VERTEX_4, N_PIXEL_TOLERANCE, value);
 	return;
 
       case GLU_PARAMETRIC_TOLERANCE:
-	r->setnurbsproperty(GL_MAP2_VERTEX_3, N_ERROR_TOLERANCE, value);
-        r->setnurbsproperty(GL_MAP2_VERTEX_4, N_ERROR_TOLERANCE, value);
-        r->setnurbsproperty(GL_MAP1_VERTEX_3, N_ERROR_TOLERANCE, value);
-        r->setnurbsproperty(GL_MAP1_VERTEX_4, N_ERROR_TOLERANCE, value);
+	r->setnurbsproperty(GLU_MAP2_VERTEX_3, N_ERROR_TOLERANCE, value);
+        r->setnurbsproperty(GLU_MAP2_VERTEX_4, N_ERROR_TOLERANCE, value);
+        r->setnurbsproperty(GLU_MAP1_VERTEX_3, N_ERROR_TOLERANCE, value);
+        r->setnurbsproperty(GLU_MAP1_VERTEX_4, N_ERROR_TOLERANCE, value);
         return;
 	
 
@@ -319,20 +319,20 @@ gluNurbsProperty(GLUnurbs *r, GLenum property, GLfloat value)
 	break;
 
       case GLU_U_STEP:
-    	r->setnurbsproperty(GL_MAP1_VERTEX_3, N_S_STEPS, value);
-    	r->setnurbsproperty(GL_MAP1_VERTEX_4, N_S_STEPS, value);
-    	r->setnurbsproperty(GL_MAP2_VERTEX_3, N_S_STEPS, value);
-    	r->setnurbsproperty(GL_MAP2_VERTEX_4, N_S_STEPS, value);
+    	r->setnurbsproperty(GLU_MAP1_VERTEX_3, N_S_STEPS, value);
+    	r->setnurbsproperty(GLU_MAP1_VERTEX_4, N_S_STEPS, value);
+    	r->setnurbsproperty(GLU_MAP2_VERTEX_3, N_S_STEPS, value);
+    	r->setnurbsproperty(GLU_MAP2_VERTEX_4, N_S_STEPS, value);
 	
 	//added for optimizing untrimmed case
         r->set_domain_distance_u_rate(value);
 	break;
 
       case GLU_V_STEP:
-        r->setnurbsproperty(GL_MAP1_VERTEX_3, N_T_STEPS, value);
-        r->setnurbsproperty(GL_MAP1_VERTEX_4, N_T_STEPS, value);
-        r->setnurbsproperty(GL_MAP2_VERTEX_3, N_T_STEPS, value);
-        r->setnurbsproperty(GL_MAP2_VERTEX_4, N_T_STEPS, value);
+        r->setnurbsproperty(GLU_MAP1_VERTEX_3, N_T_STEPS, value);
+        r->setnurbsproperty(GLU_MAP1_VERTEX_4, N_T_STEPS, value);
+        r->setnurbsproperty(GLU_MAP2_VERTEX_3, N_T_STEPS, value);
+        r->setnurbsproperty(GLU_MAP2_VERTEX_4, N_T_STEPS, value);
 
 	//added for optimizing untrimmed case
         r->set_domain_distance_v_rate(value);
@@ -367,7 +367,7 @@ gluGetNurbsProperty(GLUnurbs *r, GLenum property, GLfloat *value)
 	}
 	break;
       case GLU_CULLING:
-	r->getnurbsproperty(GL_MAP2_VERTEX_3, N_CULLING, &nurbsValue);
+	r->getnurbsproperty(GLU_MAP2_VERTEX_3, N_CULLING, &nurbsValue);
 	if (nurbsValue == N_CULLINGON) {
 	    *value = GL_TRUE;
 	} else {
@@ -375,7 +375,7 @@ gluGetNurbsProperty(GLUnurbs *r, GLenum property, GLfloat *value)
 	}
 	break;
       case GLU_SAMPLING_METHOD:
-	r->getnurbsproperty(GL_MAP2_VERTEX_3, N_SAMPLINGMETHOD, value);
+	r->getnurbsproperty(GLU_MAP2_VERTEX_3, N_SAMPLINGMETHOD, value);
 	if(*value == N_PATHLENGTH)
 	  *value = GLU_PATH_LENGTH;
 	else if(*value == N_PARAMETRICDISTANCE)
@@ -388,17 +388,17 @@ gluGetNurbsProperty(GLUnurbs *r, GLenum property, GLfloat *value)
 	  *value = GLU_OBJECT_PARAMETRIC_ERROR;	
 	break;
       case GLU_SAMPLING_TOLERANCE:
-	r->getnurbsproperty(GL_MAP2_VERTEX_3, N_PIXEL_TOLERANCE, value);
+	r->getnurbsproperty(GLU_MAP2_VERTEX_3, N_PIXEL_TOLERANCE, value);
 	break;
       case GLU_PARAMETRIC_TOLERANCE:
-	r->getnurbsproperty(GL_MAP2_VERTEX_3, N_ERROR_TOLERANCE, value);
+	r->getnurbsproperty(GLU_MAP2_VERTEX_3, N_ERROR_TOLERANCE, value);
         break;
 
       case GLU_U_STEP:
-    	r->getnurbsproperty(GL_MAP2_VERTEX_3, N_S_STEPS, value);
+    	r->getnurbsproperty(GLU_MAP2_VERTEX_3, N_S_STEPS, value);
 	break;
       case GLU_V_STEP:
-    	r->getnurbsproperty(GL_MAP2_VERTEX_3, N_T_STEPS, value);
+    	r->getnurbsproperty(GLU_MAP2_VERTEX_3, N_T_STEPS, value);
 	break;
       case GLU_DISPLAY_MODE:
 	r->getnurbsproperty(N_DISPLAY, &nurbsValue);

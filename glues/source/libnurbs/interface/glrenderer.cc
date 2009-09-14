@@ -44,52 +44,52 @@ GLUnurbs::GLUnurbs()
 	: NurbsTessellator(curveEvaluator, surfaceEvaluator)
 {
     redefineMaps();
-    defineMap(GL_MAP2_NORMAL, 0, 3);
-    defineMap(GL_MAP1_NORMAL, 0, 3);
-    defineMap(GL_MAP2_TEXTURE_COORD_1, 0, 1);
-    defineMap(GL_MAP1_TEXTURE_COORD_1, 0, 1);
-    defineMap(GL_MAP2_TEXTURE_COORD_2, 0, 2);
-    defineMap(GL_MAP1_TEXTURE_COORD_2, 0, 2);
-    defineMap(GL_MAP2_TEXTURE_COORD_3, 0, 3);
-    defineMap(GL_MAP1_TEXTURE_COORD_3, 0, 3);
-    defineMap(GL_MAP2_TEXTURE_COORD_4, 1, 4);
-    defineMap(GL_MAP1_TEXTURE_COORD_4, 1, 4);
-    defineMap(GL_MAP2_VERTEX_4, 1, 4);
-    defineMap(GL_MAP1_VERTEX_4, 1, 4);
-    defineMap(GL_MAP2_VERTEX_3, 0, 3);
-    defineMap(GL_MAP1_VERTEX_3, 0, 3);
-    defineMap(GL_MAP2_COLOR_4, 0, 4);
-    defineMap(GL_MAP1_COLOR_4, 0, 4);
-    defineMap(GL_MAP2_INDEX, 0, 1);
-    defineMap(GL_MAP1_INDEX, 0, 1);
+    defineMap(GLU_MAP2_NORMAL, 0, 3);
+    defineMap(GLU_MAP1_NORMAL, 0, 3);
+    defineMap(GLU_MAP2_TEXTURE_COORD_1, 0, 1);
+    defineMap(GLU_MAP1_TEXTURE_COORD_1, 0, 1);
+    defineMap(GLU_MAP2_TEXTURE_COORD_2, 0, 2);
+    defineMap(GLU_MAP1_TEXTURE_COORD_2, 0, 2);
+    defineMap(GLU_MAP2_TEXTURE_COORD_3, 0, 3);
+    defineMap(GLU_MAP1_TEXTURE_COORD_3, 0, 3);
+    defineMap(GLU_MAP2_TEXTURE_COORD_4, 1, 4);
+    defineMap(GLU_MAP1_TEXTURE_COORD_4, 1, 4);
+    defineMap(GLU_MAP2_VERTEX_4, 1, 4);
+    defineMap(GLU_MAP1_VERTEX_4, 1, 4);
+    defineMap(GLU_MAP2_VERTEX_3, 0, 3);
+    defineMap(GLU_MAP1_VERTEX_3, 0, 3);
+    defineMap(GLU_MAP2_COLOR_4, 0, 4);
+    defineMap(GLU_MAP1_COLOR_4, 0, 4);
+    defineMap(GLU_MAP2_INDEX, 0, 1);
+    defineMap(GLU_MAP1_INDEX, 0, 1);
 
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_SAMPLINGMETHOD, (float) N_PATHLENGTH);
 
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_PIXEL_TOLERANCE, (float) 50.0);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_PIXEL_TOLERANCE, (float) 50.0);
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_PIXEL_TOLERANCE, (float) 50.0);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_PIXEL_TOLERANCE, (float) 50.0);
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_PIXEL_TOLERANCE, (float) 50.0);
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_PIXEL_TOLERANCE, (float) 50.0);
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_PIXEL_TOLERANCE, (float) 50.0);
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_PIXEL_TOLERANCE, (float) 50.0);
 
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_ERROR_TOLERANCE, (float) 0.50);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_ERROR_TOLERANCE, (float) 0.50);
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_ERROR_TOLERANCE, (float) 0.50);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_ERROR_TOLERANCE, (float) 0.50);
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_ERROR_TOLERANCE, (float) 0.50);
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_ERROR_TOLERANCE, (float) 0.50);
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_ERROR_TOLERANCE, (float) 0.50);
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_ERROR_TOLERANCE, (float) 0.50);
 
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_S_STEPS, (float) 100.0);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_S_STEPS, (float) 100.0);
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_S_STEPS, (float) 100.0);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_S_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_S_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_S_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_S_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_S_STEPS, (float) 100.0);
 
     //added for optimizing untrimmed case
     set_domain_distance_u_rate(100.0);
 
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_T_STEPS, (float) 100.0);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_T_STEPS, (float) 100.0);
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_T_STEPS, (float) 100.0);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_T_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_T_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_T_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_T_STEPS, (float) 100.0);
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_T_STEPS, (float) 100.0);
 
     //added for optimizing untrimmed case
     set_domain_distance_v_rate(100.0);
@@ -183,13 +183,13 @@ GLUnurbs::setSamplingMatrixIdentity( void )
   const long rstride = sizeof(smat[0]) / sizeof(smat[0][0]);
   const long cstride = 1;
 
-  setnurbsproperty(GL_MAP1_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+  setnurbsproperty(GLU_MAP1_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 		   cstride);
-  setnurbsproperty(GL_MAP1_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+  setnurbsproperty(GLU_MAP1_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 		   cstride);
-  setnurbsproperty(GL_MAP2_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+  setnurbsproperty(GLU_MAP2_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 		   cstride);
-  setnurbsproperty(GL_MAP2_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+  setnurbsproperty(GLU_MAP2_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 		   cstride);
 }
 
@@ -227,13 +227,13 @@ GLUnurbs::loadSamplingMatrix(const GLfloat vmat[4][4],
     const long rstride = sizeof(smat[0]) / sizeof(smat[0][0]);
     const long cstride = 1;
 
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 	    cstride);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 	    cstride);
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 	    cstride);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_SAMPLINGMATRIX, &smat[0][0], rstride,
 	    cstride);
 }
 
@@ -265,14 +265,14 @@ GLUnurbs::loadCullingMatrix(GLfloat vmat[4][4])
     const long rstride = sizeof(cmat[0]) / sizeof(cmat[0][0]);
     const long cstride = 1;
 
-    setnurbsproperty(GL_MAP2_VERTEX_3, N_CULLINGMATRIX, &cmat[0][0], rstride,
+    setnurbsproperty(GLU_MAP2_VERTEX_3, N_CULLINGMATRIX, &cmat[0][0], rstride,
 	    cstride);
-    setnurbsproperty(GL_MAP2_VERTEX_4, N_CULLINGMATRIX, &cmat[0][0], rstride,
+    setnurbsproperty(GLU_MAP2_VERTEX_4, N_CULLINGMATRIX, &cmat[0][0], rstride,
 	    cstride);
 	//added for curves by zl
-    setnurbsproperty(GL_MAP1_VERTEX_3, N_CULLINGMATRIX, &cmat[0][0], rstride,
+    setnurbsproperty(GLU_MAP1_VERTEX_3, N_CULLINGMATRIX, &cmat[0][0], rstride,
 	    cstride);
-    setnurbsproperty(GL_MAP1_VERTEX_4, N_CULLINGMATRIX, &cmat[0][0], rstride,
+    setnurbsproperty(GLU_MAP1_VERTEX_4, N_CULLINGMATRIX, &cmat[0][0], rstride,
 	    cstride);
 }
 

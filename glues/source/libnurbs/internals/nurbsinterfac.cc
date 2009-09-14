@@ -459,9 +459,6 @@ NurbsTessellator::setnurbsproperty( long type, long purpose, INREAL *mat )
     } else if( purpose == N_BBOXSIZE ) {
 	mapdesc->setBboxsize( mat );
     } else {
-#ifndef NDEBUG
-        _glu_dprintf( "ERRORRORRORR!!!\n");
-#endif
     }
 }
 
@@ -486,10 +483,6 @@ NurbsTessellator::setnurbsproperty( long type, long purpose, INREAL *mat,
 	mapdesc->setSmat( mat, rstride, cstride );
     } else if( purpose == N_BBOXMATRIX ) {
 	mapdesc->setBmat( mat, rstride, cstride );
-    } else {
-#ifndef NDEBUG
-        _glu_dprintf( "ERRORRORRORR!!!\n");
-#endif
     }
 }
 

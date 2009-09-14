@@ -160,10 +160,6 @@ Trimline::getNextPts( Arc_ptr botarc )
 {
     reset(); swap(); append( tinterp );
 
-#ifndef NDEBUG
-    PwlArc *lastpwl = botarc->prev->pwlArc;
-    TrimVertex *lastpt1 = &lastpwl->pts[lastpwl->npts-1];
-#endif
     TrimVertex *lastpt2 = botarc->pwlArc->pts;
     register TrimVertex *p = jarcl.getnextpt();
     for( append( p ); p != lastpt2; append( p ) ) {
@@ -179,9 +175,6 @@ Trimline::getPrevPts( Arc_ptr botarc )
 
     PwlArc *lastpwl = botarc->prev->pwlArc;
     TrimVertex *lastpt1 = &lastpwl->pts[lastpwl->npts-1];
-#ifndef NDEBUG
-    TrimVertex *lastpt2 = botarc->pwlArc->pts;
-#endif
 
     register TrimVertex *q =  jarcl.getprevpt();
     for( append( q ); q != lastpt1; append( q ) ) {

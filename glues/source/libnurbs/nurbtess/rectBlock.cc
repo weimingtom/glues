@@ -87,10 +87,8 @@ void rectBlock::print()
 void rectBlock::draw(Real* u_values, Real* v_values)
 {
   Int i,j,k;
+
   //upgrid line to bot grid line
-#ifdef DEBUG
-printf("upGridLineIndex=%i, lowGridLineIndex=%i\n", upGridLineIndex, lowGridLineIndex);
-#endif
   for(k=0, i=upGridLineIndex; i > lowGridLineIndex; i--, k++)
     {
 // MIKE: TODO
@@ -107,7 +105,6 @@ printf("upGridLineIndex=%i, lowGridLineIndex=%i\n", upGridLineIndex, lowGridLine
 //      glEnd();
     }
 }
-
 
 Int rectBlock::num_quads()
 {
