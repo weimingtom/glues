@@ -36,11 +36,11 @@
 #ifndef __glutypes_h_
 #define __glutypes_h_
 
-#define INREAL          float
-typedef float REAL;
-typedef void  (*Pfvv)(void);
-typedef void  (*Pfvf)(float*);
-typedef int   (*cmpfunc)(const void*, const void*);
-typedef REAL  Knot, *Knot_ptr; /* knot values */
+#define INREAL float
+typedef float  REAL;
+typedef void   (*Pfvv)(void);
+typedef void   (*Pfvf)(float*);
+typedef int    (*cmpfunc)(const void*, const void*);
+typedef REAL   Knot, *Knot_ptr; /* knot values */
 
 #endif /* __glutypes_h_ */

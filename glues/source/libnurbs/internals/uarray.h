@@ -39,17 +39,18 @@
 #include "types.h"
 
 class Arc;
-typedef class Arc *Arc_ptr; 
+typedef class Arc* Arc_ptr; 
 
-class Uarray {
-private:
-    long		size;
-    long		ulines;
-public:
-			Uarray();
-			~Uarray();
-    long		init( REAL, Arc_ptr, Arc_ptr );
-    REAL *		uarray;
+class Uarray
+{
+   private:
+      long size;
+      long ulines;
+   public:
+      Uarray();
+      ~Uarray();
+      long init(REAL, Arc_ptr, Arc_ptr);
+      REAL* uarray;
 };
 
 #endif /* __gluuarray_h_ */

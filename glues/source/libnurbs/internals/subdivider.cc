@@ -56,16 +56,6 @@
 
 #include "polyUtil.h" //for function area()
 
-//#define  PARTITION_TEST
-#ifdef PARTITION_TEST
-#include "partitionY.h"
-#include "monoTriangulation.h"
-#include "dataTransform.h"
-#include "monoChain.h"
-#endif
-
-#define OPTIMIZE_UNTRIMED_CASE
-
 Bin* Subdivider::makePatchBoundary(const REAL* from, const REAL* to)
 {
    Bin* ret=new Bin();
@@ -194,7 +184,7 @@ void Subdivider::drawSurfaces(long nuid)
 {
    renderhints.init();
 
-   if (qlist==NULL) 
+   if (qlist==NULL)
    {
       //initialbin could be nonempty due to some errors
       freejarcs(initialbin);
@@ -212,23 +202,18 @@ void Subdivider::drawSurfaces(long nuid)
 
    REAL from[2], to[2];
    qlist->getRange(from, to, spbrkpts, tpbrkpts);
-#ifdef OPTIMIZE_UNTRIMED_CASE
+
    //perform optimization only when the samplng method is
    //DOMAIN_DISTANCE and the display methdo is either
    //fill or outline_polygon.
    int optimize=(is_domain_distance_sampling && (renderhints.display_method!=N_OUTLINE_PATCH));
-#endif
 
    if (!initialbin.isnonempty())
    {
-#ifdef OPTIMIZE_UNTRIMED_CASE
       if (!optimize)
       {
          makeBorderTrim(from, to);
       }
-#else
-      makeBorderTrim(from, to);
-#endif
    }
    else
    {
@@ -243,52 +228,6 @@ void Subdivider::drawSurfaces(long nuid)
 
    backend.bgnsurf(renderhints.wiretris, renderhints.wirequads, nuid);
 
-#ifdef PARTITION_TEST
-   if (initialbin.isnonempty() && spbrkpts.end-2==spbrkpts.start &&
-       tpbrkpts.end-2==tpbrkpts.start)
-   {
-      for (int i=spbrkpts.start; i<spbrkpts.end-1; i++)
-      {
-         for (int j=tpbrkpts.start; j<tpbrkpts.end-1; j++)
-         {
-            Real pta[2], ptb[2];
-            pta[0]=spbrkpts.pts[i];
-            ptb[0]=spbrkpts.pts[i+1];
-            pta[1]=tpbrkpts.pts[j];
-            ptb[1]=tpbrkpts.pts[j+1];
-            qlist->downloadAll(pta, ptb, backend);
-
-            directedLine* poly;
-
-            {
-               poly=bin_to_DLineLoops(initialbin);
-               poly=poly->deleteDegenerateLinesAllPolygons();
-
-               sampledLine* retSampledLines;
-               poly=MC_partitionY(poly, &retSampledLines);
-            }
-
-            {
-               primStream pStream(5000, 5000);
-               directedLine* temp;
-
-               for (temp=poly; temp!=NULL; temp=temp->getNextPolygon())
-               {
-                  monoTriangulation(temp, &pStream);
-               }
-               slicer.evalStream(&pStream);
-            }
-            // need to clean up space
-         }
-      }
-
-      freejarcs(initialbin);
-      backend.endsurf();
-      return;
-   }
-#endif //PARTITION_TEST
-
-#ifdef OPTIMIZE_UNTRIMED_CASE
    if ((!initialbin.isnonempty()) && optimize)
    {
       int i, j;
@@ -329,9 +268,6 @@ void Subdivider::drawSurfaces(long nuid)
    {
       subdivideInS(initialbin);
    }
-#else
-   subdivideInS(initialbin);
-#endif
 
    backend.endsurf();
 }
@@ -474,8 +410,6 @@ void Subdivider::samplingSplit(Bin& source, Patchlist& patchlist, int subdivisio
       freejarcs(source);
       return;
    }
-
-   // patchlist.clamp();
 
    tessellation(source, patchlist);
 
@@ -753,7 +687,7 @@ void Subdivider::findIrregularT(Bin& bin)
       }
       else
       {
-         if (b[0] >=a[0] && b[0] >=c[0])
+         if (b[0]>=a[0] && b[0]>=c[0])
          {
             if (a[1]!=b[1] && b[1]!=c[1])
             {
@@ -814,8 +748,7 @@ void Subdivider::makeBorderTrim(const REAL* from, const REAL* to)
 *----------------------------------------------------------------------------
 */
 
-void
-Subdivider::render(Bin& bin)
+void Subdivider::render(Bin& bin)
 {
    bin.markall();
 

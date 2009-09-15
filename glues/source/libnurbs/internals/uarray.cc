@@ -43,30 +43,41 @@
 #include "uarray.h"
 #include "arc.h"
 
-Uarray::Uarray( void )
+Uarray::Uarray(void)
 {
-    uarray = 0;
-    size = 0;
+   uarray=0;
+   size=0;
 }
 
-Uarray::~Uarray( void )
+Uarray::~Uarray(void)
 {
-    if( uarray ) delete[] uarray;		
+   if (uarray)
+   {
+      delete[] uarray;
+   }
 }
 
-long
-Uarray::init( REAL delta, Arc_ptr lo, Arc_ptr hi )
+long Uarray::init(REAL delta, Arc_ptr lo, Arc_ptr hi)
 {
-    ulines = (long) ((hi->tail()[0] - lo->tail()[0])/delta) + 3;
-    if( size < ulines ) {
-	size = ulines * 2;
-	if( uarray ) delete[] uarray;		
-	uarray = new REAL[size];
-	assert( uarray != 0);
-    }
-    uarray[0] = lo->tail()[0] - delta/2.0;
-    for( long i = 1 ; i != ulines; i++ )
-	uarray[i] = uarray[0] + i*delta;
-    return ulines;
-}
+   ulines=(long)((hi->tail()[0]-lo->tail()[0])/delta)+3;
 
+   if (size<ulines)
+   {
+      size=ulines*2;
+      if (uarray)
+      {
+         delete[] uarray;
+      }
+      uarray=new REAL[size];
+      assert(uarray!=0);
+   }
+
+   uarray[0]=lo->tail()[0]-delta/2.0;
+
+   for (long i=1; i!=ulines; i++)
+   {
+      uarray[i]=uarray[0]+i*delta;
+   }
+
+   return ulines;
+}
