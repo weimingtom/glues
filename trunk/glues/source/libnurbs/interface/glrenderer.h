@@ -42,105 +42,106 @@
 #include "glsurfeval.h"
 #include "glcurveval.h"
 
-extern "C" {
-      typedef void (APIENTRY *errorCallbackType)( GLenum );
+extern "C"
+{
+   typedef void (APIENTRY* errorCallbackType)(GLenum);
 }
 
-class GLUnurbs : public NurbsTessellator {
+class GLUnurbs: public NurbsTessellator
+{
+   public:
+      GLUnurbs(void);
+      void loadGLMatrices(void);
+      void useGLMatrices(const GLfloat modelMatrix[16], const GLfloat projMatrix[16],
+                         const GLint viewport[4]);
+      void setSamplingMatrixIdentity(void);
 
-public:
-		GLUnurbs( void );
-    void 	loadGLMatrices( void );
-    void	useGLMatrices( const GLfloat modelMatrix[16], 
-			       const GLfloat projMatrix[16],
-			       const GLint viewport[4] );
-    void		setSamplingMatrixIdentity( void );
+      void errorHandler(int);
+      void bgnrender(void);
+      void endrender(void);
+      void setautoloadmode(INREAL value)
+           {
+              if (value)
+              {
+                 autoloadmode=GL_TRUE;
+              }
+              else
+              {
+                 autoloadmode=GL_FALSE;
+              }
+           }
+      GLboolean getautoloadmode(void) { return autoloadmode; }
 
-    void 	errorHandler( int );
-    void	bgnrender( void );
-    void	endrender( void );
-    void	setautoloadmode( INREAL value )
-      		    { 
-		      
-		      if (value) autoloadmode = GL_TRUE; 
-		      else autoloadmode = GL_FALSE; 
-			
-		    }
-    GLboolean	getautoloadmode( void ) { return autoloadmode; }
+      errorCallbackType errorCallback;
 
-    errorCallbackType errorCallback;
-    void	postError( int which ) 
-		    { if (errorCallback) (errorCallback)( (GLenum)which ); }
+      void postError(int which)
+           {
+              if (errorCallback)
+              {
+                 (errorCallback)((GLenum)which);
+              }
+           }
 #ifdef _WIN32
-    void        putSurfCallBack(GLenum which, void (GLAPIENTRY *fn)() )
+      void putSurfCallBack(GLenum which, void (GLAPIENTRY* fn)())
 #else
-    void        putSurfCallBack(GLenum which, _GLUfuncptr fn )
+      void putSurfCallBack(GLenum which, _GLUfuncptr fn)
 #endif
-      {
-	curveEvaluator.putCallBack(which, fn);
-	surfaceEvaluator.putCallBack(which, fn);
-      }
+           {
+              curveEvaluator.putCallBack(which, fn);
+              surfaceEvaluator.putCallBack(which, fn);
+           }
+      int get_vertices_call_back()
+          {
+             return surfaceEvaluator.get_vertices_call_back();
+          }
+      void put_vertices_call_back(int flag)
+           {
+              surfaceEvaluator.put_vertices_call_back(flag);
+           }
+      int get_callback_auto_normal()
+          {
+             return surfaceEvaluator.get_callback_auto_normal();
+          }
+      void put_callback_auto_normal(int flag)
+          {
+             surfaceEvaluator.put_callback_auto_normal(flag);
+          }
+      void setNurbsCallbackData(void* userData)
+           {
+              curveEvaluator.set_callback_userData(userData);
+              surfaceEvaluator.set_callback_userData(userData);
+           }
 
-    int         get_vertices_call_back()
-      {
-	return surfaceEvaluator.get_vertices_call_back();
-      }
-    
-    void        put_vertices_call_back(int flag)
-      {
-	surfaceEvaluator.put_vertices_call_back(flag);
-      }
-
-    int         get_callback_auto_normal()
-      {
-        return surfaceEvaluator.get_callback_auto_normal();
-      }
- 
-    void         put_callback_auto_normal(int flag)
-      {
-        surfaceEvaluator.put_callback_auto_normal(flag);
-      }
-
-    void       setNurbsCallbackData(void* userData)
-      {
-       curveEvaluator.set_callback_userData(userData);
-       surfaceEvaluator.set_callback_userData(userData);
-     }
-
-
-    //for LOD
+    // for LOD
     void LOD_eval_list(int level)
-      {
-	surfaceEvaluator.LOD_eval_list(level);
-      }
+         {
+            surfaceEvaluator.LOD_eval_list(level);
+         }
 
-    //NEWCALLBACK
-    int        is_callback()
-      {
-	return callbackFlag;
-      }
-    void       put_callbackFlag(int flag)
-      {
-	callbackFlag = flag;
-	surfaceEvaluator.put_vertices_call_back(flag);
-	curveEvaluator.put_vertices_call_back(flag);
-      }
+    // NEWCALLBACK
+    int is_callback()
+        {
+           return callbackFlag;
+        }
+    void put_callbackFlag(int flag)
+         {
+            callbackFlag = flag;
+            surfaceEvaluator.put_vertices_call_back(flag);
+            curveEvaluator.put_vertices_call_back(flag);
+         }
 
-private:
-    GLboolean			autoloadmode;
-    OpenGLSurfaceEvaluator	surfaceEvaluator;
-    OpenGLCurveEvaluator	curveEvaluator;
+   private:
+      GLboolean              autoloadmode;
+      OpenGLSurfaceEvaluator surfaceEvaluator;
+      OpenGLCurveEvaluator   curveEvaluator;
 
-    void		loadSamplingMatrix( const GLfloat vmat[4][4], 
-			        const GLint viewport[4] );
-    void		loadCullingMatrix( GLfloat vmat[4][4] );
-    static void		grabGLMatrix( GLfloat vmat[4][4] );
-    static void		transform4d( GLfloat A[4], GLfloat B[4], 
-				GLfloat mat[4][4] );
-    static void		multmatrix4d( GLfloat n[4][4], const GLfloat left[4][4],
-				const GLfloat right[4][4] );
+      void loadSamplingMatrix(const GLfloat vmat[4][4], const GLint viewport[4]);
+      void loadCullingMatrix(GLfloat vmat[4][4]);
+      static void grabGLMatrix(GLfloat vmat[4][4]);
+      static void transform4d(GLfloat A[4], GLfloat B[4], GLfloat mat[4][4]);
+      static void multmatrix4d(GLfloat n[4][4], const GLfloat left[4][4], const GLfloat right[4][4]);
 
-   int                  callbackFlag;
+      int callbackFlag;
 };
 
 #endif /* __gluglrenderer_h_ */
