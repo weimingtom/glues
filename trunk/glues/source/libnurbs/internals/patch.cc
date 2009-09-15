@@ -55,27 +55,27 @@
  *--------------------------------------------------------------------------
  */
 
-Patch::Patch( Quilt_ptr geo, REAL *pta, REAL *ptb, Patch *n )
+Patch::Patch(Quilt_ptr geo, REAL* pta, REAL* ptb, Patch* n)
 {
-/* pspec[i].range is uninit here */
-    mapdesc = geo->mapdesc;
-    cullval = mapdesc->isCulling() ? CULL_ACCEPT : CULL_TRIVIAL_ACCEPT;
-    notInBbox = mapdesc->isBboxSubdividing() ? 1 : 0;
-    needsSampling = mapdesc->isRangeSampling() ? 1 : 0;
-    pspec[0].order = geo->qspec[0].order;
-    pspec[1].order = geo->qspec[1].order;
-    pspec[0].stride = pspec[1].order * MAXCOORDS;
-    pspec[1].stride = MAXCOORDS;
+   /* pspec[i].range is uninit here */
+   mapdesc = geo->mapdesc;
+   cullval = mapdesc->isCulling() ? CULL_ACCEPT : CULL_TRIVIAL_ACCEPT;
+   notInBbox = mapdesc->isBboxSubdividing() ? 1 : 0;
+   needsSampling = mapdesc->isRangeSampling() ? 1 : 0;
+   pspec[0].order = geo->qspec[0].order;
+   pspec[1].order = geo->qspec[1].order;
+   pspec[0].stride = pspec[1].order * MAXCOORDS;
+   pspec[1].stride = MAXCOORDS;
 
-    /* transform control points to sampling and culling spaces */
-    REAL *ps  = geo->cpts;
-    geo->select( pta, ptb );
-    ps += geo->qspec[0].offset;
-    ps += geo->qspec[1].offset;
-    ps += geo->qspec[0].index * geo->qspec[0].order * geo->qspec[0].stride;
-    ps += geo->qspec[1].index * geo->qspec[1].order * geo->qspec[1].stride;
+   /* transform control points to sampling and culling spaces */
+   REAL *ps  = geo->cpts;
+   geo->select( pta, ptb );
+   ps += geo->qspec[0].offset;
+   ps += geo->qspec[1].offset;
+   ps += geo->qspec[0].index * geo->qspec[0].order * geo->qspec[0].stride;
+   ps += geo->qspec[1].index * geo->qspec[1].order * geo->qspec[1].stride;
 
-    if( needsSampling ) {
+   if( needsSampling ) {
 	mapdesc->xformSampling( ps, geo->qspec[0].order, geo->qspec[0].stride, 
 				geo->qspec[1].order, geo->qspec[1].stride,
 			        spts, pspec[0].stride, pspec[1].stride );

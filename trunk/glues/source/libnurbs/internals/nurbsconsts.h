@@ -36,7 +36,7 @@
 #ifndef __glunurbsconsts_h_
 #define __glunurbsconsts_h_
 
-/* NURBS Properties - one set per map, 
+/* NURBS Properties - one set per map,
    each takes a single INREAL arg */
 #define N_SAMPLING_TOLERANCE    1
 #define N_S_RATE                6

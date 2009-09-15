@@ -223,74 +223,95 @@ NurbsTessellator::do_endcurve( void )
  * Client:
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_endsurface( void )
+void NurbsTessellator::do_endsurface(void)
 {
-    if( inTrim ) {
-	do_nurbserror( 12 );
-	endtrim();
-    }
+   if (inTrim)
+   {
+      do_nurbserror(12);
+      endtrim();
+   }
 
-    if( ! inSurface ) {
-	do_nurbserror( 13 );
-	return;
-    }
-    inSurface = 0;
+   if (!inSurface)
+   {
+      do_nurbserror(13);
+      return;
+   }
+   inSurface=0;
 
-    *nextNurbssurface = 0;
+   *nextNurbssurface=0;
 
-    if( ! isDataValid ) {
-        do_freeall( ); 
-	return;
-    }
+   if (!isDataValid)
+   {
+      do_freeall();
+      return;
+   }
 
-    if( *nextTrim != 0 ) {
-	isTrimModified = 1;
-        *nextTrim = 0;
-    }
+   if (*nextTrim!=0)
+   {
+      isTrimModified=1;
+      *nextTrim=0;
+   }
 
-    int errval;
+   int errval;
 
-    errval = ::mysetjmp( jumpbuffer );
-    if( errval == 0 ) {
-        if( numTrims > 0 ) {
+   errval=::mysetjmp(jumpbuffer);
+   if (errval==0)
+   {
+      if (numTrims>0)
+      {
+         subdivider.beginTrims();
+         for (O_trim* trim=currentSurface->o_trim; trim; trim=trim->next)
+         {
+            subdivider.beginLoop();
+            for (O_curve* curve=trim->o_curve; curve; curve=curve->next)
+            {
+               curve->used=0;
+               assert(curve->curvetype!=ct_none);
+               if (curve->curvetype==ct_pwlcurve)
+               {
+                  O_pwlcurve* c=curve->curve.o_pwlcurve;
+                  subdivider.addArc(c->npts, c->pts, curve->nuid);
+               }
+               else
+               {
+                  Quilt* quilt=curve->curve.o_nurbscurve->bezier_curves;
+                  Quiltspec* qspec=quilt->qspec;
+                  REAL* cpts=quilt->cpts+qspec->offset;
+                  REAL* cptsend=cpts+(qspec->width*qspec->order*qspec->stride);
+                  for (; cpts!=cptsend; cpts+=qspec->order*qspec->stride)
+                  {
+                     subdivider.addArc(cpts, quilt, curve->nuid);
+                  }
+               }
+            }
+            subdivider.endLoop();
+         }
+         subdivider.endTrims();
+      }
 
-	    subdivider.beginTrims();
-	    for( O_trim	*trim = currentSurface->o_trim; trim; trim = trim->next ) {
-		subdivider.beginLoop();
-		for( O_curve *curve = trim->o_curve; curve; curve = curve->next ) {  
-		    curve->used = 0;
-		    assert( curve->curvetype != ct_none );
-		    if (curve->curvetype == ct_pwlcurve) {
-			O_pwlcurve *c = curve->curve.o_pwlcurve; 
-			subdivider.addArc( c->npts, c->pts, curve->nuid );
-		    } else {
-			Quilt	   *quilt = curve->curve.o_nurbscurve->bezier_curves;
-			Quiltspec  *qspec = quilt->qspec;
-			REAL       *cpts  = quilt->cpts + qspec->offset;
-			REAL       *cptsend = cpts + (qspec->width * qspec->order * qspec->stride);
-			for( ; cpts != cptsend; cpts += qspec->order*qspec->stride ) 
-			     subdivider.addArc( cpts, quilt, curve->nuid );
-		    }
-		}
-		subdivider.endLoop();
-	    }
-	    subdivider.endTrims();
-	}
+      subdivider.beginQuilts();
+      for (O_nurbssurface* n=currentSurface->o_nurbssurface; n; n=n->next)
+      {
+         subdivider.addQuilt(n->bezier_patches);
+      }
+      subdivider.endQuilts();
+      subdivider.drawSurfaces(currentSurface->nuid);
+      if (!playBack)
+      {
+         endrender();
+      }
+   }
+   else
+   {
+      if (!playBack)
+      {
+         endrender();
+      }
+      do_nurbserror(errval);
+   }
 
-	subdivider.beginQuilts();
-	for( O_nurbssurface *n = currentSurface->o_nurbssurface; n; n = n->next ) 
-	    subdivider.addQuilt( n->bezier_patches );
-	subdivider.endQuilts();
-        subdivider.drawSurfaces( currentSurface->nuid ); 
-	if( ! playBack ) endrender();
-    } else {
-	if( ! playBack ) endrender();
-	do_nurbserror( errval );
-    }
-
-    do_freeall( );
-    resetObjects();
+   do_freeall();
+   resetObjects();
 }
 
 /*-----------------------------------------------------------------------------
@@ -569,111 +590,115 @@ NurbsTessellator::do_nurbscurve( O_nurbscurve *o_nurbscurve )
  *-----------------------------------------------------------------------------
  */
 
-void
-NurbsTessellator::do_freenurbssurface( O_nurbssurface *o_nurbssurface )
+void NurbsTessellator::do_freenurbssurface(O_nurbssurface* o_nurbssurface)
 {
-    o_nurbssurface->bezier_patches->deleteMe( quiltPool );
-    o_nurbssurface->deleteMe( o_nurbssurfacePool );
+   o_nurbssurface->bezier_patches->deleteMe(quiltPool);
+   o_nurbssurface->deleteMe(o_nurbssurfacePool);
 }
 
 /*-----------------------------------------------------------------------------
  * do_nurbssurface -
- * 
+ *
  * Client: nurbssurface()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_nurbssurface( O_nurbssurface *o_nurbssurface )
+void NurbsTessellator::do_nurbssurface(O_nurbssurface* o_nurbssurface)
 {
-    if( ! inSurface ) {
-	bgnsurface( 0 );
-	inSurface = 2;
-    }
+   if (!inSurface)
+   {
+      bgnsurface(0);
+      inSurface=2;
+   }
 
-    if( o_nurbssurface->used ) {
-	/* error - surface was already called in current block */
-	do_nurbserror( 25 );
-	isDataValid = 0;
-	return;
-    } else
-        o_nurbssurface->used = 1;
+   if (o_nurbssurface->used)
+   {
+      /* error - surface was already called in current block */
+      do_nurbserror(25);
+      isDataValid=0;
+      return;
+   }
+   else
+   {
+      o_nurbssurface->used=1;
+   }
 
-    if( *nextNurbssurface != o_nurbssurface ) {
-	isSurfaceModified = 1;
-        *nextNurbssurface  = o_nurbssurface;
-    }
+   if (*nextNurbssurface!=o_nurbssurface)
+   {
+      isSurfaceModified=1;
+      *nextNurbssurface=o_nurbssurface;
+   }
 
-    if( o_nurbssurface->owner != currentSurface ) {
-	isSurfaceModified = 1;
-	o_nurbssurface->owner = currentSurface;
-    }
-    nextNurbssurface = &(o_nurbssurface->next);
+   if (o_nurbssurface->owner!=currentSurface)
+   {
+      isSurfaceModified=1;
+      o_nurbssurface->owner=currentSurface;
+   }
+   nextNurbssurface=&(o_nurbssurface->next);
 
-    if( inSurface == 2  )
-	endsurface();
+   if (inSurface==2)
+   {
+      endsurface();
+   }
 }
-
 
 /*-----------------------------------------------------------------------------
  * do_freenurbsproperty
- * 
+ *
  *-----------------------------------------------------------------------------
  */
 
-void
-NurbsTessellator::do_freenurbsproperty( Property *prop )
+void NurbsTessellator::do_freenurbsproperty(Property* prop)
 {
-    prop->deleteMe( propertyPool );
+   prop->deleteMe(propertyPool);
 }
 
-    
 /*-----------------------------------------------------------------------------
  * do_setnurbsproperty -
- * 
+ *
  *-----------------------------------------------------------------------------
  */
 
-void
-NurbsTessellator::do_setnurbsproperty( Property *prop )
+void NurbsTessellator::do_setnurbsproperty(Property* prop)
 {
-    renderhints.setProperty( prop->tag, prop->value );
-    if( prop->save == 0 )
-	do_freenurbsproperty( prop );
+   renderhints.setProperty(prop->tag, prop->value);
+   if (prop->save==0)
+   {
+      do_freenurbsproperty(prop);
+   }
 }
 
-void
-NurbsTessellator::do_setnurbsproperty2( Property *prop )
+void NurbsTessellator::do_setnurbsproperty2(Property* prop)
 {
-    Mapdesc *mapdesc = maplist.find( prop->type );
+   Mapdesc* mapdesc=maplist.find(prop->type);
 
-    mapdesc->setProperty( prop->tag, prop->value );
-    if( prop->save == 0 )
-	do_freenurbsproperty( prop );
+   mapdesc->setProperty(prop->tag, prop->value);
+   if (prop->save==0)
+   {
+      do_freenurbsproperty(prop);
+   }
 }
 
-void
-NurbsTessellator::errorHandler( int )
+void NurbsTessellator::errorHandler(int)
 {
 }
 
-void
-NurbsTessellator::do_nurbserror( int msg )
+void NurbsTessellator::do_nurbserror(int msg)
 {
-    errorHandler( msg );
+   errorHandler(msg);
 }
 
-int 
-NurbsTessellator::do_check_knots( Knotvector *knots, const char *msg )
+int NurbsTessellator::do_check_knots(Knotvector* knots, const char* msg)
 {
-    int status = knots->validate();
-    if( status ) {
-	do_nurbserror( status );
-        if( renderhints.errorchecking != N_NOMSG ) knots->show( msg );
-    }
-    return status;
+   int status=knots->validate();
+
+   if (status)
+   {
+      do_nurbserror(status);
+      if (renderhints.errorchecking!=N_NOMSG)
+      {
+         knots->show(msg);
+      }
+   }
+
+   return status;
 }
-
-
-
-
-

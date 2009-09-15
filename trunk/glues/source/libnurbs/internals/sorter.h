@@ -38,7 +38,7 @@ class Sorter
    public:
       Sorter(int es);
       virtual ~Sorter() {/* silence warning*/}
-      void qsort( void *a, int n);
+      void qsort(void *a, int n);
 
    protected:
       virtual int  qscmp(char*, char*);
