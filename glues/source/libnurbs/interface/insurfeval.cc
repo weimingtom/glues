@@ -1240,26 +1240,24 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
  */
 void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL u_right, REAL* right_val)
 {
-  int i,j,k,l;
-  REAL botMostV[2];
-  typedef REAL REAL3[3];
+   int i,j,k,l;
+   REAL botMostV[2];
+   typedef REAL REAL3[3];
 
-  REAL3* leftXYZ = (REAL3*) malloc(sizeof(REAL3)*n_left);
-  assert(leftXYZ);
-  REAL3* leftNormal = (REAL3*) malloc(sizeof(REAL3) * n_left);
-  assert(leftNormal);
-  REAL3* rightXYZ = (REAL3*) malloc(sizeof(REAL3)*n_right);
-  assert(rightXYZ);
-  REAL3* rightNormal = (REAL3*) malloc(sizeof(REAL3) * n_right);
-  assert(rightNormal);
-  
-  inEvalVLine(n_left, u_left, left_val,  1, leftXYZ, leftNormal);
-  inEvalVLine(n_right, u_right, right_val,  1, rightXYZ, rightNormal);
+   REAL3* leftXYZ = (REAL3*) malloc(sizeof(REAL3)*n_left);
+   assert(leftXYZ);
+   REAL3* leftNormal = (REAL3*) malloc(sizeof(REAL3) * n_left);
+   assert(leftNormal);
+   REAL3* rightXYZ = (REAL3*) malloc(sizeof(REAL3)*n_right);
+   assert(rightXYZ);
+   REAL3* rightNormal = (REAL3*) malloc(sizeof(REAL3) * n_right);
+   assert(rightNormal);
 
+   inEvalVLine(n_left, u_left, left_val,  1, leftXYZ, leftNormal);
+   inEvalVLine(n_right, u_right, right_val,  1, rightXYZ, rightNormal);
 
-
-  REAL* botMostXYZ;
-  REAL* botMostNormal;
+   REAL* botMostXYZ;
+   REAL* botMostNormal;
 
   /*
    *the algorithm works by scanning from bot to top.

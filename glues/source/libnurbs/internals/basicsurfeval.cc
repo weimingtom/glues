@@ -118,7 +118,6 @@ void BasicSurfaceEvaluator::endtfan(void)
 {
 }
 
-
 void BasicSurfaceEvaluator::bgntmesh(void)
 {
 }

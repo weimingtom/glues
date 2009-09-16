@@ -154,10 +154,9 @@ void GLUnurbs::grabGLMatrix(GLfloat vmat[4][4])
 {
    GLfloat m1[4][4], m2[4][4];
 
-// MIKE: TODO
-//    ::glGetFloatv((GLenum) GL_MODELVIEW_MATRIX, (GLfloat *) &(m1[0][0]));
-// MIKE: TODO
-//    ::glGetFloatv((GLenum) GL_PROJECTION_MATRIX, (GLfloat *) &(m2[0][0]));
+   gluGetFloatv((GLenum) GL_MODELVIEW_MATRIX, (GLfloat*)&(m1[0][0]));
+   gluGetFloatv((GLenum) GL_PROJECTION_MATRIX, (GLfloat*)&(m2[0][0]));
+
    multmatrix4d((GLfloat (*)[4])vmat, (const GLfloat (*)[4])m1, (const GLfloat (*)[4])m2);
 }
 
