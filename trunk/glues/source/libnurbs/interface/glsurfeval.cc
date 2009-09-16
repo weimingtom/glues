@@ -52,96 +52,109 @@
 //use internal evaluator
 #define USE_INTERNAL_EVAL
 
-/*whether do evaluation or not*/
-/*#define NO_EVALUATION*/
-
 //#define USE_LOD //for LOD test, have to turn on USE_LOD in insurfeval.c++ too
 
 /**************begin for LOD_eval_list***********/
 void OpenGLSurfaceEvaluator::LOD_eval_list(int level)
 {
-  if(level == 0)
-    LOD_eval_level = 1;
-  else if(level == 1)
-    LOD_eval_level = 2;
-  else if(level == 2)
-    LOD_eval_level = 4;
-  else
-    LOD_eval_level = 8;
+   if (level==0)
+   {
+      LOD_eval_level=1;
+   }
+   else
+   {
+      if (level==1)
+      {
+         LOD_eval_level=2;
+      }
+      else
+      {
+         if (level==2)
+         {
+            LOD_eval_level=4;
+         }
+         else
+         {
+            LOD_eval_level = 8;
+         }
+      }
+   }
 
-  inBPMListEvalEM(global_bpm);
+   inBPMListEvalEM(global_bpm);
 }
 
 
 OpenGLSurfaceEvaluator::OpenGLSurfaceEvaluator()
 {
-    int i;
+   int i;
 
-    for (i=0; i<VERTEX_CACHE_SIZE; i++)
-    {
-        vertexCache[i] = new StoredVertex;
-    }
-    tmeshing = 0;
-    which = 0;
-    vcount = 0;
+   for (i=0; i<VERTEX_CACHE_SIZE; i++)
+   {
+      vertexCache[i] = new StoredVertex;
+   }
 
-    global_uorder = 0;
-    global_vorder = 0;
-    global_uprime = -1.0;
-    global_vprime = -1.0;
-    global_vprime_BV = -1.0;
-    global_uprime_BU = -1.0;
-    global_uorder_BU = 0;
-    global_vorder_BU = 0;
-    global_uorder_BV = 0;
-    global_vorder_BV = 0;
-    global_baseData = NULL;
+   tmeshing=0;
+   which=0;
+   vcount=0;
 
-    global_bpm = NULL;
-    output_triangles = 0; //don't output triangles by default
+   global_uorder=0;
+   global_vorder=0;
+   global_uprime=-1.0;
+   global_vprime=-1.0;
+   global_vprime_BV=-1.0;
+   global_uprime_BU=-1.0;
+   global_uorder_BU=0;
+   global_vorder_BU=0;
+   global_uorder_BV=0;
+   global_vorder_BV=0;
+   global_baseData=NULL;
 
-    //no default callback functions
-    beginCallBackN = NULL;
-    endCallBackN = NULL;
-    vertexCallBackN = NULL;
-    normalCallBackN = NULL;
-    colorCallBackN = NULL;
-    texcoordCallBackN = NULL;
-    beginCallBackData = NULL;
-    endCallBackData = NULL;
-    vertexCallBackData = NULL;
-    normalCallBackData = NULL;
-    colorCallBackData = NULL;
-    texcoordCallBackData = NULL;
+   global_bpm=NULL;
+   output_triangles=0; // don't output triangles by default
 
-    userData = NULL;
+   //no default callback functions
+   beginCallBackN=NULL;
+   endCallBackN=NULL;
+   vertexCallBackN=NULL;
+   normalCallBackN=NULL;
+   colorCallBackN=NULL;
+   texcoordCallBackN=NULL;
+   beginCallBackData=NULL;
+   endCallBackData=NULL;
+   vertexCallBackData=NULL;
+   normalCallBackData=NULL;
+   colorCallBackData=NULL;
+   texcoordCallBackData=NULL;
 
-    auto_normal_flag = 0;
-    callback_auto_normal = 0; //default of GLU_CALLBACK_AUTO_NORMAL is 0
-    vertex_flag = 0;
-    normal_flag = 0;
-    color_flag = 0;
-    texcoord_flag = 0;
+   userData=NULL;
 
-    em_vertex.uprime = -1.0;
-    em_vertex.vprime = -1.0;
-    em_normal.uprime = -1.0;
-    em_normal.vprime = -1.0;
-    em_color.uprime = -1.0;
-    em_color.vprime = -1.0;
-    em_texcoord.uprime = -1.0;
-    em_texcoord.vprime = -1.0;
+   auto_normal_flag=0;
+   callback_auto_normal=0; // default of GLU_CALLBACK_AUTO_NORMAL is 0
+   vertex_flag=0;
+   normal_flag=0;
+   color_flag=0;
+   texcoord_flag=0;
+
+   em_vertex.uprime=-1.0f;
+   em_vertex.vprime=-1.0f;
+   em_normal.uprime=-1.0f;
+   em_normal.vprime=-1.0f;
+   em_color.uprime=-1.0f;
+   em_color.vprime=-1.0f;
+   em_texcoord.uprime=-1.0f;
+   em_texcoord.vprime=-1.0f;
 
 #ifdef USE_LOD
-    LOD_eval_level = 1;
+   LOD_eval_level=1;
 #endif
 }
 
 OpenGLSurfaceEvaluator::~OpenGLSurfaceEvaluator()
 {
-   for (int ii= 0; ii< VERTEX_CACHE_SIZE; ii++) {
+   for (int ii= 0; ii< VERTEX_CACHE_SIZE; ii++)
+   {
       delete vertexCache[ii];
-      vertexCache[ii]= 0;
+      vertexCache[ii]=0;
    }
 }
 
@@ -149,20 +162,70 @@ OpenGLSurfaceEvaluator::~OpenGLSurfaceEvaluator()
  * disable - turn off a map
  *---------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::disable(long type)
+void OpenGLSurfaceEvaluator::disable(long type)
 {
-    glDisable((GLenum) type);
+   printf("OpenGLSurfaceEvaluator::disable=%08X\n", type);
+   switch (type)
+   {
+      case GLU_MAP1_COLOR_4:
+      case GLU_MAP1_INDEX:
+      case GLU_MAP1_NORMAL:
+      case GLU_MAP1_TEXTURE_COORD_1:
+      case GLU_MAP1_TEXTURE_COORD_2:
+      case GLU_MAP1_TEXTURE_COORD_3:
+      case GLU_MAP1_TEXTURE_COORD_4:
+      case GLU_MAP1_VERTEX_3:
+      case GLU_MAP1_VERTEX_4:
+      case GLU_MAP2_COLOR_4:
+      case GLU_MAP2_INDEX:
+      case GLU_MAP2_NORMAL:
+      case GLU_MAP2_TEXTURE_COORD_1:
+      case GLU_MAP2_TEXTURE_COORD_2:
+      case GLU_MAP2_TEXTURE_COORD_3:
+      case GLU_MAP2_TEXTURE_COORD_4:
+      case GLU_MAP2_VERTEX_3:
+      case GLU_MAP2_VERTEX_4:
+           gluDisable((GLenum)type);
+           break;
+      default:
+           glDisable((GLenum)type);
+           break;
+   }
 }
 
 /*---------------------------------------------------------------------------
  * enable - turn on a map
  *---------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::enable(long type)
+void OpenGLSurfaceEvaluator::enable(long type)
 {
-    glEnable((GLenum) type);
+   printf("OpenGLSurfaceEvaluator::enable=%08X\n", type);
+   switch (type)
+   {
+      case GLU_MAP1_COLOR_4:
+      case GLU_MAP1_INDEX:
+      case GLU_MAP1_NORMAL:
+      case GLU_MAP1_TEXTURE_COORD_1:
+      case GLU_MAP1_TEXTURE_COORD_2:
+      case GLU_MAP1_TEXTURE_COORD_3:
+      case GLU_MAP1_TEXTURE_COORD_4:
+      case GLU_MAP1_VERTEX_3:
+      case GLU_MAP1_VERTEX_4:
+      case GLU_MAP2_COLOR_4:
+      case GLU_MAP2_INDEX:
+      case GLU_MAP2_NORMAL:
+      case GLU_MAP2_TEXTURE_COORD_1:
+      case GLU_MAP2_TEXTURE_COORD_2:
+      case GLU_MAP2_TEXTURE_COORD_3:
+      case GLU_MAP2_TEXTURE_COORD_4:
+      case GLU_MAP2_VERTEX_3:
+      case GLU_MAP2_VERTEX_4:
+           gluEnable((GLenum)type);
+           break;
+      default:
+           glEnable((GLenum)type);
+           break;
+   }
 }
 
 /*-------------------------------------------------------------------------
@@ -173,6 +236,7 @@ void
 OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, REAL v1)
 {
 #ifdef USE_INTERNAL_EVAL
+  printf("OpenGLSurfaceEvaluator::naogrid2f\n");
   inMapGrid2f((int) nu, (REAL) u0, (REAL) u1, (int) nv,
 	      (REAL) v0, (REAL) v1);
 #else
@@ -199,6 +263,7 @@ OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, R
 void
 OpenGLSurfaceEvaluator::polymode(long style)
 {
+  printf("OpenGLSurfaceEvaluator::polymode=%08X\n", style);
   if(! output_triangles)
     {
       switch(style) {
@@ -222,6 +287,7 @@ OpenGLSurfaceEvaluator::polymode(long style)
 void
 OpenGLSurfaceEvaluator::bgnline(void)
 {
+  printf("OpenGLSurfaceEvaluator::bgnline\n");
   if(output_triangles)
   {
     bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
@@ -236,6 +302,7 @@ OpenGLSurfaceEvaluator::bgnline(void)
 void
 OpenGLSurfaceEvaluator::endline(void)
 {
+  printf("OpenGLSurfaceEvaluator::endline\n");
   if(output_triangles)
   {
     bezierPatchMeshEndStrip(global_bpm);
@@ -247,19 +314,17 @@ OpenGLSurfaceEvaluator::endline(void)
   }
 }
 
-void
-OpenGLSurfaceEvaluator::range2f(long type, REAL *from, REAL *to)
+void OpenGLSurfaceEvaluator::range2f(long type, REAL* from, REAL* to)
 {
 }
 
-void
-OpenGLSurfaceEvaluator::domain2f(REAL ulo, REAL uhi, REAL vlo, REAL vhi)
+void OpenGLSurfaceEvaluator::domain2f(REAL ulo, REAL uhi, REAL vlo, REAL vhi)
 {
 }
 
-void
-OpenGLSurfaceEvaluator::bgnclosedline(void)
+void OpenGLSurfaceEvaluator::bgnclosedline(void)
 {
+  printf("OpenGLSurfaceEvaluator::bgnclosedline\n");
   if(output_triangles)
   {
     bezierPatchMeshBeginStrip(global_bpm, GL_LINE_LOOP);
@@ -274,6 +339,7 @@ OpenGLSurfaceEvaluator::bgnclosedline(void)
 void
 OpenGLSurfaceEvaluator::endclosedline(void)
 {
+  printf("OpenGLSurfaceEvaluator::endclosedline\n");
   if(output_triangles)
   {
     bezierPatchMeshEndStrip(global_bpm);
@@ -285,10 +351,9 @@ OpenGLSurfaceEvaluator::endclosedline(void)
   }
 }
 
-void
-OpenGLSurfaceEvaluator::bgntmesh(void)
+void OpenGLSurfaceEvaluator::bgntmesh(void)
 {
-
+  printf("OpenGLSurfaceEvaluator::bgntmesh\n");
     tmeshing = 1;
     which = 0;
     vcount = 0;
@@ -308,6 +373,7 @@ OpenGLSurfaceEvaluator::bgntmesh(void)
 void
 OpenGLSurfaceEvaluator::swaptmesh(void)
 {
+  printf("OpenGLSurfaceEvaluator::swaptmesh\n");
     which = 1 - which;
 
 }
@@ -315,6 +381,7 @@ OpenGLSurfaceEvaluator::swaptmesh(void)
 void
 OpenGLSurfaceEvaluator::endtmesh(void)
 {
+  printf("OpenGLSurfaceEvaluator::endtmesh\n");
     tmeshing = 0;
 
 
@@ -330,6 +397,7 @@ OpenGLSurfaceEvaluator::endtmesh(void)
 void
 OpenGLSurfaceEvaluator::bgntfan(void)
 {
+  printf("OpenGLSurfaceEvaluator::bgntfan\n");
 
   if(output_triangles)
   {
@@ -337,6 +405,7 @@ OpenGLSurfaceEvaluator::bgntfan(void)
   }
   else
   {
+     printf("OpenGLSurfaceEvaluator::bgntfan: need to start triangle fan drawing\n");
 // MIKE: TODO
 //    glBegin((GLenum) GL_TRIANGLE_FAN);
   }
@@ -345,6 +414,7 @@ OpenGLSurfaceEvaluator::bgntfan(void)
 void
 OpenGLSurfaceEvaluator::endtfan(void)
 {
+  printf("OpenGLSurfaceEvaluator::endtfan\n");
   if(output_triangles)
   {
     bezierPatchMeshEndStrip(global_bpm);
@@ -360,6 +430,7 @@ void
 OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val)
 {
 #ifdef USE_INTERNAL_EVAL
+  printf("OpenGLSurfaceEvaluator::evalUStrip\n");
   inEvalUStrip(n_upper, v_upper, upper_val,
 	n_lower, v_lower, lower_val);
 #else
@@ -540,6 +611,7 @@ void
 OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL u_right, REAL* right_val)
 {
 #ifdef USE_INTERNAL_EVAL
+  printf("OpenGLSurfaceEvaluator::evalVStrip\n");
 	inEvalVStrip(n_left, u_left, left_val,
 	n_right, u_right, right_val);
 #else
@@ -713,6 +785,7 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 void
 OpenGLSurfaceEvaluator::bgnqstrip(void)
 {
+  printf("OpenGLSurfaceEvaluator::bgnqstrip\n");
   if(output_triangles)
   {
 // MIKE: TODO
@@ -728,6 +801,7 @@ OpenGLSurfaceEvaluator::bgnqstrip(void)
 void
 OpenGLSurfaceEvaluator::endqstrip(void)
 {
+  printf("OpenGLSurfaceEvaluator::endqstrip\n");
   if(output_triangles)
   {
 // MIKE: TODO
@@ -747,6 +821,7 @@ OpenGLSurfaceEvaluator::endqstrip(void)
 void
 OpenGLSurfaceEvaluator::bgnmap2f(long)
 {
+  printf("OpenGLSurfaceEvaluator::bgnmap2f\n");
   if(output_triangles)
     {
       /*deallocate the space which may has been
@@ -803,6 +878,7 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
 void
 OpenGLSurfaceEvaluator::endmap2f(void)
 {
+  printf("OpenGLSurfaceEvaluator::endmap2f\n");
 
   if(output_triangles)
     {
@@ -853,6 +929,7 @@ OpenGLSurfaceEvaluator::map2f(
     REAL *pts)	/* control points		*/
 {
 #ifdef USE_INTERNAL_EVAL
+  printf("OpenGLSurfaceEvaluator::map2f\n");
    inMap2f((int) _type, (REAL) _ulower, (REAL) _uupper,
 	    (int) _ustride, (int) _uorder, (REAL) _vlower,
 	    (REAL) _vupper, (int) _vstride, (int) _vorder,
@@ -917,11 +994,8 @@ OpenGLSurfaceEvaluator::map2f(
 void
 OpenGLSurfaceEvaluator::mapmesh2f(long style, long umin, long umax, long vmin, long vmax)
 {
-#ifdef NO_EVALUATION
-return;
-#endif
-
 #ifdef USE_INTERNAL_EVAL
+  printf("OpenGLSurfaceEvaluator::mapmesh2f\n");
     inEvalMesh2((int)umin, (int)vmin, (int)umax, (int)vmax);
 #else
 
@@ -1012,11 +1086,8 @@ else
 void
 OpenGLSurfaceEvaluator::evalcoord2f(long, REAL u, REAL v)
 {
+  printf("OpenGLSurfaceEvaluator::evalcoord2f\n");
 
-
-#ifdef NO_EVALUATION
-return;
-#endif
 
     newtmeshvert(u, v);
 }
@@ -1028,20 +1099,15 @@ return;
 void
 OpenGLSurfaceEvaluator::evalpoint2i(long u, long v)
 {
-#ifdef NO_EVALUATION
-return;
-#endif
 
+  printf("OpenGLSurfaceEvaluator::evalpoint2i\n");
     newtmeshvert(u, v);
 }
 
 void
 OpenGLSurfaceEvaluator::point2i( long u, long v )
 {
-#ifdef NO_EVALUATION
-return;
-#else
-
+  printf("OpenGLSurfaceEvaluator::point2i\n");
 #ifdef USE_INTERNAL_EVAL
     inEvalPoint2( (int)u,  (int)v);
 #else
@@ -1060,12 +1126,9 @@ if(output_triangles)
 }
 else
 {
-// MIKE: TODO
-//    glEvalPoint2((GLint) u, (GLint) v);
+    gluEvalPoint2((GLint) u, (GLint) v);
 }
 
-
-#endif
 
 #endif
 
@@ -1074,11 +1137,8 @@ else
 void
 OpenGLSurfaceEvaluator::coord2f( REAL u, REAL v )
 {
-#ifdef NO_EVALUATION
-return;
-#else
-
 #ifdef USE_INTERNAL_EVAL
+  printf("OpenGLSurfaceEvaluator::coord2f\n");
     inEvalCoord2f( u, v);
 #else
 
@@ -1089,12 +1149,9 @@ if(output_triangles)
 }
 else
 {
-// MIKE: TODO
-//    glEvalCoord2f((GLfloat) u, (GLfloat) v);
+    gluEvalCoord2f((GLfloat) u, (GLfloat) v);
 }
 
-
-#endif
 
 #endif
 }
@@ -1102,10 +1159,6 @@ else
 void
 OpenGLSurfaceEvaluator::newtmeshvert( long u, long v )
 {
-#ifdef NO_EVALUATION
-return;
-#else
-
     if (tmeshing) {
 
 	if (vcount == 2) {
@@ -1122,15 +1175,11 @@ return;
     } else {
 	point2i( u,  v);
     }
-#endif
 }
 
 void
 OpenGLSurfaceEvaluator::newtmeshvert( REAL u, REAL v )
 {
-#ifdef NO_EVALUATION
-return;
-#else
     if (tmeshing) {
 
 
@@ -1149,7 +1198,6 @@ return;
 
 	coord2f( u,  v);
     }
-#endif
 
 }
 

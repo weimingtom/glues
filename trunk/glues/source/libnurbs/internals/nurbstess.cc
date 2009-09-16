@@ -49,47 +49,39 @@
 #include "mapdesc.h"
 #include "maplist.h"
 
-void 
-NurbsTessellator::set_domain_distance_u_rate(REAL u_rate)
+void NurbsTessellator::set_domain_distance_u_rate(REAL u_rate)
 {
-  subdivider.set_domain_distance_u_rate(u_rate);
+   subdivider.set_domain_distance_u_rate(u_rate);
 }
 
-void 
-NurbsTessellator::set_domain_distance_v_rate(REAL v_rate)
+void NurbsTessellator::set_domain_distance_v_rate(REAL v_rate)
 {
-  subdivider.set_domain_distance_v_rate(v_rate);
+   subdivider.set_domain_distance_v_rate(v_rate);
 }
 
-void
-NurbsTessellator::set_is_domain_distance_sampling(int flag)
+void NurbsTessellator::set_is_domain_distance_sampling(int flag)
 {
-  subdivider.set_is_domain_distance_sampling(flag);
+   subdivider.set_is_domain_distance_sampling(flag);
 }
 
-void
-NurbsTessellator::resetObjects( void )
+void NurbsTessellator::resetObjects(void)
 {
-    subdivider.clear();
+   subdivider.clear();
 }
 
-void
-NurbsTessellator::makeobj( int )
+void NurbsTessellator::makeobj(int)
 {
 }
 
-void
-NurbsTessellator::closeobj( void )
+void NurbsTessellator::closeobj(void)
 {
 }
 
-void
-NurbsTessellator::bgnrender( void )
+void NurbsTessellator::bgnrender(void)
 {
 }
 
-void
-NurbsTessellator::endrender( void )
+void NurbsTessellator::endrender(void)
 {
 }
 
@@ -99,12 +91,10 @@ NurbsTessellator::endrender( void )
  * Client: do_freeall(), bgnsurface()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_freebgnsurface( O_surface *o_surface )
+void NurbsTessellator::do_freebgnsurface(O_surface* o_surface)
 {
-    o_surface->deleteMe( o_surfacePool );
+   o_surface->deleteMe(o_surfacePool);
 }
-
 
 /*-----------------------------------------------------------------------------
  * do_bgnsurface - begin the display of a surface
@@ -112,109 +102,144 @@ NurbsTessellator::do_freebgnsurface( O_surface *o_surface )
  * Client: bgnsurface()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_bgnsurface( O_surface *o_surface )
+void NurbsTessellator::do_bgnsurface(O_surface* o_surface)
 {
-    if( inSurface ) {
-	do_nurbserror( 27 );
-	endsurface();
-    }
-    inSurface = 1;
+   if (inSurface)
+   {
+      do_nurbserror(27);
+      endsurface();
+   }
+   inSurface=1;
 
-    if( ! playBack ) bgnrender();
+   if (!playBack)
+   {
+      bgnrender();
+   }
 
-    isTrimModified = 0;
-    isSurfaceModified = 0;
-    isDataValid = 1;
-    numTrims = 0;
-    currentSurface = o_surface;
-    nextTrim = &( currentSurface->o_trim );
-    nextNurbssurface = &( currentSurface->o_nurbssurface );
+   isTrimModified=0;
+   isSurfaceModified=0;
+   isDataValid=1;
+   numTrims=0;
+   currentSurface=o_surface;
+   nextTrim=&(currentSurface->o_trim);
+   nextNurbssurface=&(currentSurface->o_nurbssurface);
 }
 
 /*-----------------------------------------------------------------------------
- * do_bgncurve - begin the display of a curve 
- * 
+ * do_bgncurve - begin the display of a curve
+ *
  * Client: bgncurve()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_bgncurve( O_curve *o_curve )
+void NurbsTessellator::do_bgncurve(O_curve* o_curve)
 {
-    if ( inCurve ) {
-	do_nurbserror( 6 );
-	endcurve();
-    }
+   if (inCurve)
+   {
+      do_nurbserror(6);
+      endcurve();
+   }
 
-    inCurve = 1;
-    currentCurve = o_curve;
-    currentCurve->curvetype = ct_none;
+   inCurve=1;
+   currentCurve=o_curve;
+   currentCurve->curvetype=ct_none;
 
-    if( inTrim ) {
-        if( *nextCurve != o_curve ) {
-	    isCurveModified = 1;
-	    *nextCurve = o_curve;
-	}
-    } else {
-        if( ! playBack ) bgnrender();
-        isDataValid = 1;
-    }
-    nextCurve = &(o_curve->next);
-    nextPwlcurve = &(o_curve->curve.o_pwlcurve);
-    nextNurbscurve = &(o_curve->curve.o_nurbscurve);
+   if (inTrim)
+   {
+      if (*nextCurve!=o_curve)
+      {
+         isCurveModified=1;
+         *nextCurve=o_curve;
+      }
+   }
+   else
+   {
+      if (!playBack)
+      {
+         bgnrender();
+      }
+      isDataValid=1;
+   }
+
+   nextCurve=&(o_curve->next);
+   nextPwlcurve=&(o_curve->curve.o_pwlcurve);
+   nextNurbscurve=&(o_curve->curve.o_nurbscurve);
 }
 
 /*-----------------------------------------------------------------------------
  * do_endcurve -
- * 
+ *
  * Client: endcurve()
  *-----------------------------------------------------------------------------
  */
-    
-void
-NurbsTessellator::do_endcurve( void )
+
+void NurbsTessellator::do_endcurve(void)
 {
-    if( ! inCurve ) {
-	do_nurbserror( 7 );
-	return;
-    }
-    inCurve = 0;
+   if (!inCurve)
+   {
+      do_nurbserror(7);
+      return;
+   }
+   inCurve=0;
 
-    *nextCurve = 0;
-    if (currentCurve->curvetype == ct_nurbscurve)
-	*nextNurbscurve = 0;
-    else
-	*nextPwlcurve = 0;
+   *nextCurve=0;
+   if (currentCurve->curvetype==ct_nurbscurve)
+   {
+      *nextNurbscurve=0;
+   }
+   else
+   {
+      *nextPwlcurve=0;
+   }
 
-    if ( ! inTrim ) {
-        if( ! isDataValid ) {
-            do_freecurveall( currentCurve ); 
-	    return;
-        }
+   if (!inTrim)
+   {
+      if (!isDataValid)
+      {
+         do_freecurveall(currentCurve);
+         return;
+      }
 
-	int errval;
-	errval = ::mysetjmp( jumpbuffer );
-	if( errval == 0 ) {
-	    if( currentCurve->curvetype == ct_nurbscurve ) {
-		subdivider.beginQuilts();
-		for( O_nurbscurve *n = currentCurve->curve.o_nurbscurve; n != 0; n = n->next ) 
-		    subdivider.addQuilt( n->bezier_curves );
-		subdivider.endQuilts();
-		subdivider.drawCurves(); 
-		if( ! playBack ) endrender();
-	    } else {
-		/* XXX */
-	        if( ! playBack ) endrender();
-	        /*do_draw_pwlcurve( currentCurve->curve.o_pwlcurve ) */;
-	        do_nurbserror( 9 );
-	    }
-	} else {
-	    if( ! playBack ) endrender();
-	    do_nurbserror( errval );
-	}
-	do_freecurveall( currentCurve );
-	resetObjects();
-    }
+      int errval;
+      errval=::mysetjmp(jumpbuffer);
+
+      if (errval==0)
+      {
+         if (currentCurve->curvetype==ct_nurbscurve)
+         {
+            subdivider.beginQuilts();
+            for (O_nurbscurve* n=currentCurve->curve.o_nurbscurve; n!=0; n=n->next)
+            {
+               subdivider.addQuilt(n->bezier_curves);
+            }
+            subdivider.endQuilts();
+            subdivider.drawCurves(); 
+            if (!playBack)
+            {
+               endrender();
+            }
+         }
+         else
+         {
+            /* XXX */
+            if (!playBack)
+            {
+               endrender();
+            }
+            /* do_draw_pwlcurve( currentCurve->curve.o_pwlcurve ) */;
+            do_nurbserror(9);
+         }
+      }
+      else
+      {
+         if (!playBack)
+         {
+            endrender();
+         }
+         do_nurbserror(errval);
+      }
+      do_freecurveall( currentCurve );
+      resetObjects();
+   }
 }
 
 /*-----------------------------------------------------------------------------
@@ -320,58 +345,91 @@ void NurbsTessellator::do_endsurface(void)
  * Client:
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_freeall( void )
+void NurbsTessellator::do_freeall(void)
 {
-    for( O_trim *o_trim = currentSurface->o_trim; o_trim; ) {
-	O_trim *next_o_trim = o_trim->next;
-        for( O_curve *curve = o_trim->o_curve; curve; ) {
-	    O_curve *next_o_curve = curve->next;
-	    do_freecurveall( curve );
-	    curve = next_o_curve;
-	}
-	if( o_trim->save == 0 ) do_freebgntrim( o_trim );
-	o_trim = next_o_trim;
-    }
+   for (O_trim* o_trim=currentSurface->o_trim; o_trim;)
+   {
+      O_trim* next_o_trim=o_trim->next;
+      for (O_curve* curve=o_trim->o_curve; curve;)
+      {
+         O_curve* next_o_curve=curve->next;
+         do_freecurveall(curve);
+         curve=next_o_curve;
+      }
+      if (o_trim->save==0)
+      {
+         do_freebgntrim(o_trim);
+      }
+      o_trim=next_o_trim;
+   }
 
-    O_nurbssurface *nurbss, *next_nurbss;
-    for( nurbss= currentSurface->o_nurbssurface; nurbss; nurbss = next_nurbss) {
-	next_nurbss = nurbss->next;
-	if( nurbss->save == 0 )
-	    do_freenurbssurface( nurbss );
-	else
-	    nurbss->used = 0;
-    }
+   O_nurbssurface* nurbss;
+   O_nurbssurface* next_nurbss;
 
-    if( currentSurface->save == 0 ) do_freebgnsurface( currentSurface );
+   for (nurbss=currentSurface->o_nurbssurface; nurbss; nurbss=next_nurbss)
+   {
+      next_nurbss=nurbss->next;
+      if (nurbss->save==0)
+      {
+         do_freenurbssurface(nurbss);
+      }
+      else
+      {
+         nurbss->used=0;
+      }
+   }
+
+   if (currentSurface->save==0)
+   {
+      do_freebgnsurface(currentSurface);
+   }
 }
 
-void
-NurbsTessellator::do_freecurveall( O_curve *curve )
+void NurbsTessellator::do_freecurveall(O_curve* curve)
 {
-    assert( curve->curvetype != ct_none );
+   assert(curve->curvetype!=ct_none);
 
-    if( curve->curvetype == ct_nurbscurve ) {
-	O_nurbscurve *ncurve, *next_ncurve;
-	for( ncurve=curve->curve.o_nurbscurve; ncurve; ncurve=next_ncurve ) {
-	    next_ncurve = ncurve->next;
-	    if( ncurve->save == 0 )
-		do_freenurbscurve( ncurve );
-	    else
-		ncurve->used = 0;
-	}
-    } else {
-	O_pwlcurve *pcurve, *next_pcurve;
-	for( pcurve=curve->curve.o_pwlcurve; pcurve; pcurve=next_pcurve ) {
-	    next_pcurve = pcurve->next;
-	    if( pcurve->save == 0 )
-		do_freepwlcurve( pcurve );
-	    else
-		pcurve->used = 0;
-	}
-    }
-    if( curve->save == 0 )
-        do_freebgncurve( curve );
+   if (curve->curvetype==ct_nurbscurve)
+   {
+      O_nurbscurve* ncurve;
+      O_nurbscurve* next_ncurve;
+
+      for (ncurve=curve->curve.o_nurbscurve; ncurve; ncurve=next_ncurve)
+      {
+         next_ncurve=ncurve->next;
+         if (ncurve->save==0)
+         {
+            do_freenurbscurve(ncurve);
+         }
+         else
+         {
+            ncurve->used=0;
+         }
+      }
+   }
+   else
+   {
+      O_pwlcurve* pcurve;
+      O_pwlcurve* next_pcurve;
+
+      for (pcurve=curve->curve.o_pwlcurve; pcurve; pcurve=next_pcurve)
+      {
+         next_pcurve=pcurve->next;
+         if (pcurve->save==0)
+         {
+            do_freepwlcurve(pcurve);
+         }
+         else
+         {
+            pcurve->used = 0;
+         }
+      }
+   }
+
+   if (curve->save==0)
+   {
+      do_freebgncurve(curve);
+   }
 }
 
 
@@ -381,12 +439,10 @@ NurbsTessellator::do_freecurveall( O_curve *curve )
  * Client:
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_freebgntrim( O_trim *o_trim )
-{ 
-    o_trim->deleteMe( o_trimPool );
+void NurbsTessellator::do_freebgntrim(O_trim* o_trim)
+{
+   o_trim->deleteMe(o_trimPool);
 }
-
 
 /*-----------------------------------------------------------------------------
  * do_bgntrim - link in a trim loop to the current trimmed surface description
@@ -394,32 +450,32 @@ NurbsTessellator::do_freebgntrim( O_trim *o_trim )
  * Client: bgntrim()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_bgntrim( O_trim *o_trim )
+void NurbsTessellator::do_bgntrim(O_trim* o_trim)
 {
+   if (!inSurface)
+   {
+      do_nurbserror(15);
+      bgnsurface(0);
+      inSurface=2;
+   }
 
-    if( ! inSurface ) {
-	do_nurbserror( 15 );
-	bgnsurface( 0 );
-	inSurface = 2;
-    }
+   if (inTrim)
+   {
+      do_nurbserror(16);
+      endtrim();
+   }
+   inTrim=1;
 
-    if( inTrim ) {
-	do_nurbserror( 16 );
-	endtrim();
-    }
-    inTrim = 1;
+   if (*nextTrim!=o_trim)
+   {
+      isTrimModified=1;
+      *nextTrim=o_trim;
+   }
 
-    if( *nextTrim != o_trim ) {
-	isTrimModified = 1;	
-        *nextTrim = o_trim;
-    }
-
-    currentTrim = o_trim;
-    nextTrim = &(o_trim->next);
-    nextCurve = &(o_trim->o_curve);
+   currentTrim=o_trim;
+   nextTrim=&(o_trim->next);
+   nextCurve=&(o_trim->o_curve);
 }
-
 
 /*-----------------------------------------------------------------------------
  * do_endtrim - mark the end of the current trim loop 
@@ -427,159 +483,189 @@ NurbsTessellator::do_bgntrim( O_trim *o_trim )
  * Client: endtrim()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_endtrim( void )
+void NurbsTessellator::do_endtrim(void)
 {
-    if( ! inTrim ) {
-	do_nurbserror( 17 );
-	return;
-    }
-    inTrim = 0;
+   if (!inTrim)
+   {
+      do_nurbserror(17);
+      return;
+   }
+   inTrim=0;
 
-    if( currentTrim->o_curve == 0 ) {
-	do_nurbserror( 18 );
-	isDataValid = 0;
-    }
+   if (currentTrim->o_curve==0)
+   {
+      do_nurbserror(18);
+      isDataValid=0;
+   }
 
-    numTrims++;
-   
-    if( *nextCurve != 0 ) {
-	isTrimModified = 1;
-        *nextCurve = 0;	
-    }
+   numTrims++;
+
+   if (*nextCurve!=0)
+   {
+      isTrimModified=1;
+      *nextCurve=0;
+   }
 }
 
 /*-----------------------------------------------------------------------------
  * do_freepwlcurve -
- * 
+ *
  * Client:
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_freepwlcurve( O_pwlcurve *o_pwlcurve )
+void NurbsTessellator::do_freepwlcurve(O_pwlcurve* o_pwlcurve)
 {
-    o_pwlcurve->deleteMe( o_pwlcurvePool );
+   o_pwlcurve->deleteMe(o_pwlcurvePool);
 }
 
-void
-NurbsTessellator::do_freebgncurve( O_curve *o_curve )
+void NurbsTessellator::do_freebgncurve(O_curve* o_curve)
 {
-    o_curve->deleteMe( o_curvePool );
+   o_curve->deleteMe(o_curvePool);
 }
 
 /*-----------------------------------------------------------------------------
  * do_pwlcurve - link in pwl trim loop to the current surface description
- * 
+ *
  * Client: pwlcurve()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_pwlcurve( O_pwlcurve *o_pwlcurve )
+void NurbsTessellator::do_pwlcurve(O_pwlcurve* o_pwlcurve)
 {
-    if( ! inTrim ) {
-	do_nurbserror( 19 );
-	if( o_pwlcurve->save == 0 )
-	    do_freepwlcurve(o_pwlcurve );
-	return;
-    }
+   if (!inTrim)
+   {
+      do_nurbserror(19);
+      if (o_pwlcurve->save==0)
+      {
+         do_freepwlcurve(o_pwlcurve);
+      }
+      return;
+   }
 
-    if( ! inCurve ) {
-	bgncurve( 0 );
-	inCurve = 2;
-    }
+   if (!inCurve)
+   {
+      bgncurve(0);
+      inCurve=2;
+   }
 
-    if( o_pwlcurve->used ) {
-	do_nurbserror( 20 );
-	isDataValid = 0;
-	return;
-    } else
-        o_pwlcurve->used = 1;
+   if (o_pwlcurve->used)
+   {
+      do_nurbserror(20);
+      isDataValid=0;
+      return;
+   }
+   else
+   {
+      o_pwlcurve->used = 1;
+   }
 
-    if( currentCurve->curvetype == ct_none ) {
-        currentCurve->curvetype = ct_pwlcurve;
-    } else if( currentCurve->curvetype != ct_pwlcurve ) {
-	do_nurbserror( 21 );
-	isDataValid = 0;
-	return;
-    }
-	
-    if( *nextPwlcurve != o_pwlcurve ) {
-	isCurveModified = 1;
-        *nextPwlcurve = o_pwlcurve;
-    }
-    nextPwlcurve = &(o_pwlcurve->next);
+   if (currentCurve->curvetype==ct_none)
+   {
+      currentCurve->curvetype=ct_pwlcurve;
+   }
+   else
+   {
+      if (currentCurve->curvetype!=ct_pwlcurve)
+      {
+         do_nurbserror(21);
+         isDataValid=0;
+         return;
+      }
+   }
 
-    if( o_pwlcurve->owner != currentCurve ) {
-	isCurveModified = 1;
-	o_pwlcurve->owner = currentCurve;
-    }
+   if (*nextPwlcurve!=o_pwlcurve)
+   {
+      isCurveModified=1;
+      *nextPwlcurve=o_pwlcurve;
+   }
+   nextPwlcurve=&(o_pwlcurve->next);
 
-    if( (inCurve == 2) ) 
-	endcurve();
+   if (o_pwlcurve->owner!=currentCurve)
+   {
+      isCurveModified=1;
+      o_pwlcurve->owner=currentCurve;
+   }
+
+   if ((inCurve==2))
+   {
+      endcurve();
+   }
 }
-
 
 /*-----------------------------------------------------------------------------
  * do_freenurbscurve -
- * 
+ *
  * Client:
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_freenurbscurve( O_nurbscurve *o_nurbscurve )
+void NurbsTessellator::do_freenurbscurve(O_nurbscurve* o_nurbscurve)
 {
-    o_nurbscurve->bezier_curves->deleteMe( quiltPool );
-    o_nurbscurve->deleteMe( o_nurbscurvePool );
+   o_nurbscurve->bezier_curves->deleteMe(quiltPool);
+   o_nurbscurve->deleteMe(o_nurbscurvePool);
 }
-
 
 /*-----------------------------------------------------------------------------
  * do_nurbscurve -
- * 
- * Client: nurbscurve() 
+ *
+ * Client: nurbscurve()
  *-----------------------------------------------------------------------------
  */
-void
-NurbsTessellator::do_nurbscurve( O_nurbscurve *o_nurbscurve )
+void NurbsTessellator::do_nurbscurve(O_nurbscurve* o_nurbscurve)
 {
-    if ( ! inCurve ) {
-	bgncurve( 0 );
-	inCurve = 2;
-    }
+   if (!inCurve)
+   {
+      bgncurve(0);
+      inCurve=2;
+   }
 
-    if( o_nurbscurve->used ) {
-	/* error - curve was already called in current surface */
-	do_nurbserror( 23 );
-	isDataValid = 0;
-	return;
-    } else
-        o_nurbscurve->used = 1;
+   if (o_nurbscurve->used)
+   {
+      /* error - curve was already called in current surface */
+      do_nurbserror(23);
+      isDataValid=0;
+      return;
+   }
+   else
+   {
+      o_nurbscurve->used=1;
+   }
 
-    if( currentCurve->curvetype == ct_none ) {
-        currentCurve->curvetype = ct_nurbscurve;
-    } else if( currentCurve->curvetype != ct_nurbscurve ) {
-	do_nurbserror( 24 );
-	isDataValid = 0;
-	return;
-    }
-	
-    if( *nextNurbscurve != o_nurbscurve ) {
-	isCurveModified = 1;
-	*nextNurbscurve = o_nurbscurve;
-    }
+   if (currentCurve->curvetype==ct_none)
+   {
+      currentCurve->curvetype=ct_nurbscurve;
+   }
+   else
+   {
+      if (currentCurve->curvetype!=ct_nurbscurve)
+      {
+         do_nurbserror(24);
+         isDataValid=0;
+         return;
+      }
+   }
 
-    nextNurbscurve = &(o_nurbscurve->next);
+   if (*nextNurbscurve!=o_nurbscurve)
+   {
+      isCurveModified=1;
+      *nextNurbscurve=o_nurbscurve;
+   }
 
-    if( o_nurbscurve->owner != currentCurve ) {
-	isCurveModified = 1;
-	o_nurbscurve->owner = currentCurve;
-    }
+   nextNurbscurve=&(o_nurbscurve->next);
 
-    if( o_nurbscurve->owner == 0 )
-	isCurveModified = 1;
-    
-    if( inCurve == 2 )
-        endcurve();
+   if (o_nurbscurve->owner!=currentCurve)
+   {
+      isCurveModified=1;
+      o_nurbscurve->owner=currentCurve;
+   }
+
+   if (o_nurbscurve->owner==0)
+   {
+      isCurveModified=1;
+   }
+
+   if (inCurve==2)
+   {
+      endcurve();
+   }
 }
 
 

@@ -55,41 +55,41 @@
  * bgnsurf - preamble to surface definition and evaluations
  *-------------------------------------------------------------------------
  */
-void
-Backend::bgnsurf( int wiretris, int wirequads, long nuid )
+void Backend::bgnsurf(int wiretris, int wirequads, long nuid)
 {
-/*#ifndef NOWIREFRAME*/ //need this for old version
-    wireframetris = wiretris;
-    wireframequads = wirequads;
-/*#endif*/
+   wireframetris=wiretris;
+   wireframequads=wirequads;
 
-    /*in the spec, GLU_DISPLAY_MODE is either
-     * GLU_FILL
-     * GLU_OUTLINE_POLY
-     * GLU_OUTLINE_PATCH.
-     *In fact, GLU_FLL is has the same effect as
-     * set GL_FRONT_AND_BACK to be GL_FILL
-     * and GLU_OUTLINE_POLY is the same as set 
-     *     GL_FRONT_AND_BACK to be GL_LINE
-     *It is more efficient to do this once at the beginning of
-     *each surface than to do it for each primitive.
-     *   The internal has more options: outline_triangle and outline_quad
-     *can be seperated. But since this is not in spec, and more importantly,
-     *this is not so useful, so we don't need to keep this option.
-     */
+   /* in the spec, GLU_DISPLAY_MODE is either
+    * GLU_FILL
+    * GLU_OUTLINE_POLY
+    * GLU_OUTLINE_PATCH.
+    * In fact, GLU_FILL has the same effect as
+    * set GL_FRONT_AND_BACK to be GL_FILL
+    * and GLU_OUTLINE_POLY is the same as set 
+    *     GL_FRONT_AND_BACK to be GL_LINE
+    * It is more efficient to do this once at the beginning of
+    * each surface than to do it for each primitive.
+    *   The internal has more options: outline_triangle and outline_quad
+    * can be seperated. But since this is not in spec, and more importantly,
+    * this is not so useful, so we don't need to keep this option.
+    */
 
-    surfaceEvaluator.bgnmap2f( nuid );
+   surfaceEvaluator.bgnmap2f(nuid);
 
-    if(wiretris)
-      surfaceEvaluator.polymode(N_MESHLINE);
-    else
-      surfaceEvaluator.polymode(N_MESHFILL);
+   if (wiretris)
+   {
+     surfaceEvaluator.polymode(N_MESHLINE);
+   }
+   else
+   {
+     surfaceEvaluator.polymode(N_MESHFILL);
+   }
 }
 
-void
-Backend::patch( REAL ulo, REAL uhi, REAL vlo, REAL vhi )
+void Backend::patch(REAL ulo, REAL uhi, REAL vlo, REAL vhi)
 {
-    surfaceEvaluator.domain2f( ulo, uhi, vlo, vhi );
+   surfaceEvaluator.domain2f(ulo, uhi, vlo, vhi);
 }
 
 void

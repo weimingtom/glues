@@ -40,9 +40,11 @@
    #endif
 #elif defined (__QNXNTO__)
    #include <GLES/gl.h>
+   #include <GLES/glext.h>
 #elif defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
    /* mainly for PowerVR OpenGL ES 1.x win32 emulator */
    #include <GLES\gl.h>
+   #include <GLES\glext.h>
    #undef APIENTRY
    #define APIENTRY
    #if defined(GLUES_EXPORTS)
@@ -370,7 +372,17 @@ GLAPI void APIENTRY gluPwlCurve(GLUnurbs* nurb, GLint count, GLfloat* data, GLin
 #define GLU_MAP2_VERTEX_3                       0x0DB7
 #define GLU_MAP2_VERTEX_4                       0x0DB8
 
+#ifndef GL_MODELVIEW_MATRIX
+   #define GL_MODELVIEW_MATRIX                  0x0BA6
+#endif /* GL_MODELVIEW_MATRIX */
+
+#ifndef GL_PROJECTION_MATRIX
+   #define GL_PROJECTION_MATRIX                 0x0BA7
+#endif /* GL_PROJECTION_MATRIX */
+
 GLAPI void APIENTRY gluEnable(GLenum cap);
+GLAPI void APIENTRY gluDisable(GLenum cap);
+GLAPI void APIENTRY gluGetFloatv(GLenum pname, GLfloat* params);
 
 #ifdef __cplusplus
 }

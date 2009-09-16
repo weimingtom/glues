@@ -228,7 +228,7 @@ Quilt::findSampleRates( Flist& slist, Flist& tlist )
 	    (qspec[0].breakpoints[qspec[0].width] - qspec[0].breakpoints[0]); 
     qspec[1].step_size = DEF_PATCH_STEPSIZE * 
 	    (qspec[1].breakpoints[qspec[1].width] - qspec[1].breakpoints[0]); 
- 
+
     for( int i = slist.start; i < slist.end-1; i++ ) {
 	for( int j = tlist.start; j < tlist.end-1; j++ ) {
 
@@ -239,7 +239,7 @@ Quilt::findSampleRates( Flist& slist, Flist& tlist )
 	    ptb[1] = tlist.pts[j+1];
 	    Patchlist patchlist( this, pta, ptb );
 	    patchlist.getstepsize();
-	    
+
 	    {
 	    float edge_len_s = min(glu_abs(ptb[0]-pta[0]),1.0);
 	    float edge_len_t = min(glu_abs(ptb[1]-pta[1]),1.0);

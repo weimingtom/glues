@@ -37,6 +37,9 @@
 #ifndef __gles_evaluator_h_
 #define __gles_evaluator_h_
 
+/* Fixed point to float point conversion */
+#define FX2F(fx) (GLfloat(fx)/65536.0f)
+
 /* Primitives */
 #define GL_QUAD_STRIP                           0x0008
 

@@ -158,7 +158,7 @@ class NurbsTessellator
     O_curve**           nextCurve;              /* place to link o_curve */
     O_nurbscurve**      nextNurbscurve;         /* place to link o_nurbscurve */
     O_pwlcurve**        nextPwlcurve;           /* place to link o_pwlcurve */
-    O_nurbssurface**    nextNurbssurface        /* place to link o_nurbssurface */
+    O_nurbssurface**    nextNurbssurface;       /* place to link o_nurbssurface */
 
     O_surface* currentSurface;
     O_trim*    currentTrim;

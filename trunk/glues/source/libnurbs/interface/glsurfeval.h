@@ -105,16 +105,15 @@ public:
     void		domain2f( REAL, REAL, REAL, REAL );
     void		addMap( SurfaceMap * ) { }
 
-    void		enable( long );
-    void		disable( long );
-    void		bgnmap2f( long );
-    void		map2f( long, REAL, REAL, long, long, 
-				     REAL, REAL, long, long, REAL * );
-    void		mapgrid2f( long, REAL, REAL, long, REAL, REAL );
-    void		mapmesh2f( long, long, long, long, long );
-    void		evalcoord2f( long, REAL, REAL );
-    void		evalpoint2i( long, long );
-    void		endmap2f( void );
+    void		enable(long);
+    void		disable(long);
+    void		bgnmap2f(long);
+    void		map2f(long, REAL, REAL, long, long, REAL, REAL, long, long, REAL*);
+    void		mapgrid2f(long, REAL, REAL, long, REAL, REAL);
+    void		mapmesh2f(long, long, long, long, long);
+    void		evalcoord2f(long, REAL, REAL);
+    void		evalpoint2i(long, long);
+    void		endmap2f(void);
 
     void	 	bgnline( void );
     void	 	endline( void );
