@@ -238,84 +238,219 @@ void OpenGLSurfaceEvaluator::inBPMEval(bezierPatchMesh* bpm)
 
 void OpenGLSurfaceEvaluator::inEvalPoint2(int i, int j)
 {
-  REAL du, dv;
-  REAL point[4];
-  REAL normal[3];
-  REAL u,v;
-  du = (global_grid_u1 - global_grid_u0) / (REAL)global_grid_nu;
-  dv = (global_grid_v1 - global_grid_v0) / (REAL)global_grid_nv;
-  u = (i==global_grid_nu)? global_grid_u1:(global_grid_u0 + i*du);
-  v = (j == global_grid_nv)? global_grid_v1: (global_grid_v0 +j*dv);
-  inDoEvalCoord2(u,v,point,normal);
+   REAL du, dv;
+   REAL point[4];
+   REAL normal[3];
+   REAL u,v;
+
+   du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
+   dv=(global_grid_v1-global_grid_v0)/(REAL)global_grid_nv;
+   u=(i==global_grid_nu)?global_grid_u1:(global_grid_u0+i*du);
+   v=(j==global_grid_nv)?global_grid_v1:(global_grid_v0+j*dv);
+
+   inDoEvalCoord2(u, v, point, normal);
 }
 
 void OpenGLSurfaceEvaluator::inEvalCoord2f(REAL u, REAL v)
 {
+   REAL point[4];
+   REAL normal[3];
 
-  REAL point[4];
-  REAL normal[3];
-  inDoEvalCoord2(u,v,point, normal);
+   inDoEvalCoord2(u, v, point, normal);
 }
 
 
 
-/*define a grid. store the values into the global variabls:
- * global_grid_*
- *These values will be used later by evaluating functions
+/* define a grid. store the values into the global variabls:
+ *  global_grid_*
+ * These values will be used later by evaluating functions
  */
-void OpenGLSurfaceEvaluator::inMapGrid2f(int nu, REAL u0, REAL u1,
-		 int nv, REAL v0, REAL v1)
+void OpenGLSurfaceEvaluator::inMapGrid2f(int nu, REAL u0, REAL u1, int nv, REAL v0, REAL v1)
 {
- global_grid_u0 = u0;
- global_grid_u1 = u1;
- global_grid_nu = nu;
- global_grid_v0 = v0;
- global_grid_v1 = v1;
- global_grid_nv = nv;
+   global_grid_u0=u0;
+   global_grid_u1=u1;
+   global_grid_nu=nu;
+   global_grid_v0=v0;
+   global_grid_v1=v1;
+   global_grid_nv=nv;
 }
 
 void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int highV)
 {
-  REAL du, dv;
-  int i,j;
-  REAL point[4];
-  REAL normal[3];
-  if(global_grid_nu == 0 || global_grid_nv == 0)
-    return; /*no points need to be output*/
-  du = (global_grid_u1 - global_grid_u0) / (REAL)global_grid_nu;
-  dv = (global_grid_v1 - global_grid_v0) / (REAL)global_grid_nv;  
-  
-  if(global_grid_nu >= global_grid_nv){
-    for(i=lowU; i<highU; i++){
-      REAL u1 = (i==global_grid_nu)? global_grid_u1:(global_grid_u0 + i*du);
-      REAL u2 = ((i+1) == global_grid_nu)? global_grid_u1: (global_grid_u0+(i+1)*du);
-      
-      bgnqstrip();
-      for(j=highV; j>=lowV; j--){
-	REAL v1 = (j == global_grid_nv)? global_grid_v1: (global_grid_v0 +j*dv);
-	
-	inDoEvalCoord2(u1, v1, point, normal);
-	inDoEvalCoord2(u2, v1, point, normal);
+   REAL  du, dv;
+   int   i, j;
+   int   it;
+   REAL  point[4];
+   REAL  normal[3];
+   REAL* normals=NULL;
+   REAL* vertices=NULL;
+
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
+
+   if (global_grid_nu==0 || global_grid_nv==0)
+   {
+      return; /* no points need to be output */
+   }
+
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
+
+   normals=(REAL*)malloc(sizeof(REAL)*3*2*((highU-lowU)>(highV-lowV)?(highU-lowU+1):(highV-lowV+1)));
+   assert(normals);
+   vertices=(REAL*)malloc(sizeof(REAL)*3*2*((highU-lowU)>(highV-lowV)?(highU-lowU+1):(highV-lowV+1)));
+   assert(vertices);
+
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, vertices);
+   glEnableClientState(GL_NORMAL_ARRAY);
+   glNormalPointer(GL_FLOAT, 0, normals);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+
+   du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
+   dv=(global_grid_v1-global_grid_v0)/(REAL)global_grid_nv;
+
+   if (global_grid_nu>=global_grid_nv)
+   {
+      for(i=lowU; i<highU; i++)
+      {
+         REAL u1=(i==global_grid_nu)?global_grid_u1:(global_grid_u0+i*du);
+         REAL u2=((i+1)==global_grid_nu)?global_grid_u1:(global_grid_u0+(i+1)*du);
+
+         it=0;
+
+         bgnqstrip();
+
+         for(j=highV; j>=lowV; j--)
+         {
+            REAL v1=(j==global_grid_nv)?global_grid_v1:(global_grid_v0+j*dv);
+
+            inDoEvalCoord2(u1, v1, point, normal);
+            if (!output_triangles)
+            {
+               vertices[it*3+0]=point[0];
+               vertices[it*3+1]=point[1];
+               vertices[it*3+2]=point[2];
+               normals[it*3+0]=normal[0];
+               normals[it*3+1]=normal[1];
+               normals[it*3+2]=normal[2];
+               it++;
+            }
+            inDoEvalCoord2(u2, v1, point, normal);
+            if (!output_triangles)
+            {
+               vertices[it*3+0]=point[0];
+               vertices[it*3+1]=point[1];
+               vertices[it*3+2]=point[2];
+               normals[it*3+0]=normal[0];
+               normals[it*3+1]=normal[1];
+               normals[it*3+2]=normal[2];
+               it++;
+            }
+         }
+
+         endqstrip();
+
+         if (!output_triangles)
+         {
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
+         }
       }
-      endqstrip();
-    }
-  }
-  
-  else{
-    for(i=lowV; i<highV; i++){
-      REAL v1 = (i==global_grid_nv)? global_grid_v1:(global_grid_v0 + i*dv);
-      REAL v2 = ((i+1) == global_grid_nv)? global_grid_v1: (global_grid_v0+(i+1)*dv);
-      
-      bgnqstrip();
-      for(j=highU; j>=lowU; j--){
-	REAL u1 = (j == global_grid_nu)? global_grid_u1: (global_grid_u0 +j*du);	
-	inDoEvalCoord2(u1, v2, point, normal);
-	inDoEvalCoord2(u1, v1, point, normal);
+   }
+   else
+   {
+      for(i=lowV; i<highV; i++)
+      {
+         REAL v1=(i==global_grid_nv)?global_grid_v1:(global_grid_v0+i*dv);
+         REAL v2=((i+1)==global_grid_nv)?global_grid_v1:(global_grid_v0+(i+1)*dv);
+
+         it=0;
+
+         bgnqstrip();
+
+         for(j=highU; j>=lowU; j--)
+         {
+            REAL u1=(j==global_grid_nu)?global_grid_u1:(global_grid_u0+j*du);
+            inDoEvalCoord2(u1, v2, point, normal);
+            if (!output_triangles)
+            {
+               vertices[it*3+0]=point[0];
+               vertices[it*3+1]=point[1];
+               vertices[it*3+2]=point[2];
+               normals[it*3+0]=normal[0];
+               normals[it*3+1]=normal[1];
+               normals[it*3+2]=normal[2];
+               it++;
+            }
+            inDoEvalCoord2(u1, v1, point, normal);
+            if (!output_triangles)
+            {
+               vertices[it*3+0]=point[0];
+               vertices[it*3+1]=point[1];
+               vertices[it*3+2]=point[2];
+               normals[it*3+0]=normal[0];
+               normals[it*3+1]=normal[1];
+               normals[it*3+2]=normal[2];
+               it++;
+            }
+         }
+
+         endqstrip();
+
+         if (!output_triangles)
+         {
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
+         }
       }
-      endqstrip();
-    }
-  }
-    
+   }
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
+
+   free(vertices);
+   free(normals);
 }
 
 void OpenGLSurfaceEvaluator::inMap2f(int k,
@@ -386,93 +521,98 @@ void OpenGLSurfaceEvaluator::inComputeFirstPartials(REAL *p, REAL *pu, REAL *pv)
     pv[2] = pv[2]*p[3] - pv[3]*p[2];
 }
 
-/*compute the cross product of pu and pv and normalize.
- *the normal is returned in retNormal
- * pu: dimension 3
- * pv: dimension 3
- * n: return normal, of dimension 3
+/* compute the cross product of pu and pv and normalize.
+ * the normal is returned in retNormal
+ *  pu: dimension 3
+ *  pv: dimension 3
+ *  n: return normal, of dimension 3
  */
-void OpenGLSurfaceEvaluator::inComputeNormal2(REAL *pu, REAL *pv, REAL *n)
+void OpenGLSurfaceEvaluator::inComputeNormal2(REAL* pu, REAL* pv, REAL* n)
 {
-  REAL mag; 
+   REAL mag;
 
-  n[0] = pu[1]*pv[2] - pu[2]*pv[1];
-  n[1] = pu[2]*pv[0] - pu[0]*pv[2];
-  n[2] = pu[0]*pv[1] - pu[1]*pv[0];  
+   n[0]=pu[1]*pv[2]-pu[2]*pv[1];
+   n[1]=pu[2]*pv[0]-pu[0]*pv[2];
+   n[2]=pu[0]*pv[1]-pu[1]*pv[0];
 
-  mag = sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
+   mag=sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
 
-  if (mag > 0.0) {
-     n[0] /= mag; 
-     n[1] /= mag;
-     n[2] /= mag;
-  }
+   if (mag>0.0f)
+   {
+      n[0]/=mag;
+      n[1]/=mag;
+      n[2]/=mag;
+   }
 }
- 
 
-
-/*Compute point and normal
- *see the head of inDoDomain2WithDerivs
- *for the meaning of the arguments
+/* Compute point and normal
+ * see the head of inDoDomain2WithDerivs
+ * for the meaning of the arguments
  */
-void OpenGLSurfaceEvaluator::inDoEvalCoord2(REAL u, REAL v,
-			   REAL *retPoint, REAL *retNormal)
+void OpenGLSurfaceEvaluator::inDoEvalCoord2(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
+   REAL du[4];
+   REAL dv[4];
 
-  REAL du[4];
-  REAL dv[4];
-
- 
-  assert(global_ev_k>=3 && global_ev_k <= 4);
-  /*compute homegeneous point and partial derivatives*/
-  inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
+   assert(global_ev_k>=3 && global_ev_k<=4);
+   /* compute homegeneous point and partial derivatives */
+   inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
 
 #ifdef AVOID_ZERO_NORMAL
-
-  if(myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
-    {
-
+   if (myabs(dv[0])<=MYZERO && myabs(dv[1])<=MYZERO && myabs(dv[2])<=MYZERO)
+   {
       REAL tempdu[4];
       REAL tempdata[4];
-      REAL u1 = global_ev_u1;
-      REAL u2 = global_ev_u2;
-      if(u-MYDELTA*(u2-u1) < u1)
-	u = u+ MYDELTA*(u2-u1);
+      REAL u1=global_ev_u1;
+      REAL u2=global_ev_u2;
+
+      if (u-MYDELTA*(u2-u1)<u1)
+      {
+         u=u+MYDELTA*(u2-u1);
+      }
       else
-	u = u-MYDELTA*(u2-u1);
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
-    }
-  if(myabs(du[0]) <= MYZERO && myabs(du[1]) <= MYZERO && myabs(du[2]) <= MYZERO)
-    {
+      {
+         u=u-MYDELTA*(u2-u1);
+      }
+      inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
+   }
+
+   if (myabs(du[0])<=MYZERO && myabs(du[1])<=MYZERO && myabs(du[2])<=MYZERO)
+   {
       REAL tempdv[4];
       REAL tempdata[4];
-      REAL v1 = global_ev_v1;
-      REAL v2 = global_ev_v2;
-      if(v-MYDELTA*(v2-v1) < v1)
-	v = v+ MYDELTA*(v2-v1);
+      REAL v1=global_ev_v1;
+      REAL v2=global_ev_v2;
+
+      if (v-MYDELTA*(v2-v1)<v1)
+      {
+         v=v+MYDELTA*(v2-v1);
+      }
       else
-	v = v-MYDELTA*(v2-v1);
+      {
+         v=v-MYDELTA*(v2-v1);
+      }
       inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
-    }
-#endif
+   }
+#endif /* AVOID_ZERO_NORMAL */
 
+   /* compute normal */
+   switch (global_ev_k)
+   {
+      case 3:
+           inComputeNormal2(du, dv, retNormal);
+           break;
+      case 4:
+           inComputeFirstPartials(retPoint, du, dv);
+           inComputeNormal2(du, dv, retNormal);
+           /* transform the homegeneous coordinate of retPoint into inhomogenous one */
+           retPoint[0] /= retPoint[3];
+           retPoint[1] /= retPoint[3];
+           retPoint[2] /= retPoint[3];
+           break;
+   }
 
-  /*compute normal*/
-  switch(global_ev_k){
-  case 3:
-    inComputeNormal2(du, dv, retNormal);
-
-    break;
-  case 4:
-    inComputeFirstPartials(retPoint, du, dv);
-    inComputeNormal2(du, dv, retNormal);
-    /*transform the homegeneous coordinate of retPoint into inhomogenous one*/
-    retPoint[0] /= retPoint[3];
-    retPoint[1] /= retPoint[3];
-    retPoint[2] /= retPoint[3];
-    break;
-  }
-  /*output this vertex*/
+   /* output this vertex */
 
 // MIKE: TODO
 //  glNormal3fv(retNormal);
@@ -1021,7 +1161,7 @@ inPreEvaluateBU_intfac(u);
       ret_points[i][2] = temp[2];
     }
 }
-      
+
 
 /*triangulate a strip bounded by two lines which are parallel  to U-axis
  *upperVerts: the verteces on the upper line
@@ -1031,218 +1171,385 @@ inPreEvaluateBU_intfac(u);
  */
 void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val)
 {
-  int i,j,k,l;
-  REAL leftMostV[2];
- typedef REAL REAL3[3];
+   int i,j,k,l;
+   REAL leftMostV[2];
+   typedef REAL REAL3[3];
 
-  REAL3* upperXYZ = (REAL3*) malloc(sizeof(REAL3)*n_upper);
-  assert(upperXYZ);
-  REAL3* upperNormal = (REAL3*) malloc(sizeof(REAL3) * n_upper);
-  assert(upperNormal);
-  REAL3* lowerXYZ = (REAL3*) malloc(sizeof(REAL3)*n_lower);
-  assert(lowerXYZ);
-  REAL3* lowerNormal = (REAL3*) malloc(sizeof(REAL3) * n_lower);
-  assert(lowerNormal);
-  
-  inEvalULine(n_upper, v_upper, upper_val,  1, upperXYZ, upperNormal);
-  inEvalULine(n_lower, v_lower, lower_val,  1, lowerXYZ, lowerNormal);
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
 
+   REAL3* upperXYZ=(REAL3*)malloc(sizeof(REAL3)*n_upper);
+   assert(upperXYZ);
+   REAL3* upperNormal=(REAL3*)malloc(sizeof(REAL3)*n_upper);
+   assert(upperNormal);
+   REAL3* lowerXYZ=(REAL3*)malloc(sizeof(REAL3)*n_lower);
+   assert(lowerXYZ);
+   REAL3* lowerNormal=(REAL3*)malloc(sizeof(REAL3)*n_lower);
+   assert(lowerNormal);
+   REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_lower>n_upper?n_lower:n_upper)+3));
+   assert(normals);
+   REAL3* vertices=(REAL3*)malloc(sizeof(REAL3)*((n_lower>n_upper?n_lower:n_upper)+3));
+   assert(vertices);
 
+   inEvalULine(n_upper, v_upper, upper_val, 1, upperXYZ, upperNormal);
+   inEvalULine(n_lower, v_lower, lower_val, 1, lowerXYZ, lowerNormal);
 
-  REAL* leftMostXYZ;
-  REAL* leftMostNormal;
+   REAL* leftMostXYZ;
+   REAL* leftMostNormal;
 
-  /*
-   *the algorithm works by scanning from left to right.
-   *leftMostV: the left most of the remaining verteces (on both upper and lower).
-   *           it could an element of upperVerts or lowerVerts.
-   *i: upperVerts[i] is the first vertex to the right of leftMostV on upper line   *j: lowerVerts[j] is the first vertex to the right of leftMostV on lower line   */
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
 
-  /*initialize i,j,and leftMostV
-   */
-  if(upper_val[0] <= lower_val[0])
-    {
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, vertices);
+   glEnableClientState(GL_NORMAL_ARRAY);
+   glNormalPointer(GL_FLOAT, 0, normals);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+
+   /*
+    * the algorithm works by scanning from left to right.
+    * leftMostV: the left most of the remaining verteces (on both upper and lower).
+    *            it could an element of upperVerts or lowerVerts.
+    * i: upperVerts[i] is the first vertex to the right of leftMostV on upper line   *j: lowerVerts[j] is the first vertex to the right of leftMostV on lower line
+    */
+
+   /* initialize i,j,and leftMostV */
+   if (upper_val[0]<=lower_val[0])
+   {
       i=1;
       j=0;
 
-      leftMostV[0] = upper_val[0];
-      leftMostV[1] = v_upper;
-      leftMostXYZ = upperXYZ[0];
-      leftMostNormal = upperNormal[0];
-    }
-  else
-    {
+      leftMostV[0]=upper_val[0];
+      leftMostV[1]=v_upper;
+      leftMostXYZ=upperXYZ[0];
+      leftMostNormal=upperNormal[0];
+   }
+   else
+   {
       i=0;
       j=1;
 
-      leftMostV[0] = lower_val[0];
-      leftMostV[1] = v_lower;
+      leftMostV[0]=lower_val[0];
+      leftMostV[1]=v_lower;
 
-      leftMostXYZ = lowerXYZ[0];
-      leftMostNormal = lowerNormal[0];
-    }
-  
-  /*the main loop.
-   *the invariance is that: 
-   *at the beginning of each loop, the meaning of i,j,and leftMostV are 
-   *maintained
-   */
-  while(1)
-    {
-      if(i >= n_upper) /*case1: no more in upper*/
-        {
-          if(j<n_lower-1) /*at least two vertices in lower*/
+      leftMostXYZ=lowerXYZ[0];
+      leftMostNormal=lowerNormal[0];
+   }
+
+   /* the main loop.
+    * the invariance is that:
+    * at the beginning of each loop, the meaning of i,j,and leftMostV are
+    * maintained
+    */
+
+   while(1)
+   {
+      if (i>=n_upper) /* case1: no more in upper */
+      {
+         if (j<n_lower-1) /* at least two vertices in lower */
+         {
+            int it=0;
+
+            bgntfan();
+
+            if (!output_triangles)
             {
-              bgntfan();
-// MIKE: TODO
-//	      glNormal3fv(leftMostNormal);
-// MIKE: TODO
-//              glVertex3fv(leftMostXYZ);
-
-              while(j<n_lower){
-// MIKE: TODO
-//		glNormal3fv(lowerNormal[j]);
-// MIKE: TODO
-//		glVertex3fv(lowerXYZ[j]);
-		j++;
-
-              }
-              endtfan();
+               /* Fill up start vertex for triangle fan */
+               *((REAL*)(normals+it)+0)=*((REAL*)leftMostNormal+0);
+               *((REAL*)(normals+it)+1)=*((REAL*)leftMostNormal+1);
+               *((REAL*)(normals+it)+2)=*((REAL*)leftMostNormal+2);
+               *((REAL*)(vertices+it)+0)=*((REAL*)leftMostXYZ+0);
+               *((REAL*)(vertices+it)+1)=*((REAL*)leftMostXYZ+1);
+               *((REAL*)(vertices+it)+2)=*((REAL*)leftMostXYZ+2);
+               it++;
             }
-          break; /*exit the main loop*/
-        }
-      else if(j>= n_lower) /*case2: no more in lower*/
-        {
-          if(i<n_upper-1) /*at least two vertices in upper*/
-            {
-              bgntfan();
-// MIKE: TODO
-//	      glNormal3fv(leftMostNormal);
-// MIKE: TODO
-//	      glVertex3fv(leftMostXYZ);
-	      
-              for(k=n_upper-1; k>=i; k--) /*reverse order for two-side lighting*/
-		{
-// MIKE: TODO
-//		  glNormal3fv(upperNormal[k]);
-// MIKE: TODO
-//		  glVertex3fv(upperXYZ[k]);
-		}
 
-              endtfan();
+            while(j<n_lower)
+            {
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+j)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+j)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+j)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+j)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+j)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+j)+2);
+                  j++;
+               }
+               it++;
             }
-          break; /*exit the main loop*/
-        }
-      else /* case3: neither is empty, plus the leftMostV, there is at least one triangle to output*/
-        {
-          if(upper_val[i] <= lower_val[j])
+
+            endtfan();
+
+            if (!output_triangles)
             {
-	      bgntfan();
+               glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+            }
+         }
+         break; /* exit the main loop */
+      }
+      else
+      {
+         if (j>= n_lower) /* case2: no more in lower */
+         {
+            if (i<n_upper-1) /*at least two vertices in upper*/
+            {
+               int it=0;
 
-// MIKE: TODO
-//	      glNormal3fv(lowerNormal[j]);
-// MIKE: TODO
-//	      glVertex3fv(lowerXYZ[j]);
+               bgntfan();
 
-              /*find the last k>=i such that 
-               *upperverts[k][0] <= lowerverts[j][0]
-               */
-              k=i;
+               if (!output_triangles)
+               {
+                  /* Fill up start vertex for triangle fan */
+                  *((REAL*)(normals+it)+0)=*((REAL*)leftMostNormal+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)leftMostNormal+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)leftMostNormal+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)leftMostXYZ+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)leftMostXYZ+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)leftMostXYZ+2);
+                  it++;
+               }
 
-              while(k<n_upper)
-                {
-                  if(upper_val[k] > lower_val[j])
-                    break;
+               for(k=n_upper-1; k>=i; k--) /* reverse order for two-side lighting */
+               {
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+k)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+k)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+k)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+k)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+k)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+k)+2);
+                     it++;
+                  }
+               }
+
+               endtfan();
+
+               if (!output_triangles)
+               {
+                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               }
+            }
+            break; /*exit the main loop*/
+         }
+         else /* case3: neither is empty, plus the leftMostV, there is at least one triangle to output*/
+         {
+            if (upper_val[i]<=lower_val[j])
+            {
+               int it=0;
+
+               bgntfan();
+
+               if (!output_triangles)
+               {
+                  /* Fill up start vertex for triangle fan */
+                  *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+j)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+j)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+j)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+j)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+j)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+j)+2);
+                  it++;
+               }
+
+               /* find the last k>=i such that 
+                * upperverts[k][0] <= lowerverts[j][0]
+                */
+               k=i;
+
+               while(k<n_upper)
+               {
+                  if (upper_val[k]>lower_val[j])
+                  {
+                     break;
+                  }
                   k++;
+               }
+               k--;
 
-                }
-              k--;
+               for(l=k; l>=i; l--) /* the reverse is for two-side lighting */
+               {
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+l)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+l)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+l)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+l)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+l)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+l)+2);
+                     it++;
+                  }
+               }
 
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)leftMostNormal+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)leftMostNormal+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)leftMostNormal+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)leftMostXYZ+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)leftMostXYZ+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)leftMostXYZ+2);
+                  it++;
+               }
 
-              for(l=k; l>=i; l--)/*the reverse is for two-side lighting*/
-                {
-// MIKE: TODO
-//		  glNormal3fv(upperNormal[l]);
-// MIKE: TODO
-//		  glVertex3fv(upperXYZ[l]);
+               endtfan();
 
-                }
-// MIKE: TODO
-//	      glNormal3fv(leftMostNormal);
-// MIKE: TODO
-//	      glVertex3fv(leftMostXYZ);
+               if (!output_triangles)
+               {
+                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               }
 
-              endtfan();
+               /* update i and leftMostV for next loop */
+               i=k+1;
 
-              /*update i and leftMostV for next loop
-               */
-              i = k+1;
-
-	      leftMostV[0] = upper_val[k];
-	      leftMostV[1] = v_upper;
-	      leftMostNormal = upperNormal[k];
-	      leftMostXYZ = upperXYZ[k];
+               leftMostV[0]=upper_val[k];
+               leftMostV[1]=v_upper;
+               leftMostNormal=upperNormal[k];
+               leftMostXYZ=upperXYZ[k];
             }
-          else /*upperVerts[i][0] > lowerVerts[j][0]*/
+            else /* upperVerts[i][0] > lowerVerts[j][0] */
             {
-	      bgntfan();
-// MIKE: TODO
-//	      glNormal3fv(upperNormal[i]);
-// MIKE: TODO
-//	      glVertex3fv(upperXYZ[i]);
-	      
-// MIKE: TODO
-//              glNormal3fv(leftMostNormal);
-// MIKE: TODO
-//	      glVertex3fv(leftMostXYZ);
-	      
+               int it=0;
 
-              /*find the last k>=j such that
-               *lowerverts[k][0] < upperverts[i][0]
-               */
-              k=j;
-              while(k< n_lower)
-                {
-                  if(lower_val[k] >= upper_val[i])
-                    break;
-// MIKE: TODO
-//		  glNormal3fv(lowerNormal[k]);
-// MIKE: TODO
-//		  glVertex3fv(lowerXYZ[k]);
+               bgntfan();
 
+               if (!output_triangles)
+               {
+                  /* Fill up start vertex for triangle fan */
+                  *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+i)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+i)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+i)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+i)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+i)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+i)+2);
+                  it++;
+               }
+
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)leftMostNormal+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)leftMostNormal+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)leftMostNormal+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)leftMostXYZ+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)leftMostXYZ+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)leftMostXYZ+2);
+                  it++;
+               }
+
+               /* find the last k>=j such that
+                * lowerverts[k][0] < upperverts[i][0]
+                */
+               k=j;
+               while(k<n_lower)
+               {
+                  if (lower_val[k]>=upper_val[i])
+                  {
+                     break;
+                  }
+
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+k)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+k)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+k)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+k)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+k)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+k)+2);
+                     it++;
+                  }
                   k++;
-                }
-              endtfan();
+               }
 
-              /*update j and leftMostV for next loop
-               */
-              j=k;
-	      leftMostV[0] = lower_val[j-1];
-	      leftMostV[1] = v_lower;
+               endtfan();
 
-	      leftMostNormal = lowerNormal[j-1];
-	      leftMostXYZ = lowerXYZ[j-1];
-            }     
-        }
-    }
-  //clean up 
-  free(upperXYZ);
-  free(lowerXYZ);
-  free(upperNormal);
-  free(lowerNormal);
+               if (!output_triangles)
+               {
+                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               }
+
+               /* update j and leftMostV for next loop */
+               j=k;
+               leftMostV[0]=lower_val[j-1];
+               leftMostV[1]=v_lower;
+
+               leftMostNormal=lowerNormal[j-1];
+               leftMostXYZ=lowerXYZ[j-1];
+            }
+         }
+      }
+   }
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
+
+   // clean up
+   free(normals);
+   free(vertices);
+   free(upperXYZ);
+   free(lowerXYZ);
+   free(upperNormal);
+   free(lowerNormal);
 }
 
-/*triangulate a strip bounded by two lines which are parallel  to V-axis
- *leftVerts: the verteces on the left line
- *rightVertx: the verteces on the right line
- *n_left >=1
- *n_right >=1
+/* triangulate a strip bounded by two lines which are parallel  to V-axis
+ * leftVerts: the verteces on the left line
+ * rightVertx: the verteces on the right line
+ * n_left >=1
+ * n_right >=1
  */
 void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL u_right, REAL* right_val)
 {
    int i,j,k,l;
    REAL botMostV[2];
    typedef REAL REAL3[3];
+
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
 
    REAL3* leftXYZ = (REAL3*) malloc(sizeof(REAL3)*n_left);
    assert(leftXYZ);
@@ -1252,6 +1559,10 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
    assert(rightXYZ);
    REAL3* rightNormal = (REAL3*) malloc(sizeof(REAL3) * n_right);
    assert(rightNormal);
+   REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)+3));
+   assert(normals);
+   REAL3* vertices=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)+3));
+   assert(vertices);
 
    inEvalVLine(n_left, u_left, left_val,  1, leftXYZ, leftNormal);
    inEvalVLine(n_right, u_right, right_val,  1, rightXYZ, rightNormal);
@@ -1259,185 +1570,334 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
    REAL* botMostXYZ;
    REAL* botMostNormal;
 
-  /*
-   *the algorithm works by scanning from bot to top.
-   *botMostV: the bot most of the remaining verteces (on both left and right).
-   *           it could an element of leftVerts or rightVerts.
-   *i: leftVerts[i] is the first vertex to the top of botMostV on left line   
-   *j: rightVerts[j] is the first vertex to the top of botMostV on rightline   */
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
 
-  /*initialize i,j,and botMostV
-   */
-  if(left_val[0] <= right_val[0])
-    {
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, vertices);
+   glEnableClientState(GL_NORMAL_ARRAY);
+   glNormalPointer(GL_FLOAT, 0, normals);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+
+   /*
+    * the algorithm works by scanning from bot to top.
+    * botMostV: the bot most of the remaining verteces (on both left and right).
+    *           it could an element of leftVerts or rightVerts.
+    * i: leftVerts[i] is the first vertex to the top of botMostV on left line   
+    * j: rightVerts[j] is the first vertex to the top of botMostV on rightline   */
+
+   /* initialize i,j,and botMostV */
+   if (left_val[0]<=right_val[0])
+   {
       i=1;
       j=0;
 
-      botMostV[0] = u_left;
-      botMostV[1] = left_val[0];
-      botMostXYZ = leftXYZ[0];
-      botMostNormal = leftNormal[0];
-    }
-  else
-    {
+      botMostV[0]=u_left;
+      botMostV[1]=left_val[0];
+      botMostXYZ=leftXYZ[0];
+      botMostNormal=leftNormal[0];
+   }
+   else
+   {
       i=0;
       j=1;
 
-      botMostV[0] = u_right;
-      botMostV[1] = right_val[0];
+      botMostV[0]=u_right;
+      botMostV[1]=right_val[0];
 
-      botMostXYZ = rightXYZ[0];
-      botMostNormal = rightNormal[0];
-    }
-  
-  /*the main loop.
-   *the invariance is that: 
-   *at the beginning of each loop, the meaning of i,j,and botMostV are 
-   *maintained
-   */
-  while(1)
-    {
-      if(i >= n_left) /*case1: no more in left*/
-        {
-          if(j<n_right-1) /*at least two vertices in right*/
+      botMostXYZ=rightXYZ[0];
+      botMostNormal=rightNormal[0];
+   }
+
+   /* the main loop.
+    * the invariance is that:
+    * at the beginning of each loop, the meaning of i,j,and botMostV are
+    * maintained
+    */
+   while(1)
+   {
+      if (i>=n_left) /* case1: no more in left */
+      {
+         if (j<n_right-1) /* at least two vertices in right */
+         {
+            int it=0;
+
+            bgntfan();
+
+            if (!output_triangles)
             {
-              bgntfan();
-// MIKE: TODO
-//	      glNormal3fv(botMostNormal);
-// MIKE: TODO
-//              glVertex3fv(botMostXYZ);
-
-              while(j<n_right){
-// MIKE: TODO
-//		glNormal3fv(rightNormal[j]);
-// MIKE: TODO
-//		glVertex3fv(rightXYZ[j]);
-		j++;
-
-              }
-              endtfan();
+               *((REAL*)(normals+it)+0)=*((REAL*)(botMostNormal+0)+0);
+               *((REAL*)(normals+it)+1)=*((REAL*)(botMostNormal+0)+1);
+               *((REAL*)(normals+it)+2)=*((REAL*)(botMostNormal+0)+2);
+               *((REAL*)(vertices+it)+0)=*((REAL*)(botMostXYZ+0)+0);
+               *((REAL*)(vertices+it)+1)=*((REAL*)(botMostXYZ+0)+1);
+               *((REAL*)(vertices+it)+2)=*((REAL*)(botMostXYZ+0)+2);
+               it++;
             }
-          break; /*exit the main loop*/
-        }
-      else if(j>= n_right) /*case2: no more in right*/
-        {
-          if(i<n_left-1) /*at least two vertices in left*/
-            {
-              bgntfan();
-// MIKE: TODO
-//	      glNormal3fv(botMostNormal);
-// MIKE: TODO
-//	      glVertex3fv(botMostXYZ);
-	      
-              for(k=n_left-1; k>=i; k--) /*reverse order for two-side lighting*/
-		{
-// MIKE: TODO
-//		  glNormal3fv(leftNormal[k]);
-// MIKE: TODO
-//		  glVertex3fv(leftXYZ[k]);
-		}
 
-              endtfan();
+            while(j<n_right)
+            {
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+j)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+j)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+j)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+j)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+j)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+j)+2);
+                  it++;
+               }
+               j++;
             }
-          break; /*exit the main loop*/
-        }
-      else /* case3: neither is empty, plus the botMostV, there is at least one triangle to output*/
-        {
-          if(left_val[i] <= right_val[j])
+
+            endtfan();
+
+            if (!output_triangles)
             {
-	      bgntfan();
+               glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+            }
+         }
+         break; /* exit the main loop */
+      }
+      else
+      {
+         if(j>=n_right) /* case2: no more in right */
+         {
+            if(i<n_left-1) /* at least two vertices in left */
+            {
+               int it=0;
 
-// MIKE: TODO
-//	      glNormal3fv(rightNormal[j]);
-// MIKE: TODO
-//	      glVertex3fv(rightXYZ[j]);
+               bgntfan();
 
-              /*find the last k>=i such that 
-               *leftverts[k][0] <= rightverts[j][0]
-               */
-              k=i;
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(botMostNormal+0)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(botMostNormal+0)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(botMostNormal+0)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(botMostXYZ+0)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(botMostXYZ+0)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(botMostXYZ+0)+2);
+                  it++;
+               }
 
-              while(k<n_left)
-                {
-                  if(left_val[k] > right_val[j])
-                    break;
+               for(k=n_left-1; k>=i; k--) /* reverse order for two-side lighting */
+               {
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+k)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+k)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+k)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+k)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+k)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+k)+2);
+                     it++;
+                  }
+               }
+
+               endtfan();
+
+               if (!output_triangles)
+               {
+                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               }
+            }
+            break; /* exit the main loop */
+         }
+         else /* case3: neither is empty, plus the botMostV, there is at least one triangle to output */
+         {
+            if(left_val[i]<=right_val[j])
+            {
+               int it=0;
+
+               bgntfan();
+
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+j)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+j)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+j)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+j)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+j)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+j)+2);
+                  it++;
+               }
+
+               /* find the last k>=i such that
+                * leftverts[k][0] <= rightverts[j][0]
+                */
+               k=i;
+
+               while(k<n_left)
+               {
+                  if(left_val[k]>right_val[j])
+                  {
+                     break;
+                  }
                   k++;
+               }
+               k--;
 
-                }
-              k--;
+               for(l=k; l>=i; l--) /* the reverse is for two-side lighting */
+               {
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+l)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+l)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+l)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+l)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+l)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+l)+2);
+                     it++;
+                  }
+               }
 
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(botMostNormal+0)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(botMostNormal+0)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(botMostNormal+0)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(botMostXYZ+0)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(botMostXYZ+0)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(botMostXYZ+0)+2);
+                  it++;
+               }
 
-              for(l=k; l>=i; l--)/*the reverse is for two-side lighting*/
-                {
-// MIKE: TODO
-//		  glNormal3fv(leftNormal[l]);
-// MIKE: TODO
-//		  glVertex3fv(leftXYZ[l]);
+               endtfan();
 
-                }
-// MIKE: TODO
-//	      glNormal3fv(botMostNormal);
-// MIKE: TODO
-//	      glVertex3fv(botMostXYZ);
+               if (!output_triangles)
+               {
+                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               }
 
-              endtfan();
+               /* update i and botMostV for next loop */
+               i=k+1;
 
-              /*update i and botMostV for next loop
-               */
-              i = k+1;
-
-	      botMostV[0] = u_left;
-	      botMostV[1] = left_val[k];
-	      botMostNormal = leftNormal[k];
-	      botMostXYZ = leftXYZ[k];
+               botMostV[0]=u_left;
+               botMostV[1]=left_val[k];
+               botMostNormal=leftNormal[k];
+               botMostXYZ=leftXYZ[k];
             }
-          else /*left_val[i] > right_val[j])*/
+            else /* left_val[i] > right_val[j]) */
             {
-	      bgntfan();
-// MIKE: TODO
-//	      glNormal3fv(leftNormal[i]);
-// MIKE: TODO
-//	      glVertex3fv(leftXYZ[i]);
-	      
-// MIKE: TODO
-//              glNormal3fv(botMostNormal);
-// MIKE: TODO
-//	      glVertex3fv(botMostXYZ);
-	      
+               int it=0;
 
-              /*find the last k>=j such that
-               *rightverts[k][0] < leftverts[i][0]
-               */
-              k=j;
-              while(k< n_right)
-                {
-                  if(right_val[k] >= left_val[i])
-                    break;
-// MIKE: TODO
-//		  glNormal3fv(rightNormal[k]);
-// MIKE: TODO
-//		  glVertex3fv(rightXYZ[k]);
+               bgntfan();
 
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+i)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+i)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+i)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+i)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+i)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+i)+2);
+                  it++;
+               }
+
+               if (!output_triangles)
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(botMostNormal+0)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(botMostNormal+0)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(botMostNormal+0)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(botMostXYZ+0)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(botMostXYZ+0)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(botMostXYZ+0)+2);
+                  it++;
+               }
+
+               /* find the last k>=j such that
+                * rightverts[k][0] < leftverts[i][0]
+                */
+               k=j;
+               while(k<n_right)
+               {
+                  if(right_val[k]>=left_val[i])
+                  {
+                     break;
+                  }
+
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+k)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+k)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+k)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+k)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+k)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+k)+2);
+                     it++;
+                  }
                   k++;
-                }
-              endtfan();
+               }
 
-              /*update j and botMostV for next loop
-               */
-              j=k;
-	      botMostV[0] = u_right;
-	      botMostV[1] = right_val[j-1];
+               endtfan();
 
-	      botMostNormal = rightNormal[j-1];
-	      botMostXYZ = rightXYZ[j-1];
-            }     
-        }
-    }
-  //clean up 
-  free(leftXYZ);
-  free(rightXYZ);
-  free(leftNormal);
-  free(rightNormal);
+               if (!output_triangles)
+               {
+                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               }
+
+               /* update j and botMostV for next loop */
+               j=k;
+               botMostV[0]=u_right;
+               botMostV[1]=right_val[j-1];
+
+               botMostNormal = rightNormal[j-1];
+               botMostXYZ = rightXYZ[j-1];
+            }
+         }
+      }
+   }
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
+
+   // clean up
+   free(normals);
+   free(vertices);
+   free(leftXYZ);
+   free(rightXYZ);
+   free(leftNormal);
+   free(rightNormal);
 }
 
 /*-----------------------begin evalMachine-------------------*/
@@ -1599,8 +2059,8 @@ void OpenGLSurfaceEvaluator::inDoDomain2EM(surfEvalMachine *em, REAL u, REAL v,
 	    /* Use p, pdv value to incrementally add up r, du, dv */
 	    retPoint[j] += em->ucoeff[row] * p;
 	}
-    }  
-}  
+    }
+}
 
 
 void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
@@ -1625,7 +2085,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
     {
       inDoDomain2EM(&em_normal, u,v, temp_normal);
       normalCallBack(temp_normal, userData);
-    
+
       if(vertex_flag)
 	{
 	  inDoDomain2EM(&em_vertex, u,v,temp_vertex);
@@ -1633,10 +2093,10 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
 	    {
 	      temp_vertex[0] /= temp_vertex[3];
 	      temp_vertex[1] /= temp_vertex[3];
-	      temp_vertex[2] /= temp_vertex[3];	      
+	      temp_vertex[2] /= temp_vertex[3];
 	    }
           temp_vertex[3]=u;
-          temp_vertex[4]=v;	  
+          temp_vertex[4]=v;
 	  vertexCallBack(temp_vertex, userData);
 	}
     }
@@ -1666,7 +2126,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
 	  inDoDomain2WithDerivsEM(&em_vertex,u,v, tempdata, tempdu, dv);
 
 	  if(em_vertex.k ==4)
-	    inComputeFirstPartials(temp_vertex, du, dv);	  
+	    inComputeFirstPartials(temp_vertex, du, dv);
 	}
       else if(myabs(du[0]) <= MYZERO && myabs(du[1]) <= MYZERO && myabs(du[2]) <= MYZERO)
 	{
@@ -1706,7 +2166,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
       temp_vertex[3] = u;
       temp_vertex[4] = v;
       vertexCallBack(temp_vertex, userData);
-      
+
     }/*end if auto_normal*/
   else //no normal map, and no normal callback function
     {
@@ -1859,8 +2319,8 @@ void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
 		   0
 		   );
 	}
-	  k+= 2*bpm->length_array[i];       
-    
+	  k+= 2*bpm->length_array[i];
+
 #else //undef  USE_LOD
 
       beginCallBack(bpm->type_array[i], userData);

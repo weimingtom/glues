@@ -284,10 +284,10 @@ GLAPI void APIENTRY gluCylinder(GLUquadric* qobj, GLfloat baseRadius,
    }
 
    /* Store status of enabled arrays */
-   texcoord_enabled=GL_FALSE; //glIsEnabled(GL_TEXTURE_COORD_ARRAY);
-   normal_enabled=GL_FALSE; //glIsEnabled(GL_NORMAL_ARRAY);
-   vertex_enabled=GL_FALSE; //glIsEnabled(GL_VERTEX_ARRAY);
-   color_enabled=GL_FALSE; //glIsEnabled(GL_COLOR_ARRAY);
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
 
    /* Enable or disable arrays */
    glEnableClientState(GL_VERTEX_ARRAY);

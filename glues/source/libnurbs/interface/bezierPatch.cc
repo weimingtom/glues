@@ -32,8 +32,6 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
-/*
-*/
 
 #include "glues.h"
 #include <stdlib.h>
@@ -44,136 +42,158 @@
 #include "bezierEval.h"
 
 /*
- *allocate an instance of bezierPatch. The control points are unknown. But
- *the space of this array is allocated with size of 
+ * allocate an instance of bezierPatch. The control points are unknown. But
+ * the space of this array is allocated with size of
  *   uorder*vorder*dimension
  *
  */
 bezierPatch* bezierPatchMake(float umin, float vmin, float umax, float vmax, int uorder, int vorder, int dimension)
 {
-  bezierPatch* ret = (bezierPatch*) malloc(sizeof(bezierPatch));
-  assert(ret);
-  ret->umin = umin;
-  ret->vmin = vmin;
-  ret->umax = umax;
-  ret->vmax = vmax;
-  ret->uorder = uorder;
-  ret->vorder = vorder;
-  ret->dimension = dimension;
-  ret->ctlpoints = (float*) malloc(sizeof(float) * dimension * uorder * vorder);
-  assert(ret->ctlpoints);
+   bezierPatch* ret = (bezierPatch*) malloc(sizeof(bezierPatch));
+   assert(ret);
+   ret->umin=umin;
+   ret->vmin=vmin;
+   ret->umax=umax;
+   ret->vmax=vmax;
+   ret->uorder=uorder;
+   ret->vorder=vorder;
+   ret->dimension=dimension;
+   ret->ctlpoints=(float*)malloc(sizeof(float)*dimension*uorder*vorder);
+   assert(ret->ctlpoints);
 
-  ret->next = NULL;
+   ret->next=NULL;
 
-  return ret;
+   return ret;
 }
 
 bezierPatch* bezierPatchMake2(float umin, float vmin, float umax, float vmax, int uorder, int vorder, int dimension, int ustride, int vstride,  float* ctlpoints)
 {
-  bezierPatch* ret = (bezierPatch*) malloc(sizeof(bezierPatch));
-  assert(ret);
-  ret->umin = umin;
-  ret->vmin = vmin;
-  ret->umax = umax;
-  ret->vmax = vmax;
-  ret->uorder = uorder;
-  ret->vorder = vorder;
-  ret->dimension = dimension;
-  ret->ctlpoints = (float*) malloc(sizeof(float) * dimension * uorder * vorder);
-  assert(ret->ctlpoints);
+   bezierPatch* ret=(bezierPatch*)malloc(sizeof(bezierPatch));
+   assert(ret);
+   ret->umin=umin;
+   ret->vmin=vmin;
+   ret->umax=umax;
+   ret->vmax=vmax;
+   ret->uorder=uorder;
+   ret->vorder=vorder;
+   ret->dimension=dimension;
+   ret->ctlpoints=(float*)malloc(sizeof(float)*dimension*uorder*vorder);
+   assert(ret->ctlpoints);
 
-  /*copy the control points there*/
-  int the_ustride = vorder * dimension;
-  int the_vstride = dimension;
-  for(int i=0; i<uorder; i++)
-    for(int j=0; j<vorder; j++)
-      for(int k=0; k<dimension; k++)
-	ret->ctlpoints[i * the_ustride + j*the_vstride+k] = ctlpoints[i*ustride+j*vstride+k];
-  
-  ret->next = NULL;
+   /* copy the control points there */
+   int the_ustride=vorder*dimension;
+   int the_vstride=dimension;
 
-  return ret;
+   for(int i=0; i<uorder; i++)
+   {
+      for(int j=0; j<vorder; j++)
+      {
+         for(int k=0; k<dimension; k++)
+         {
+            ret->ctlpoints[i*the_ustride+j*the_vstride+k]=ctlpoints[i*ustride+j*vstride+k];
+         }
+      }
+   }
+
+   ret->next=NULL;
+
+   return ret;
 }
 
 /*
- *deallocate the space as allocated by Make
+ * deallocate the space as allocated by Make
  */
-void bezierPatchDelete(bezierPatch *b)
+void bezierPatchDelete(bezierPatch* b)
 {
-  free(b->ctlpoints);
-  free(b);
+   free(b->ctlpoints);
+   free(b);
 }
 
-/*delete the whole linked list
- */
-void bezierPatchDeleteList(bezierPatch *b)
+/* delete the whole linked list */
+void bezierPatchDeleteList(bezierPatch* b)
 {
-  bezierPatch *temp;
-  while (b != NULL) {
-    temp = b;
-    b = b->next;
-    bezierPatchDelete(temp);
-  }
+   bezierPatch* temp;
+
+   while (b!=NULL)
+   {
+      temp=b;
+      b=b->next;
+      bezierPatchDelete(temp);
+   }
 }
 
-bezierPatch* bezierPatchInsert(bezierPatch *list, bezierPatch *b)
+bezierPatch* bezierPatchInsert(bezierPatch* list, bezierPatch* b)
 {
-  b->next = list;
-  return b;
+   b->next=list;
+
+   return b;
 }
 
-/*print the data stored in this patch*/
+/* print the data stored in this patch */
 void bezierPatchPrint(bezierPatch *b)
 {
-  printf("bezierPatch:\n");
-  printf("umin,umax=(%f,%f), (vmin, vmax)=(%f,%f)\n", b->umin, b->umax, b->vmin, b->vmax);
-  printf("uorder=%i, vorder=%i\n", b->uorder, b->vorder);
-  printf("idmension = %i\n", b->dimension);
+   printf("bezierPatch:\n");
+   printf("umin,umax=(%f,%f), (vmin, vmax)=(%f,%f)\n", b->umin, b->umax, b->vmin, b->vmax);
+   printf("uorder=%i, vorder=%i\n", b->uorder, b->vorder);
+   printf("idmension = %i\n", b->dimension);
 }
 
-/*print the whole list*/
+/* print the whole list */
 void bezierPatchPrintList(bezierPatch *list)
 {
-  bezierPatch* temp;
-  for(temp=list; temp != NULL; temp = temp->next)
-    bezierPatchPrint(temp);
+   bezierPatch* temp;
+
+   for(temp=list; temp!=NULL; temp=temp->next)
+   {
+      bezierPatchPrint(temp);
+   }
 }
 
 void bezierPatchEval(bezierPatch *b, float u, float v, float ret[])
 {
-  if(   u >= b->umin && u<= b->umax
-     && v >= b->vmin && v<= b->vmax)
-    {
-
-      bezierSurfEval(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);
-
-     }
-  else if(b->next != NULL)
-    bezierPatchEval(b->next, u,v, ret);
-  else 
-    bezierSurfEval(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);    
+   if (u>=b->umin && u<=b->umax && v>=b->vmin && v<=b->vmax)
+   {
+      bezierSurfEval(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension*b->vorder, b->dimension, u, v, ret);
+   }
+   else
+   {
+      if (b->next!=NULL)
+      {
+         bezierPatchEval(b->next, u, v, ret);
+      }
+      else
+      {
+         bezierSurfEval(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension*b->vorder, b->dimension, u, v, ret);
+      }
+   }
 }
 
-/*the returned normal is normlized
+/* the returned normal is normlized
  */
-void bezierPatchEvalNormal(bezierPatch *b, float u, float v, float ret[])
+void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float ret[])
 {
-  bezierSurfEvalNormal(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);  
+   bezierSurfEvalNormal(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);
 
-  if(   u >= b->umin && u<= b->umax
-     && v >= b->vmin && v<= b->vmax)
-    {
+   if (u>=b->umin && u<=b->umax && v>=b->vmin && v<=b->vmax)
+   {
       bezierSurfEvalNormal(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);
-     }
-  else if(b->next != NULL)
-    bezierPatchEvalNormal(b->next, u,v, ret);
-  else 
-    bezierSurfEvalNormal(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);    
-
+   }
+   else
+   {
+      if (b->next!=NULL)
+      {
+         bezierPatchEvalNormal(b->next, u, v, ret);
+      }
+      else
+      {
+         bezierSurfEvalNormal(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);
+      }
+   }
 }
 
 void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso)
 {
+printf("MIKE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! bezierPatchDraw\n");
    if (bpatch->dimension==3)
    {
 // MIKE: TODO
@@ -197,10 +217,8 @@ void bezierPatchListDraw(bezierPatch *list, int u_reso, int v_reso)
 
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
-// MIKE: TODO
-//   glEnable(GLU_MAP2_VERTEX_3);
-// MIKE: TODO
-//   glEnable(GLU_AUTO_NORMAL);
+   gluEnable(GLU_MAP2_VERTEX_3);
+   gluEnable(GLU_AUTO_NORMAL);
    glEnable(GL_NORMALIZE);
    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 

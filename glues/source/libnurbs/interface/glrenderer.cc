@@ -128,11 +128,10 @@ void GLUnurbs::loadGLMatrices(void)
    GLfloat vmat[4][4];
    GLint viewport[4];
 
-   grabGLMatrix((GLfloat (*)[4])vmat);
-   loadCullingMatrix((GLfloat (*)[4])vmat);
-// MIKE: TODO
-//    ::glGetIntegerv((GLenum) GL_VIEWPORT, (GLint *) viewport);
-   loadSamplingMatrix((const GLfloat (*)[4])vmat, (const GLint*)viewport);
+   grabGLMatrix((GLfloat(*)[4])vmat);
+   loadCullingMatrix((GLfloat(*)[4])vmat);
+   gluGetIntegerv((GLenum)GL_VIEWPORT, (GLint*)viewport);
+   loadSamplingMatrix((const GLfloat(*)[4])vmat, (const GLint*)viewport);
 }
 
 void GLUnurbs::useGLMatrices(const GLfloat modelMatrix[16], const GLfloat projMatrix[16],

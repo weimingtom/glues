@@ -164,33 +164,7 @@ OpenGLSurfaceEvaluator::~OpenGLSurfaceEvaluator()
  */
 void OpenGLSurfaceEvaluator::disable(long type)
 {
-   printf("OpenGLSurfaceEvaluator::disable=%08X\n", type);
-   switch (type)
-   {
-      case GLU_MAP1_COLOR_4:
-      case GLU_MAP1_INDEX:
-      case GLU_MAP1_NORMAL:
-      case GLU_MAP1_TEXTURE_COORD_1:
-      case GLU_MAP1_TEXTURE_COORD_2:
-      case GLU_MAP1_TEXTURE_COORD_3:
-      case GLU_MAP1_TEXTURE_COORD_4:
-      case GLU_MAP1_VERTEX_3:
-      case GLU_MAP1_VERTEX_4:
-      case GLU_MAP2_COLOR_4:
-      case GLU_MAP2_INDEX:
-      case GLU_MAP2_NORMAL:
-      case GLU_MAP2_TEXTURE_COORD_1:
-      case GLU_MAP2_TEXTURE_COORD_2:
-      case GLU_MAP2_TEXTURE_COORD_3:
-      case GLU_MAP2_TEXTURE_COORD_4:
-      case GLU_MAP2_VERTEX_3:
-      case GLU_MAP2_VERTEX_4:
-           gluDisable((GLenum)type);
-           break;
-      default:
-           glDisable((GLenum)type);
-           break;
-   }
+   gluDisable((GLenum)type);
 }
 
 /*---------------------------------------------------------------------------
@@ -199,33 +173,7 @@ void OpenGLSurfaceEvaluator::disable(long type)
  */
 void OpenGLSurfaceEvaluator::enable(long type)
 {
-   printf("OpenGLSurfaceEvaluator::enable=%08X\n", type);
-   switch (type)
-   {
-      case GLU_MAP1_COLOR_4:
-      case GLU_MAP1_INDEX:
-      case GLU_MAP1_NORMAL:
-      case GLU_MAP1_TEXTURE_COORD_1:
-      case GLU_MAP1_TEXTURE_COORD_2:
-      case GLU_MAP1_TEXTURE_COORD_3:
-      case GLU_MAP1_TEXTURE_COORD_4:
-      case GLU_MAP1_VERTEX_3:
-      case GLU_MAP1_VERTEX_4:
-      case GLU_MAP2_COLOR_4:
-      case GLU_MAP2_INDEX:
-      case GLU_MAP2_NORMAL:
-      case GLU_MAP2_TEXTURE_COORD_1:
-      case GLU_MAP2_TEXTURE_COORD_2:
-      case GLU_MAP2_TEXTURE_COORD_3:
-      case GLU_MAP2_TEXTURE_COORD_4:
-      case GLU_MAP2_VERTEX_3:
-      case GLU_MAP2_VERTEX_4:
-           gluEnable((GLenum)type);
-           break;
-      default:
-           glEnable((GLenum)type);
-           break;
-   }
+   gluEnable((GLenum)type);
 }
 
 /*-------------------------------------------------------------------------
@@ -236,7 +184,6 @@ void
 OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, REAL v1)
 {
 #ifdef USE_INTERNAL_EVAL
-  printf("OpenGLSurfaceEvaluator::naogrid2f\n");
   inMapGrid2f((int) nu, (REAL) u0, (REAL) u1, (int) nv,
 	      (REAL) v0, (REAL) v1);
 #else
@@ -263,7 +210,6 @@ OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, R
 void
 OpenGLSurfaceEvaluator::polymode(long style)
 {
-  printf("OpenGLSurfaceEvaluator::polymode=%08X\n", style);
   if(! output_triangles)
     {
       switch(style) {
@@ -287,7 +233,6 @@ OpenGLSurfaceEvaluator::polymode(long style)
 void
 OpenGLSurfaceEvaluator::bgnline(void)
 {
-  printf("OpenGLSurfaceEvaluator::bgnline\n");
   if(output_triangles)
   {
     bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
@@ -302,7 +247,6 @@ OpenGLSurfaceEvaluator::bgnline(void)
 void
 OpenGLSurfaceEvaluator::endline(void)
 {
-  printf("OpenGLSurfaceEvaluator::endline\n");
   if(output_triangles)
   {
     bezierPatchMeshEndStrip(global_bpm);
@@ -324,7 +268,6 @@ void OpenGLSurfaceEvaluator::domain2f(REAL ulo, REAL uhi, REAL vlo, REAL vhi)
 
 void OpenGLSurfaceEvaluator::bgnclosedline(void)
 {
-  printf("OpenGLSurfaceEvaluator::bgnclosedline\n");
   if(output_triangles)
   {
     bezierPatchMeshBeginStrip(global_bpm, GL_LINE_LOOP);
@@ -339,7 +282,6 @@ void OpenGLSurfaceEvaluator::bgnclosedline(void)
 void
 OpenGLSurfaceEvaluator::endclosedline(void)
 {
-  printf("OpenGLSurfaceEvaluator::endclosedline\n");
   if(output_triangles)
   {
     bezierPatchMeshEndStrip(global_bpm);
@@ -353,7 +295,6 @@ OpenGLSurfaceEvaluator::endclosedline(void)
 
 void OpenGLSurfaceEvaluator::bgntmesh(void)
 {
-  printf("OpenGLSurfaceEvaluator::bgntmesh\n");
     tmeshing = 1;
     which = 0;
     vcount = 0;
@@ -373,105 +314,82 @@ void OpenGLSurfaceEvaluator::bgntmesh(void)
 void
 OpenGLSurfaceEvaluator::swaptmesh(void)
 {
-  printf("OpenGLSurfaceEvaluator::swaptmesh\n");
     which = 1 - which;
 
 }
 
-void
-OpenGLSurfaceEvaluator::endtmesh(void)
+void OpenGLSurfaceEvaluator::endtmesh(void)
 {
-  printf("OpenGLSurfaceEvaluator::endtmesh\n");
-    tmeshing = 0;
+   tmeshing = 0;
 
-
-    if(output_triangles)
+   if(output_triangles)
+   {
       bezierPatchMeshEndStrip(global_bpm);
-    else
-    {
+   }
+   else
+   {
 // MIKE: TODO
 //      glEnd();
-    }
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::bgntfan(void)
+void OpenGLSurfaceEvaluator::bgntfan(void)
 {
-  printf("OpenGLSurfaceEvaluator::bgntfan\n");
-
-  if(output_triangles)
-  {
-    bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLE_FAN);
-  }
-  else
-  {
-     printf("OpenGLSurfaceEvaluator::bgntfan: need to start triangle fan drawing\n");
-// MIKE: TODO
-//    glBegin((GLenum) GL_TRIANGLE_FAN);
-  }
+   if(output_triangles)
+   {
+      bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLE_FAN);
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::endtfan(void)
+void OpenGLSurfaceEvaluator::endtfan(void)
 {
-  printf("OpenGLSurfaceEvaluator::endtfan\n");
-  if(output_triangles)
-  {
-    bezierPatchMeshEndStrip(global_bpm);
-  }
-  else
-  {
-// MIKE: TODO
-//    glEnd();
-  }
+   if(output_triangles)
+   {
+      bezierPatchMeshEndStrip(global_bpm);
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val)
+void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val)
 {
 #ifdef USE_INTERNAL_EVAL
-  printf("OpenGLSurfaceEvaluator::evalUStrip\n");
-  inEvalUStrip(n_upper, v_upper, upper_val,
-	n_lower, v_lower, lower_val);
+   inEvalUStrip(n_upper, v_upper, upper_val, n_lower, v_lower, lower_val);
 #else
-  int i,j,k,l;
-  REAL leftMostV[2];
+   int i, j, k, l;
+   REAL leftMostV[2];
 
-  /*
-   *the algorithm works by scanning from left to right.
-   *leftMostV: the left most of the remaining verteces (on both upper and lower).
-   *	       it could an element of upperVerts or lowerVerts.
-   *i: upperVerts[i] is the first vertex to the right of leftMostV on upper line
-   *j: lowerVerts[j] is the first vertex to the right of leftMostV on lower line
-   */
+   /*
+    * the algorithm works by scanning from left to right.
+    * leftMostV: the left most of the remaining verteces (on both upper and lower).
+    *            it could an element of upperVerts or lowerVerts.
+    * i: upperVerts[i] is the first vertex to the right of leftMostV on upper line
+    * j: lowerVerts[j] is the first vertex to the right of leftMostV on lower line
+    */
 
-  /*initialize i,j,and leftMostV
-   */
-  if(upper_val[0] <= lower_val[0])
-    {
+   /* initialize i,j,and leftMostV */
+   if (upper_val[0]<=lower_val[0])
+   {
       i=1;
       j=0;
 
-      leftMostV[0] = upper_val[0];
-      leftMostV[1] = v_upper;
-    }
-  else
-    {
+      leftMostV[0]=upper_val[0];
+      leftMostV[1]=v_upper;
+   }
+   else
+   {
       i=0;
       j=1;
 
-      leftMostV[0] = lower_val[0];
-      leftMostV[1] = v_lower;
+      leftMostV[0]=lower_val[0];
+      leftMostV[1]=v_lower;
+   }
 
-    }
-
-  /*the main loop.
-   *the invariance is that:
-   *at the beginning of each loop, the meaning of i,j,and leftMostV are
-   *maintained
-   */
-  while(1)
-    {
+   /* the main loop.
+    * the invariance is that:
+    * at the beginning of each loop, the meaning of i,j,and leftMostV are
+    * maintained
+    */
+   while(1)
+   {
       if(i >= n_upper) /*case1: no more in upper*/
 	{
 	  if(j<n_lower-1) /*at least two vertices in lower*/
@@ -597,13 +515,7 @@ OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, i
 	    }
 	}
     }
-  //clean up
-//  free(upperXYZ);
-//  free(lowerXYZ);
-//  free(upperNormal);
-//  free(lowerNormal);
-#endif
-
+#endif /* USE_INTERNAL_EVAL */
 }
 
 
@@ -611,50 +523,47 @@ void
 OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL u_right, REAL* right_val)
 {
 #ifdef USE_INTERNAL_EVAL
-  printf("OpenGLSurfaceEvaluator::evalVStrip\n");
-	inEvalVStrip(n_left, u_left, left_val,
-	n_right, u_right, right_val);
+   inEvalVStrip(n_left, u_left, left_val, n_right, u_right, right_val);
 #else
-  int i,j,k,l;
-  REAL botMostV[2];
-  /*
-   *the algorithm works by scanning from bot to top.
-   *botMostV: the bot most of the remaining verteces (on both left and right).
-   *	       it could an element of leftVerts or rightVerts.
-   *i: leftVerts[i] is the first vertex to the top of botMostV on left line
-   *j: rightVerts[j] is the first vertex to the top of botMostV on rightline
-   */
+   int i, j, k, l;
+   REAL botMostV[2];
+   /*
+    * the algorithm works by scanning from bot to top.
+    * botMostV: the bot most of the remaining verteces (on both left and right).
+    *           it could an element of leftVerts or rightVerts.
+    *i: leftVerts[i] is the first vertex to the top of botMostV on left line
+    *j: rightVerts[j] is the first vertex to the top of botMostV on rightline
+    */
 
-  /*initialize i,j,and botMostV
-   */
-  if(left_val[0] <= right_val[0])
-    {
+   /*initialize i,j,and botMostV */
+   if(left_val[0]<=right_val[0])
+   {
       i=1;
       j=0;
 
-      botMostV[0] = u_left;
-      botMostV[1] = left_val[0];
-    }
-  else
-    {
+      botMostV[0]=u_left;
+      botMostV[1]=left_val[0];
+   }
+   else
+   {
       i=0;
       j=1;
 
-      botMostV[0] = u_right;
-      botMostV[1] = right_val[0];
-    }
+      botMostV[0]=u_right;
+      botMostV[1]=right_val[0];
+   }
 
-  /*the main loop.
-   *the invariance is that:
-   *at the beginning of each loop, the meaning of i,j,and botMostV are
-   *maintained
-   */
-  while(1)
-    {
-      if(i >= n_left) /*case1: no more in left*/
-	{
-	  if(j<n_right-1) /*at least two vertices in right*/
-	    {
+   /* the main loop.
+    * the invariance is that:
+    * at the beginning of each loop, the meaning of i,j,and botMostV are
+    * maintained
+    */
+   while(1)
+   {
+      if (i>=n_left) /* case1: no more in left */
+      {
+         if (j<n_right-1) /* at least two vertices in right */
+         {
 	      bgntfan();
 	      coord2f(botMostV[0], botMostV[1]);
 	      while(j<n_right){
@@ -773,45 +682,24 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	    }
 	}
     }
-  //clean up
-//  free(leftXYZ);
-//  free(leftNormal);
-//  free(rightXYZ);
-//  free(rightNormal);
-#endif
+#endif /* USE_INTERNAL_EVAL */
 }
 
 
-void
-OpenGLSurfaceEvaluator::bgnqstrip(void)
+void OpenGLSurfaceEvaluator::bgnqstrip(void)
 {
-  printf("OpenGLSurfaceEvaluator::bgnqstrip\n");
-  if(output_triangles)
-  {
-// MIKE: TODO
-//    bezierPatchMeshBeginStrip(global_bpm, GL_QUAD_STRIP);
-  }
-  else
-  {
-// MIKE: TODO
-//    glBegin((GLenum) GL_QUAD_STRIP);
-  }
+   if (output_triangles)
+   {
+      bezierPatchMeshBeginStrip(global_bpm, GL_QUAD_STRIP);
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::endqstrip(void)
+void OpenGLSurfaceEvaluator::endqstrip(void)
 {
-  printf("OpenGLSurfaceEvaluator::endqstrip\n");
-  if(output_triangles)
-  {
-// MIKE: TODO
-//    bezierPatchMeshEndStrip(global_bpm);
-  }
-  else
-  {
-// MIKE: TODO
-//    glEnd();
-  }
+   if (output_triangles)
+   {
+      bezierPatchMeshEndStrip(global_bpm);
+   }
 }
 
 /*-------------------------------------------------------------------------
@@ -821,7 +709,6 @@ OpenGLSurfaceEvaluator::endqstrip(void)
 void
 OpenGLSurfaceEvaluator::bgnmap2f(long)
 {
-  printf("OpenGLSurfaceEvaluator::bgnmap2f\n");
   if(output_triangles)
     {
       /*deallocate the space which may has been
@@ -878,7 +765,6 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
 void
 OpenGLSurfaceEvaluator::endmap2f(void)
 {
-  printf("OpenGLSurfaceEvaluator::endmap2f\n");
 
   if(output_triangles)
     {
@@ -929,7 +815,6 @@ OpenGLSurfaceEvaluator::map2f(
     REAL *pts)	/* control points		*/
 {
 #ifdef USE_INTERNAL_EVAL
-  printf("OpenGLSurfaceEvaluator::map2f\n");
    inMap2f((int) _type, (REAL) _ulower, (REAL) _uupper,
 	    (int) _ustride, (int) _uorder, (REAL) _vlower,
 	    (REAL) _vupper, (int) _vstride, (int) _vorder,
@@ -991,15 +876,11 @@ OpenGLSurfaceEvaluator::map2f(
  * mapmesh2f - evaluate a mesh of points on lattice
  *-------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::mapmesh2f(long style, long umin, long umax, long vmin, long vmax)
+void OpenGLSurfaceEvaluator::mapmesh2f(long style, long umin, long umax, long vmin, long vmax)
 {
 #ifdef USE_INTERNAL_EVAL
-  printf("OpenGLSurfaceEvaluator::mapmesh2f\n");
-    inEvalMesh2((int)umin, (int)vmin, (int)umax, (int)vmax);
+   inEvalMesh2((int)umin, (int)vmin, (int)umax, (int)vmax);
 #else
-
-
 
 if(output_triangles)
 {
@@ -1086,9 +967,6 @@ else
 void
 OpenGLSurfaceEvaluator::evalcoord2f(long, REAL u, REAL v)
 {
-  printf("OpenGLSurfaceEvaluator::evalcoord2f\n");
-
-
     newtmeshvert(u, v);
 }
 
@@ -1099,15 +977,12 @@ OpenGLSurfaceEvaluator::evalcoord2f(long, REAL u, REAL v)
 void
 OpenGLSurfaceEvaluator::evalpoint2i(long u, long v)
 {
-
-  printf("OpenGLSurfaceEvaluator::evalpoint2i\n");
     newtmeshvert(u, v);
 }
 
 void
 OpenGLSurfaceEvaluator::point2i( long u, long v )
 {
-  printf("OpenGLSurfaceEvaluator::point2i\n");
 #ifdef USE_INTERNAL_EVAL
     inEvalPoint2( (int)u,  (int)v);
 #else
@@ -1138,7 +1013,6 @@ void
 OpenGLSurfaceEvaluator::coord2f( REAL u, REAL v )
 {
 #ifdef USE_INTERNAL_EVAL
-  printf("OpenGLSurfaceEvaluator::coord2f\n");
     inEvalCoord2f( u, v);
 #else
 

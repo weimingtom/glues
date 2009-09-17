@@ -350,7 +350,7 @@ GLAPI void APIENTRY gluNurbsProperty(GLUnurbs* nurb, GLenum property, GLfloat va
 GLAPI void APIENTRY gluNurbsSurface(GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type);
 GLAPI void APIENTRY gluPwlCurve(GLUnurbs* nurb, GLint count, GLfloat* data, GLint stride, GLenum type);
 
-/* OpenGL emulation layer */
+/* OpenGL (and OpenGL ES 1.1 for OpenGL ES 1.0) emulation layer */
 #define GLU_AUTO_NORMAL                         0x0D80
 
 #define GLU_MAP1_COLOR_4                        0x0D90
@@ -380,9 +380,15 @@ GLAPI void APIENTRY gluPwlCurve(GLUnurbs* nurb, GLint count, GLfloat* data, GLin
    #define GL_PROJECTION_MATRIX                 0x0BA7
 #endif /* GL_PROJECTION_MATRIX */
 
+#ifndef GL_VIEWPORT
+   #define GL_VIEWPORT                          0x0BA2
+#endif /* GL_VIEWPORT */
+
 GLAPI void APIENTRY gluEnable(GLenum cap);
 GLAPI void APIENTRY gluDisable(GLenum cap);
 GLAPI void APIENTRY gluGetFloatv(GLenum pname, GLfloat* params);
+GLAPI void APIENTRY gluGetIntegerv(GLenum pname, GLint* params);
+GLAPI void APIENTRY gluViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
 #ifdef __cplusplus
 }
