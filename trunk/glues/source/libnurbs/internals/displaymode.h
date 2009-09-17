@@ -27,8 +27,6 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-/*
-*/
 
 #ifndef __gludisplaymode_h_
 #define __gludisplaymode_h_

@@ -171,22 +171,16 @@ public:
     /**************begin for LOD_eval_list***********/
     void LOD_eval_list(int level);
 
+   private:
+      StoredVertex	*vertexCache[VERTEX_CACHE_SIZE];
+      int			tmeshing;
+      int			which;
+      int			vcount;
 
-
-   
-private:
-    StoredVertex	*vertexCache[VERTEX_CACHE_SIZE];
-    int			tmeshing;
-    int			which;
-    int			vcount;
-
-    GLint              gl_polygon_mode[2];/*to save and restore so that
-					 *no side effect
-					 */
-    bezierPatchMesh        *global_bpm; //for output triangles
-    int                output_triangles; //true 1 or false 0
-
-
+      GLint            gl_polygon_mode[2]; // to save and restore so that no side effect
+      bezierPatchMesh* global_bpm;         // for output triangles
+      int              output_triangles;   // true 1 or false 0
+      long             output_style;       // N_MESHFILL or N_MESHLINE or N_MESHPOINT
 
     void (APIENTRY *beginCallBackN) (GLenum type);
     void (APIENTRY *endCallBackN)   (void);

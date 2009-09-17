@@ -52,8 +52,8 @@ void init_scene(int width, int height)
    gluEnable(GLU_AUTO_NORMAL);
 
    nurb=gluNewNurbsRenderer();
-   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 25.0f);
-   gluNurbsProperty(nurb, GLU_DISPLAY_MODE, GLU_FILL);
+   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 250.0f);
+   gluNurbsProperty(nurb, GLU_DISPLAY_MODE, GLU_OUTLINE_POLYGON);
 
    /* Build control points for NURBS mole hills. */
    for(u=0; u<4; u++)

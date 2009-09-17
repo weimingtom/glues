@@ -193,7 +193,6 @@ void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float ret[])
 
 void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso)
 {
-printf("MIKE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! bezierPatchDraw\n");
    if (bpatch->dimension==3)
    {
 // MIKE: TODO
