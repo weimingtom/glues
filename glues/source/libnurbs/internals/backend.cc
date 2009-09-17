@@ -182,34 +182,19 @@ Backend::endsurf( void )
 }
 
 /***************************************/
-void
-Backend::bgntfan( void )
+void Backend::bgntfan(void)
 {
   surfaceEvaluator.bgntfan();
-/*
-  if(wireframetris)	
-    surfaceEvaluator.polymode( N_MESHLINE );
-  else
-    surfaceEvaluator.polymode( N_MESHFILL );
-*/
 }
 
-void
-Backend::endtfan( void )
+void Backend::endtfan(void)
 {
    surfaceEvaluator.endtfan();
 }
 
-void
-Backend::bgnqstrip( void )
+void Backend::bgnqstrip( void )
 {
    surfaceEvaluator.bgnqstrip();
-/*
-  if(wireframequads)
-    surfaceEvaluator.polymode( N_MESHLINE );
-  else
-    surfaceEvaluator.polymode( N_MESHFILL );    
-*/
 }
 
 void
@@ -243,11 +228,9 @@ Backend::evalVStrip(int n_left, REAL u_left, REAL* left_val,
  * bgntmesh - preamble to a triangle mesh
  *-------------------------------------------------------------------------
  */
-void
-Backend::bgntmesh( const char * )		
+void Backend::bgntmesh(const char*)
 {
 #ifndef NOWIREFRAME
-
     meshindex = 0;	/* I think these need to be initialized to zero */
     npts = 0;
 
@@ -465,7 +448,6 @@ Backend::endtmesh( void )
         surfaceEvaluator.endtmesh();
 #else
     surfaceEvaluator.endtmesh();
-/*    surfaceEvaluator.polymode( N_MESHFILL );*/
 #endif
 }
 
@@ -474,30 +456,27 @@ Backend::endtmesh( void )
  * bgnoutline - preamble to outlined rendering
  *-------------------------------------------------------------------------
  */
-void
-Backend::bgnoutline( void )
+void Backend::bgnoutline(void)
 {
-    surfaceEvaluator.bgnline();
+   surfaceEvaluator.bgnline();
 }
 
 /*-------------------------------------------------------------------------
  * linevert - evaluate a point on an outlined contour
  *-------------------------------------------------------------------------
  */
-void
-Backend::linevert( TrimVertex *t )
+void Backend::linevert(TrimVertex* t)
 {
-    surfaceEvaluator.evalcoord2f( t->nuid, t->param[0], t->param[1] );
+   surfaceEvaluator.evalcoord2f(t->nuid, t->param[0], t->param[1]);
 }
 
 /*-------------------------------------------------------------------------
  * linevert - evaluate a grid point of an outlined contour
  *-------------------------------------------------------------------------
  */
-void
-Backend::linevert( GridVertex *g )
+void Backend::linevert(GridVertex* g)
 {
-    surfaceEvaluator.evalpoint2i( g->gparam[0], g->gparam[1] );
+   surfaceEvaluator.evalpoint2i(g->gparam[0], g->gparam[1]);
 }
 
 /*-------------------------------------------------------------------------

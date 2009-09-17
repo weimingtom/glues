@@ -328,7 +328,7 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
 
          bgnqstrip();
 
-         for(j=highV; j>=lowV; j--)
+         for (j=highV; j>=lowV; j--)
          {
             REAL v1=(j==global_grid_nv)?global_grid_v1:(global_grid_v0+j*dv);
 
@@ -360,7 +360,15 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
 
          if (!output_triangles)
          {
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
+            switch (output_style)
+            {
+               case N_MESHFILL:
+                    glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
+                    break;
+               case N_MESHLINE:
+                    glDrawArrays(GL_LINE_LOOP, 0, it);
+                    break;
+            }
          }
       }
    }
@@ -406,7 +414,15 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
 
          if (!output_triangles)
          {
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
+            switch (output_style)
+            {
+               case N_MESHFILL:
+                    glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
+                    break;
+               case N_MESHLINE:
+                    glDrawArrays(GL_LINE_LOOP, 0, it);
+                    break;
+            }
          }
       }
    }
@@ -2061,7 +2077,6 @@ void OpenGLSurfaceEvaluator::inDoDomain2EM(surfEvalMachine *em, REAL u, REAL v,
 	}
     }
 }
-
 
 void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
 {

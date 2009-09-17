@@ -110,9 +110,10 @@ OpenGLSurfaceEvaluator::OpenGLSurfaceEvaluator()
    global_baseData=NULL;
 
    global_bpm=NULL;
-   output_triangles=0; // don't output triangles by default
+   output_triangles=0;      // don't output triangles by default.
+   output_style=N_MESHFILL; // default is FILL mode.
 
-   //no default callback functions
+   // no default callback functions
    beginCallBackN=NULL;
    endCallBackN=NULL;
    vertexCallBackN=NULL;
@@ -180,82 +181,61 @@ void OpenGLSurfaceEvaluator::enable(long type)
  * mapgrid2f - define a lattice of points with origin and offset
  *-------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, REAL v1)
+void OpenGLSurfaceEvaluator::mapgrid2f(long nu, REAL u0, REAL u1, long nv, REAL v0, REAL v1)
 {
 #ifdef USE_INTERNAL_EVAL
-  inMapGrid2f((int) nu, (REAL) u0, (REAL) u1, (int) nv,
-	      (REAL) v0, (REAL) v1);
+   inMapGrid2f((int)nu, (REAL)u0, (REAL)u1, (int)nv, (REAL)v0, (REAL)v1);
 #else
-
-  if(output_triangles)  
-    {
-      global_grid_u0 = u0;
-      global_grid_u1 = u1;
-      global_grid_nu = nu;
-      global_grid_v0 = v0;
-      global_grid_v1 = v1;
-      global_grid_nv = nv;
-    }
-  else
-  {
-// MIKE: TODO
-//    glMapGrid2d((GLint) nu, (GLdouble) u0, (GLdouble) u1, (GLint) nv,
-//	    (GLdouble) v0, (GLdouble) v1);
+   if (output_triangles)
+   {
+      global_grid_u0=u0;
+      global_grid_u1=u1;
+      global_grid_nu=nu;
+      global_grid_v0=v0;
+      global_grid_v1=v1;
+      global_grid_nv=nv;
    }
-
-#endif
+   else
+   {
+      gluMapGrid2f((GLint)nu, (GLfloat)u0, (GLfloat)u1, (GLint)nv, (GLfloat)v0, (GLfloat)v1);
+   }
+#endif /* USE_INTERNAL_EVAL */
 }
 
-void
-OpenGLSurfaceEvaluator::polymode(long style)
+void OpenGLSurfaceEvaluator::polymode(long style)
 {
-  if(! output_triangles)
-    {
-      switch(style) {
-      default:
-      case N_MESHFILL:
-// MIKE: TODO
-//	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_FILL);
-	break;
-      case N_MESHLINE:
-// MIKE: TODO
-//	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_LINE);
-	break;
-      case N_MESHPOINT:
-// MIKE: TODO
-//	glPolygonMode((GLenum) GL_FRONT_AND_BACK, (GLenum) GL_POINT);
-	break;
+   if (!output_triangles)
+   {
+      switch(style)
+      {
+         default:
+         case N_MESHFILL:
+              output_style=N_MESHFILL;
+              break;
+         case N_MESHLINE:
+              output_style=N_MESHLINE;
+              break;
+         case N_MESHPOINT:
+              output_style=N_MESHPOINT;
+              break;
       }
-    }
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::bgnline(void)
+void OpenGLSurfaceEvaluator::bgnline(void)
 {
-  if(output_triangles)
-  {
-    bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
-  }
-  else
-  {
-// MIKE: TODO
-//    glBegin((GLenum) GL_LINE_STRIP);
-  }
+   if (output_triangles)
+   {
+      bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::endline(void)
+void OpenGLSurfaceEvaluator::endline(void)
 {
-  if(output_triangles)
-  {
-    bezierPatchMeshEndStrip(global_bpm);
-  }
-  else
-  {
-// MIKE: TODO
-//    glEnd();
-  }
+   if (output_triangles)
+   {
+      bezierPatchMeshEndStrip(global_bpm);
+   }
 }
 
 void OpenGLSurfaceEvaluator::range2f(long type, REAL* from, REAL* to)
@@ -268,74 +248,50 @@ void OpenGLSurfaceEvaluator::domain2f(REAL ulo, REAL uhi, REAL vlo, REAL vhi)
 
 void OpenGLSurfaceEvaluator::bgnclosedline(void)
 {
-  if(output_triangles)
-  {
-    bezierPatchMeshBeginStrip(global_bpm, GL_LINE_LOOP);
-  }
-  else
-  {
-// MIKE: TODO
-//    glBegin((GLenum) GL_LINE_LOOP);
-  }
+   if(output_triangles)
+   {
+      bezierPatchMeshBeginStrip(global_bpm, GL_LINE_LOOP);
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::endclosedline(void)
+void OpenGLSurfaceEvaluator::endclosedline(void)
 {
-  if(output_triangles)
-  {
-    bezierPatchMeshEndStrip(global_bpm);
-  }
-  else
-  {
-// MIKE: TODO
-//    glEnd();
-  }
+   if(output_triangles)
+   {
+      bezierPatchMeshEndStrip(global_bpm);
+   }
 }
 
 void OpenGLSurfaceEvaluator::bgntmesh(void)
 {
-    tmeshing = 1;
-    which = 0;
-    vcount = 0;
+   tmeshing=1;
+   which=0;
+   vcount=0;
 
-    if(output_triangles)
-    {
+   if (output_triangles)
+   {
       bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLES);
-    }
-    else
-    {
-// MIKE: TODO
-//      glBegin((GLenum) GL_TRIANGLES);
-    }
-
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::swaptmesh(void)
+void OpenGLSurfaceEvaluator::swaptmesh(void)
 {
-    which = 1 - which;
-
+   which=1-which;
 }
 
 void OpenGLSurfaceEvaluator::endtmesh(void)
 {
    tmeshing = 0;
 
-   if(output_triangles)
+   if (output_triangles)
    {
       bezierPatchMeshEndStrip(global_bpm);
-   }
-   else
-   {
-// MIKE: TODO
-//      glEnd();
    }
 }
 
 void OpenGLSurfaceEvaluator::bgntfan(void)
 {
-   if(output_triangles)
+   if (output_triangles)
    {
       bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLE_FAN);
    }
@@ -343,7 +299,7 @@ void OpenGLSurfaceEvaluator::bgntfan(void)
 
 void OpenGLSurfaceEvaluator::endtfan(void)
 {
-   if(output_triangles)
+   if (output_triangles)
    {
       bezierPatchMeshEndStrip(global_bpm);
    }
@@ -390,40 +346,32 @@ void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_v
     */
    while(1)
    {
-      if(i >= n_upper) /*case1: no more in upper*/
-	{
-	  if(j<n_lower-1) /*at least two vertices in lower*/
-	    {
-	      bgntfan();
-	      coord2f(leftMostV[0], leftMostV[1]);
-//	      glNormal3fv(leftMostNormal);
-//		glVertex3fv(leftMostXYZ);
+      if (i>=n_upper) /* case1: no more in upper */
+      {
+         if (j<n_lower-1) /* at least two vertices in lower */
+         {
+            bgntfan();
+            coord2f(leftMostV[0], leftMostV[1]);
 
-	      while(j<n_lower){
-		coord2f(lower_val[j], v_lower);
-//		glNormal3fv(lowerNormal[j]);
-//		glVertex3fv(lowerXYZ[j]);
-		j++;
-
-	      }
-	      endtfan();
-	    }
-	  break; /*exit the main loop*/
-	}
+            while (j<n_lower)
+            {
+               coord2f(lower_val[j], v_lower);
+               j++;
+            }
+            endtfan();
+         }
+         break; /* exit the main loop */
+      }
       else if(j>= n_lower) /*case2: no more in lower*/
 	{
 	  if(i<n_upper-1) /*at least two vertices in upper*/
 	    {
 	      bgntfan();
 	      coord2f(leftMostV[0], leftMostV[1]);
-//	      glNormal3fv(leftMostNormal);
-//	      glVertex3fv(leftMostXYZ);
         
 	      for(k=n_upper-1; k>=i; k--) /*reverse order for two-side lighting*/
 		{
 		  coord2f(upper_val[k], v_upper);
-//		  glNormal3fv(upperNormal[k]);
-//		  glVertex3fv(upperXYZ[k]);
 		}
 
 	      endtfan();
@@ -436,8 +384,6 @@ void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_v
 	    {
 	      bgntfan();
 	      coord2f(lower_val[j], v_lower);
-//	      glNormal3fv(lowerNormal[j]);
-//	      glVertex3fv(lowerXYZ[j]);
 
 	      /*find the last k>=i such that
 	       *upperverts[k][0] <= lowerverts[j][0]
@@ -457,13 +403,9 @@ void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_v
 	      for(l=k; l>=i; l--)/*the reverse is for two-side lighting*/
 		{
 		  coord2f(upper_val[l], v_upper);
-//		  glNormal3fv(upperNormal[l]);
-//		  glVertex3fv(upperXYZ[l]);
 
 		}
 	      coord2f(leftMostV[0], leftMostV[1]);
-//	      glNormal3fv(leftMostNormal);
-//	      glVertex3fv(leftMostXYZ);
 
 	      endtfan();
 
@@ -473,19 +415,13 @@ void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_v
 
 	      leftMostV[0] = upper_val[k];
 	      leftMostV[1] = v_upper;
-//	      leftMostNormal = upperNormal[k];
-//	      leftMostXYZ = upperXYZ[k];
 	    }
 	  else /*upperVerts[i][0] > lowerVerts[j][0]*/
 	    {
 	      bgntfan();
 	      coord2f(upper_val[i], v_upper);
-//	      glNormal3fv(upperNormal[i]);
-//	      glVertex3fv(upperXYZ[i]);
         
 	      coord2f(leftMostV[0], leftMostV[1]);
-//		glNormal3fv(leftMostNormal);
-//	      glVertex3fv(leftMostXYZ);
         
 
 	      /*find the last k>=j such that
@@ -497,8 +433,6 @@ void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_v
 		  if(lower_val[k] >= upper_val[i])
 		    break;
 		  coord2f(lower_val[k], v_lower);
-//		  glNormal3fv(lowerNormal[k]);
-//		  glVertex3fv(lowerXYZ[k]);
 
 		  k++;
 		}
@@ -509,15 +443,11 @@ void OpenGLSurfaceEvaluator::evalUStrip(int n_upper, REAL v_upper, REAL* upper_v
 	      j=k;
 	      leftMostV[0] = lower_val[j-1];
 	      leftMostV[1] = v_lower;
-
-//	      leftMostNormal = lowerNormal[j-1];
-//	      leftMostXYZ = lowerXYZ[j-1];
 	    }
 	}
     }
 #endif /* USE_INTERNAL_EVAL */
 }
-
 
 void
 OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL u_right, REAL* right_val)
@@ -719,14 +649,6 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
 	global_bpm = NULL;
       }
 
-
-      /*
-	auto_normal_flag = 1; //always output normal in callback mode.
-			      //we could have used the following code,
-			      //but Inspector doesn't have gl context
-			      //before it calls tessellator.
-			      //this way is temporary.
-	*/
       //NEWCALLBACK
       //if one of the two normal callback functions are set,
       //then set
