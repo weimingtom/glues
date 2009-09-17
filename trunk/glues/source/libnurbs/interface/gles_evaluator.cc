@@ -41,10 +41,62 @@
 
 GLAPI void APIENTRY gluEnable(GLenum cap)
 {
+   switch (cap)
+   {
+      case GLU_MAP1_COLOR_4:
+      case GLU_MAP1_INDEX:
+      case GLU_MAP1_NORMAL:
+      case GLU_MAP1_TEXTURE_COORD_1:
+      case GLU_MAP1_TEXTURE_COORD_2:
+      case GLU_MAP1_TEXTURE_COORD_3:
+      case GLU_MAP1_TEXTURE_COORD_4:
+      case GLU_MAP1_VERTEX_3:
+      case GLU_MAP1_VERTEX_4:
+      case GLU_MAP2_COLOR_4:
+      case GLU_MAP2_INDEX:
+      case GLU_MAP2_NORMAL:
+      case GLU_MAP2_TEXTURE_COORD_1:
+      case GLU_MAP2_TEXTURE_COORD_2:
+      case GLU_MAP2_TEXTURE_COORD_3:
+      case GLU_MAP2_TEXTURE_COORD_4:
+      case GLU_MAP2_VERTEX_3:
+      case GLU_MAP2_VERTEX_4:
+      case GLU_AUTO_NORMAL:
+           break;
+      default:
+           glEnable(cap);
+           break;
+   }
 }
 
 GLAPI void APIENTRY gluDisable(GLenum cap)
 {
+   switch (cap)
+   {
+      case GLU_MAP1_COLOR_4:
+      case GLU_MAP1_INDEX:
+      case GLU_MAP1_NORMAL:
+      case GLU_MAP1_TEXTURE_COORD_1:
+      case GLU_MAP1_TEXTURE_COORD_2:
+      case GLU_MAP1_TEXTURE_COORD_3:
+      case GLU_MAP1_TEXTURE_COORD_4:
+      case GLU_MAP1_VERTEX_3:
+      case GLU_MAP1_VERTEX_4:
+      case GLU_MAP2_COLOR_4:
+      case GLU_MAP2_INDEX:
+      case GLU_MAP2_NORMAL:
+      case GLU_MAP2_TEXTURE_COORD_1:
+      case GLU_MAP2_TEXTURE_COORD_2:
+      case GLU_MAP2_TEXTURE_COORD_3:
+      case GLU_MAP2_TEXTURE_COORD_4:
+      case GLU_MAP2_VERTEX_3:
+      case GLU_MAP2_VERTEX_4:
+      case GLU_AUTO_NORMAL:
+           break;
+      default:
+           glDisable(cap);
+           break;
+   }
 }
 
 GLint lg2table[32]=
@@ -96,6 +148,7 @@ GLAPI void APIENTRY gluGetFloatv(GLenum pname, GLfloat* params)
            #if defined(GL_VERSION_ES_CM_1_1)
               /* Just passthrough the request to OpenGL ES 1.1 */
               glGetFloatv(pname, params);
+              return;
            #endif /* GL_VERSION_ES_CM_1_1 */
            /* Check if OpenGL ES 1.0 is used, then try to emulate glGetFloatv */
            #if (defined(GL_OES_VERSION_1_0) || defined(GL_VERSION_ES_CM_1_0)) && !defined(GL_VERSION_ES_CM_1_1)
@@ -139,4 +192,39 @@ GLAPI void APIENTRY gluGetFloatv(GLenum pname, GLfloat* params)
            #endif /* GL_OES_VERSION_1_0 or GL_VERSION_ES_CM_1_0 only */
            break;
    }
+
+   #if defined(GL_VERSION_ES_CM_1_1)
+      /* Just passthrough the request to OpenGL ES 1.1             */
+      /* In OpenGL ES 1.0 all other Float requests will be ignored */
+      glGetFloatv(pname, params);
+   #endif /* GL_VERSION_ES_CM_1_1 */
+}
+
+GLint glu_viewport[4];
+
+GLAPI void APIENTRY gluGetIntegerv(GLenum pname, GLint* params)
+{
+   switch (pname)
+   {
+      case GL_VIEWPORT:
+           #if (defined(GL_OES_VERSION_1_0) || defined(GL_VERSION_ES_CM_1_0)) && !defined(GL_VERSION_ES_CM_1_1)
+           params[0]=glu_viewport[0];
+           params[1]=glu_viewport[1];
+           params[2]=glu_viewport[2];
+           params[3]=glu_viewport[3];
+           return;
+           #endif /* GL_OES_VERSION_1_0 or GL_VERSION_ES_CM_1_0 only */
+           break;
+
+   }
+
+   glGetIntegerv(pname, params);
+}
+
+GLAPI void APIENTRY gluViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+{
+   glu_viewport[0]=x;
+   glu_viewport[1]=y;
+   glu_viewport[2]=(GLint)width;
+   glu_viewport[3]=(GLint)height;
 }

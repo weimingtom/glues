@@ -59,169 +59,189 @@
 static void normalize(float vec[3]);
 static void crossProduct(float x[3], float y[3], float ret[3]);
 
-static float binomialCoefficients[8][8] = {
-  {1,0,0,0,0,0,0,0},
-  {1,1,0,0,0,0,0,0},
-  {1,2,1,0,0,0,0,0},
-  {1,3,3,1,0,0,0,0},
-  {1,4,6,4,1,0,0,0},
-  {1,5,10,10,5,1,0,0},
-  {1,6,15,20,15,6,1,0},
-  {1,7,21,35,35,21,7,1}
+static float binomialCoefficients[8][8]=
+{
+   {1, 0, 0,  0,  0,  0,  0, 0},
+   {1, 1, 0,  0,  0,  0,  0, 0},
+   {1, 2, 1,  0,  0,  0,  0, 0},
+   {1, 3, 3,  1,  0,  0,  0, 0},
+   {1, 4, 6,  4,  1,  0,  0, 0},
+   {1, 5, 10, 10, 5,  1,  0, 0},
+   {1, 6, 15, 20, 15, 6,  1, 0},
+   {1, 7, 21, 35, 35, 21, 7, 1}
 };
 
 void bezierCurveEval(float u0, float u1, int order, float *ctlpoints, int stride, int dimension, float u, float retpoint[])
 {
-  float uprime = (u-u0)/(u1-u0);
-  float *ctlptr = ctlpoints;
-  float oneMinusX = 1.0f-uprime;
-  float XPower = 1.0f;
+   float  uprime=(u-u0)/(u1-u0);
+   float* ctlptr=ctlpoints;
+   float  oneMinusX=1.0f-uprime;
+   float  XPower=1.0f;
 
-  int i,k;
-  for(k=0; k<dimension; k++)
-    retpoint[k] = (*(ctlptr + k));
+   int i, k;
 
-  for(i=1; i<order; i++){
-    ctlptr += stride;
-    XPower *= uprime;
-    for(k=0; k<dimension; k++) {
-      retpoint[k] = retpoint[k]*oneMinusX + ctlptr[k]* binomialCoefficients[order-1][i] * XPower;
-    }
-  }
+   for(k=0; k<dimension; k++)
+   {
+      retpoint[k]=(*(ctlptr+k));
+   }
+
+   for(i=1; i<order; i++)
+   {
+      ctlptr+=stride;
+      XPower*=uprime;
+      for(k=0; k<dimension; k++)
+      {
+         retpoint[k]=retpoint[k]*oneMinusX+ctlptr[k]*binomialCoefficients[order-1][i]*XPower;
+      }
+   }
 }
 
-/*order = degree +1 >=1.
- */
+/* order = degree +1 >=1. */
 void bezierCurveEvalDer(float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retDer[])
 {
-  int i,k;
-  float width = u1-u0;
-  float *ctlptr = ctlpoints;
+   int i, k;
+   float  width=u1-u0;
+   float* ctlptr=ctlpoints;
+   float buf[MAX_ORDER][MAX_DIMENSION];
 
-  float buf[MAX_ORDER][MAX_DIMENSION];
-  if(order == 1){
-    for(k=0; k<dimension; k++)
-      retDer[k]=0;
-  }
-  for(i=0; i<order-1; i++){
-    for(k=0; k<dimension; k++) {
-      buf[i][k] = (ctlptr[stride+k] - ctlptr[k])*(order-1)/width;
-    }
-    ctlptr += stride;
-  }
-
-  bezierCurveEval(u0, u1, order-1, (float*) buf, MAX_DIMENSION,  dimension, u, retDer);
-}
-
-void bezierCurveEvalDerGen(int der, float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retDer[])
-{
-  int i,k,r;
-  float *ctlptr = ctlpoints;
-  float width=u1-u0;
-  float buf[MAX_ORDER][MAX_ORDER][MAX_DIMENSION];
-  if(der<0) der=0;
-  for(i=0; i<order; i++){
-    for(k=0; k<dimension; k++){
-      buf[0][i][k] = ctlptr[k];
-    }
-    ctlptr += stride;
-  }
-
-
-  for(r=1; r<=der; r++){
-    for(i=0; i<order-r; i++){
-      for(k=0; k<dimension; k++){
-	buf[r][i][k] = (buf[r-1][i+1][k] - buf[r-1][i][k])*(order-r)/width;
+   if (order==1)
+   {
+      for(k=0; k<dimension; k++)
+      {
+         retDer[k]=0;
       }
-    }
-  }
+   }
 
-  bezierCurveEval(u0, u1, order-der, (float *) (buf[der]), MAX_DIMENSION, dimension, u, retDer);
+   for(i=0; i<order-1; i++)
+   {
+      for(k=0; k<dimension; k++)
+      {
+         buf[i][k]=(ctlptr[stride+k]-ctlptr[k])*(order-1)/width;
+      }
+      ctlptr+=stride;
+   }
+
+   bezierCurveEval(u0, u1, order-1, (float*)buf, MAX_DIMENSION,  dimension, u, retDer);
 }
 
-/*the Bezier bivarite polynomial is:
+void bezierCurveEvalDerGen(int der, float u0, float u1, int order, float* ctlpoints, int stride,  int dimension, float u, float retDer[])
+{
+   int i, k, r;
+   float* ctlptr = ctlpoints;
+   float  width=u1-u0;
+   float  buf[MAX_ORDER][MAX_ORDER][MAX_DIMENSION];
+
+   if (der<0)
+   {
+      der=0;
+   }
+
+   for(i=0; i<order; i++)
+   {
+      for(k=0; k<dimension; k++)
+      {
+         buf[0][i][k]=ctlptr[k];
+      }
+      ctlptr+=stride;
+   }
+
+   for(r=1; r<=der; r++)
+   {
+      for(i=0; i<order-r; i++)
+      {
+         for(k=0; k<dimension; k++)
+         {
+            buf[r][i][k]=(buf[r-1][i+1][k]-buf[r-1][i][k])*(order-r)/width;
+         }
+      }
+   }
+
+   bezierCurveEval(u0, u1, order-der, (float*)(buf[der]), MAX_DIMENSION, dimension, u, retDer);
+}
+
+/* the Bezier bivarite polynomial is:
  * sum[i:0,uorder-1][j:0,vorder-1] { ctlpoints[i*ustride+j*vstride] * B(i)*B(j)
  * where B(i) and B(j) are basis functions
  */
 void bezierSurfEvalDerGen(int uder, int vder, float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float *ctlpoints, int ustride, int vstride, float u, float v, float ret[])
 {
-  int i;
-  float newPoints[MAX_ORDER][MAX_DIMENSION];
+   int i;
+   float newPoints[MAX_ORDER][MAX_DIMENSION];
 
-  for(i=0; i<uorder; i++){
+   for(i=0; i<uorder; i++)
+   {
+      bezierCurveEvalDerGen(vder, v0, v1, vorder, ctlpoints+ustride*i, vstride, dimension, v, newPoints[i]);
+   }
 
-    bezierCurveEvalDerGen(vder, v0, v1, vorder, ctlpoints+ustride*i, vstride, dimension, v, newPoints[i]);
-
-  }
-
-  bezierCurveEvalDerGen(uder, u0, u1, uorder, (float *) newPoints, MAX_DIMENSION, dimension, u, ret);
+   bezierCurveEvalDerGen(uder, u0, u1, uorder, (float *) newPoints, MAX_DIMENSION, dimension, u, ret);
 }
 
 
-/*division by w is performed*/
+/* division by w is performed */
 void bezierSurfEval(float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float *ctlpoints, int ustride, int vstride, float u, float v, float ret[])
 {
-  bezierSurfEvalDerGen(0, 0, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, ret);
-  if(dimension == 4) /*homogeneous*/{
-    ret[0] /= ret[3];
-    ret[1] /= ret[3];
-    ret[2] /= ret[3];
-  }
+   bezierSurfEvalDerGen(0, 0, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, ret);
+   if (dimension==4) /* homogeneous */
+   {
+      ret[0]/=ret[3];
+      ret[1]/=ret[3];
+      ret[2]/=ret[3];
+   }
 }
 
 void bezierSurfEvalNormal(float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float *ctlpoints, int ustride, int vstride, float u, float v, float retNormal[])
 {
-  float partialU[4];
-  float partialV[4];
-  assert(dimension>=3 && dimension <=4);
-  bezierSurfEvalDerGen(1,0, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, partialU);
-  bezierSurfEvalDerGen(0,1, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, partialV);
+   float partialU[4];
+   float partialV[4];
+   assert(dimension>=3 && dimension <=4);
+   bezierSurfEvalDerGen(1,0, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, partialU);
+   bezierSurfEvalDerGen(0,1, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, partialV);
 
-  if(dimension == 3){/*inhomogeneous*/
-    crossProduct(partialU, partialV, retNormal);
+   if (dimension == 3) /* inhomogeneous */
+   {
+      crossProduct(partialU, partialV, retNormal);
+      normalize(retNormal);
+      return;
+   }
+   else /* homogeneous */
+   {
+      float val[4]; /* the point coordinates (without derivative) */
+      float newPartialU[MAX_DIMENSION];
+      float newPartialV[MAX_DIMENSION];
+      int i;
 
-    normalize(retNormal);
+      bezierSurfEvalDerGen(0,0, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, val);
 
-    return;
-  }
-  else { /*homogeneous*/
-    float val[4]; /*the point coordinates (without derivative)*/
-    float newPartialU[MAX_DIMENSION];
-    float newPartialV[MAX_DIMENSION];
-    int i;
-    bezierSurfEvalDerGen(0,0, u0, u1, uorder, v0, v1, vorder, dimension, ctlpoints, ustride, vstride, u, v, val);
-
-    for(i=0; i<=2; i++){
-      newPartialU[i] = partialU[i] * val[3] - val[i] * partialU[3];
-      newPartialV[i] = partialV[i] * val[3] - val[i] * partialV[3];
-    }
-    crossProduct(newPartialU, newPartialV, retNormal);
-    normalize(retNormal);
-  }
+      for(i=0; i<=2; i++)
+      {
+         newPartialU[i]=partialU[i]*val[3]-val[i]*partialU[3];
+         newPartialV[i]=partialV[i]*val[3]-val[i]*partialV[3];
+      }
+      crossProduct(newPartialU, newPartialV, retNormal);
+      normalize(retNormal);
+   }
 }
 
-/*if size is 0, then nothing is done*/
+/* if size is 0, then nothing is done */
 static void normalize(float vec[3])
 {
-  float size = (float)sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+   float size=(float)sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);
 
-  if(size < TOLERANCE)
-    {
+   if (size<TOLERANCE)
+   {
       return;
-    }
-  else {
-    vec[0] = vec[0]/size;
-    vec[1] = vec[1]/size;
-    vec[2] = vec[2]/size;
-  }
+   }
+   else
+   {
+      vec[0]=vec[0]/size;
+      vec[1]=vec[1]/size;
+      vec[2]=vec[2]/size;
+   }
 }
-
 
 static void crossProduct(float x[3], float y[3], float ret[3])
 {
-  ret[0] = x[1]*y[2] - y[1]*x[2];
-  ret[1] = x[2]*y[0] - y[2]*x[0];
-  ret[2] = x[0]*y[1] - y[0]*x[1];
-
+   ret[0]=x[1]*y[2]-y[1]*x[2];
+   ret[1]=x[2]*y[0]-y[2]*x[0];
+   ret[2]=x[0]*y[1]-y[0]*x[1];
 }
-

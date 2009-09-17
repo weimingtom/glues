@@ -52,7 +52,6 @@ void drawStrips(float* vertex_array, float* normal_array, int* length_array, GLe
 {
    int i,j,k;
    k=0; /* k is the index of the first component of the current vertex */
-
    for (i=0; i<num_strips; i++)
    {
 // MIKE: TODO
@@ -342,39 +341,49 @@ void bezierPatchMeshInsertUV(bezierPatchMesh *bpm, float u, float v)
 
 void bezierPatchMeshPrint(bezierPatchMesh *bpm)
 {
-  int i;
-  printf("the bezier patch is\n");
-  bezierPatchPrint(bpm->bpatch);
-  printf("index_length_array= %i\n", bpm->index_length_array);
-  printf("size_length_array =%i\n", bpm->size_length_array);
-  printf("index_UVarray =%i\n", bpm->index_UVarray);
-  printf("size_UVarray =%i\n", bpm->size_UVarray);
-  printf("UVarray is\n");
-  for(i=0; i<bpm->index_UVarray; i++)
-    printf("%f ", bpm->UVarray[i]);
+   int i;
 
-  printf("length_array is\n");
-  for(i=0; i<bpm->index_length_array; i++)
-    printf("%i ", bpm->length_array[i]);
-  printf("\n");
+   printf("the bezier patch is\n");
 
+   bezierPatchPrint(bpm->bpatch);
+
+   printf("index_length_array=%i\n", bpm->index_length_array);
+   printf("size_length_array=%i\n", bpm->size_length_array);
+   printf("index_UVarray=%i\n", bpm->index_UVarray);
+   printf("size_UVarray=%i\n", bpm->size_UVarray);
+   printf("UVarray is\n");
+
+   for(i=0; i<bpm->index_UVarray; i++)
+   {
+      printf("%f ", bpm->UVarray[i]);
+   }
+
+   printf("length_array is\n");
+
+   for(i=0; i<bpm->index_length_array; i++)
+   {
+      printf("%i ", bpm->length_array[i]);
+   }
+
+   printf("\n");
 }
 
-/*insert a new patch in front of the current linked list and return the new list*/
+/* insert a new patch in front of the current linked list and return the new list */
 bezierPatchMesh* bezierPatchMeshListInsert(bezierPatchMesh* list, bezierPatchMesh* bpm)
 {
-  bpm->next=list;
-  return bpm;
+   bpm->next=list;
+   return bpm;
 }
 
-/*print all the patches*/
+/* print all the patches */
 void bezierPatchMeshListPrint(bezierPatchMesh* list)
 {
-  bezierPatchMesh *temp;
-  for(temp = list; temp != NULL; temp = temp->next)
-    {
+   bezierPatchMesh* temp;
+
+   for(temp=list; temp!=NULL; temp=temp->next)
+   {
       bezierPatchMeshPrint(temp);
-    }
+   }
 }
 
 int bezierPatchMeshListTotalStrips(bezierPatchMesh* list)
@@ -412,33 +421,42 @@ int bezierPatchMeshListNumTriangles(bezierPatchMesh* list)
 
 int bezierPatchMeshNumTriangles(bezierPatchMesh* bpm)
 {
-  int i;
-  int sum=0;
-  for(i=0; i<bpm->index_length_array; i++)
-    {
+   int i;
+   int sum=0;
+
+   for(i=0; i<bpm->index_length_array; i++)
+   {
       switch(bpm->type_array[i])
-	{
-	case GL_TRIANGLES:
-	  sum += bpm->length_array[i]/3;
-	  break;
-	case GL_TRIANGLE_FAN:
-	  if(bpm->length_array[i] > 2)
-	    sum += bpm->length_array[i]-2;
-	  break;
-	case GL_TRIANGLE_STRIP:
-	  if(bpm->length_array[i] > 2)
-	    sum += bpm->length_array[i]-2;
-	  break;
+      {
+          case GL_TRIANGLES:
+               sum+=bpm->length_array[i]/3;
+               break;
+          case GL_TRIANGLE_FAN:
+               if (bpm->length_array[i]>2)
+               {
+                  sum+=bpm->length_array[i]-2;
+               }
+               break;
+          case GL_TRIANGLE_STRIP:
+               if(bpm->length_array[i]>2)
+               {
+                  sum+=bpm->length_array[i]-2;
+               }
+               break;
 // MIKE: TODO
-	case GL_QUAD_STRIP:
-	  if(bpm->length_array[i]>2)
-	    sum += (bpm->length_array[i]-2);
-	  break;
-	default:
-	  fprintf(stderr,"error in bezierPatchMeshListNumTriangles, type invalid\n");
-	}
-    }
-  return sum;
+          case GL_QUAD_STRIP:
+               if (bpm->length_array[i]>2)
+               {
+                  sum+=(bpm->length_array[i]-2);
+               }
+               break;
+          default:
+               fprintf(stderr, "error in bezierPatchMeshListNumTriangles, type invalid\n");
+               break;
+      }
+   }
+
+   return sum;
 }
 
 /*delete degenerate triangles*/
@@ -541,24 +559,33 @@ void bezierPatchMeshListEval(bezierPatchMesh* list)
 
 void bezierPatchMeshDraw(bezierPatchMesh* bpm)
 {
-  int i,j,k;
-  k=0;
-  /*k is the index of the first component of the current vertex*/
-  for(i=0; i<bpm->index_length_array; i++)
-    {
+   int i, j;
+   int k;
+
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+
+   /* Store status of enabled arrays */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+
+   k=0; /* k is the index of the first component of the current vertex */
+
+   for(i=0; i<bpm->index_length_array; i++)
+   {
 // MIKE: TODO
 //      glBegin(bpm->type_array[i]);
       for(j=0; j<bpm->length_array[i]; j++)
-	{
+      {
 // MIKE: TODO
 //	  glNormal3fv(bpm->normal_array+k);
 // MIKE: TODO
 //	  glVertex3fv(bpm->vertex_array+k);
-	  k+= 3;
-	}
+         k+=3;
+      }
 // MIKE: TODO
 //      glEnd();
-    }
+   }
 }
 
 void bezierPatchMeshListDraw(bezierPatchMesh* list)

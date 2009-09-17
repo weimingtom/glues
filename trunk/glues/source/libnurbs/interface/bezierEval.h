@@ -33,16 +33,11 @@
 #ifndef _BEZIEREVAL_H
 #define _BEZIEREVAL_H
 
-void bezierCurveEval(float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retpoint[]);
-void bezierCurveEvalDer(float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retDer[]);
-void bezierCurveEvalDerGen(int der, float u0, float u1, int order, float *ctlpoints, int stride,  int dimension, float u, float retDer[]);
+void bezierCurveEval(float u0, float u1, int order, float* ctlpoints, int stride,  int dimension, float u, float retpoint[]);
+void bezierCurveEvalDer(float u0, float u1, int order, float* ctlpoints, int stride,  int dimension, float u, float retDer[]);
+void bezierCurveEvalDerGen(int der, float u0, float u1, int order, float* ctlpoints, int stride,  int dimension, float u, float retDer[]);
+void bezierSurfEvalDerGen(int uder, int vder, float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float* ctlpoints, int ustride, int vstride, float u, float v, float ret[]);
+void bezierSurfEval(float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float* ctlpoints, int ustride, int vstride, float u, float v, float ret[]);
+void bezierSurfEvalNormal(float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float* ctlpoints, int ustride, int vstride, float u, float v, float retNormal[]);
 
-
-void bezierSurfEvalDerGen(int uder, int vder, float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float *ctlpoints, int ustride, int vstride, float u, float v, float ret[]);
-
-void bezierSurfEval(float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float *ctlpoints, int ustride, int vstride, float u, float v, float ret[]);
-
-void bezierSurfEvalNormal(float u0, float u1, int uorder, float v0, float v1, int vorder, int dimension, float *ctlpoints, int ustride, int vstride, float u, float v, float retNormal[]);
-
-
-#endif
+#endif /* _BEZIEREVAL_H */

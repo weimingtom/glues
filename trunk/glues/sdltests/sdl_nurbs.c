@@ -22,6 +22,7 @@ GLfloat mat_red_diffuse[]={0.7f, 0.0f, 0.1f, 1.0f};
 GLfloat mat_green_diffuse[]={0.0f, 0.7f, 0.1f, 1.0f};
 GLfloat mat_blue_diffuse[]={0.0f, 0.1f, 0.7f, 1.0f};
 GLfloat mat_yellow_diffuse[]={0.7f, 0.8f, 0.1f, 1.0f};
+GLfloat mat_ambient[4]={0.2f, 0.2f, 0.2f, 0.2f};
 GLfloat mat_specular[]={1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat mat_shininess[]={100.0f};
 GLfloat knots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
@@ -33,8 +34,14 @@ void init_scene(int width, int height)
 {
    int u, v;
 
-   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+   /* Setup our viewport for OpenGL ES */
+   glViewport(0, 0, (GLint)width, (GLint)height);
+   /* Setup our viewport for GLU ES (required when using OpenGL ES 1.0 only) */
+   gluViewport(0, 0, (GLint)width, (GLint)height);
+
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
@@ -153,7 +160,7 @@ void render_scene()
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    /* Render red hill. */
-   glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_red_diffuse);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_red_diffuse);
    gluBeginSurface(nurb);
       gluNurbsSurface(nurb, 8, knots, 8, knots,
                       4 * 3, 3, &pts1[0][0][0],
@@ -161,7 +168,7 @@ void render_scene()
    gluEndSurface(nurb);
 
    /* Render green hill. */
-   glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_green_diffuse);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_green_diffuse);
    gluBeginSurface(nurb);
       gluNurbsSurface(nurb, 8, knots, 8, knots,
                       4 * 3, 3, &pts2[0][0][0],
@@ -169,7 +176,7 @@ void render_scene()
    gluEndSurface(nurb);
 
    /* Render blue hill. */
-   glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_blue_diffuse);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_blue_diffuse);
    gluBeginSurface(nurb);
       gluNurbsSurface(nurb, 8, knots, 8, knots,
                       4 * 3, 3, &pts3[0][0][0],
@@ -177,7 +184,7 @@ void render_scene()
    gluEndSurface(nurb);
 
    /* Render yellow hill. */
-   glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_yellow_diffuse);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_yellow_diffuse);
    gluBeginSurface(nurb);
       gluNurbsSurface(nurb, 8, knots, 8, knots,
                       4 * 3, 3, &pts4[0][0][0],

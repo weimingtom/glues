@@ -27,78 +27,61 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-/*
-*/
 
 #ifndef _BEZIERPATCH_H
 #define _BEZIERPATCH_H
 
-typedef struct bezierPatch{
-  float umin, vmin, umax, vmax;
-  int uorder; /*order= degree + 1*/
-  int vorder; 
+typedef struct bezierPatch
+{
+   float umin, vmin, umax, vmax;
+   int uorder; /* order= degree + 1 */
+   int vorder;
 
-  /*
-   *the control points are stored in a one dimensional  array.
-   *the surface is defined as:
-   *      s(u,v) = sum_{i,j} P(i,j) * B_i(u) * B_j(v).
-   *where P(i,j) are the control points, B_i(.) are Bezier
-   *basis functions.
-   *Each control point can have dimension 3 or 4: (x,y,z,w).
-   *The components of P(i,j) are stored in a one dimensional 
-   *array: 
-   *       ctlpoints[]
-   *in the order of:
-   * P[0,0], P[0,1], ..., P[0,vorder-1],
-   * P[1,0], P[1,1], ..., P[1,vorder-1],
-   *  ...             
-   * P[uorder-1,0], P[uorder-1,1], ..., P[uorder-1,vorder-1].
-   */
-  int dimension;
-  float* ctlpoints;
+   /*
+    * the control points are stored in a one dimensional  array.
+    * the surface is defined as:
+    *      s(u,v) = sum_{i,j} P(i,j) * B_i(u) * B_j(v).
+    * where P(i,j) are the control points, B_i(.) are Bezier
+    * basis functions.
+    * Each control point can have dimension 3 or 4: (x,y,z,w).
+    * The components of P(i,j) are stored in a one dimensional 
+    * array:
+    *       ctlpoints[]
+    * in the order of:
+    * P[0,0], P[0,1], ..., P[0,vorder-1],
+    * P[1,0], P[1,1], ..., P[1,vorder-1],
+    *  ...
+    * P[uorder-1,0], P[uorder-1,1], ..., P[uorder-1,vorder-1].
+    */
+   int dimension;
+   float* ctlpoints;
 
-  /*
-   *in case we have to manage multiple bezierPatches.
-   */
-  struct bezierPatch  *next; 
-
+   /*
+    * in case we have to manage multiple bezierPatches.
+    */
+   struct bezierPatch* next;
 } bezierPatch;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 bezierPatch* bezierPatchMake(float umin, float vmin, float umax, float vmax, int urder, int vorder, int dimension);
-
-bezierPatch* bezierPatchMake2(float umin, float vmin, float umax, float vmax, int urder, int vorder, int dimension, int ustride, int vstride, float *ctlpoints);
-
-
-bezierPatch* bezierPatchInsert(bezierPatch *list, bezierPatch *b);
-
-void bezierPatchDelete(bezierPatch *b);
-
-void bezierPatchDeleteList(bezierPatch *b);
-
-void bezierPatchPrint(bezierPatch *b);
-
-void bezierPatchPrintList(bezierPatch *list);
-
-void bezierPatchEval(bezierPatch *b, float u, float v, float ret[]);
-
-void bezierPatchEvalNormal(bezierPatch *b, float u, float v, float retNormal[]);
-
-void bezierPatchEval(bezierPatch *b, float u, float v, float ret[]);
-
-void bezierPatchEvalNormal(bezierPatch *b, float u, float v, float ret[]);
-
-
-void bezierPatchDraw(bezierPatch *bpatch, int u_reso, int v_reso);
-
-void bezierPatchListDraw(bezierPatch *list, int u_reso, int v_reso);
+bezierPatch* bezierPatchMake2(float umin, float vmin, float umax, float vmax, int urder, int vorder, int dimension, int ustride, int vstride, float* ctlpoints);
+bezierPatch* bezierPatchInsert(bezierPatch* list, bezierPatch* b);
+void bezierPatchDelete(bezierPatch* b);
+void bezierPatchDeleteList(bezierPatch* b);
+void bezierPatchPrint(bezierPatch* b);
+void bezierPatchPrintList(bezierPatch* list);
+void bezierPatchEval(bezierPatch* b, float u, float v, float ret[]);
+void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float retNormal[]);
+void bezierPatchEval(bezierPatch* b, float u, float v, float ret[]);
+void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float ret[]);
+void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso);
+void bezierPatchListDraw(bezierPatch* list, int u_reso, int v_reso);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-
-#endif
+#endif /* _BEZIERPATCH_H */
