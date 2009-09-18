@@ -562,12 +562,7 @@ void bezierPatchMeshDraw(bezierPatchMesh* bpm)
    int i, j;
    int k;
 
-   GLboolean normal_enabled;
-   GLboolean vertex_enabled;
-
-   /* Store status of enabled arrays */
-   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
-   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   printf("bezierPatchMeshDraw\n");
 
    k=0; /* k is the index of the first component of the current vertex */
 

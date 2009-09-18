@@ -62,10 +62,12 @@ CoveAndTiler::output( GridVertex &gv )
     backend.tmeshvert( &gv );
 }
 
-inline void
-CoveAndTiler::output( TrimVertex *tv )
+inline void CoveAndTiler::output(TrimVertex* tv)
 {
-    backend.tmeshvert( tv );
+   REAL retPoint[4];
+   REAL retNormal[3];
+
+   backend.tmeshvert(tv, retPoint, retNormal);
 }
 
 inline void

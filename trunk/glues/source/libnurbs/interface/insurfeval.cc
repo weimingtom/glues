@@ -32,8 +32,6 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
-/*
-*/
 
 #include "glues.h"
 
@@ -54,186 +52,54 @@
 #define MYDELTA 0.001
 #endif
 
-//#define USE_LOD
-#ifdef USE_LOD
-//#define LOD_EVAL_COORD(u,v) inDoEvalCoord2EM(u,v)
-#define LOD_EVAL_COORD(u,v) glEvalCoord2f(u,v)
-
-static void LOD_interpolate(REAL A[2], REAL B[2], REAL C[2], int j, int k, int pow2_level,
-			    REAL& u, REAL& v)
-{
-   REAL a, a1, b, b1;
-
-   a=((REAL)j)/((REAL)pow2_level);
-   a1=1-a;
-
-   if(j != 0)
-   {
-      b=((REAL)k)/((REAL)j);
-      b1=1-b;
-   }
-
-   REAL x, y, z;
-   x=a1;
-
-   if (j==0)
-   {
-      y=0;
-      z=0;
-   }
-   else
-   {
-      y=b1*a;
-      z=b*a;
-   }
-
-  u = x*A[0] + y*B[0] + z*C[0];
-  v = x*A[1] + y*B[1] + z*C[1];
-}
-
-void OpenGLSurfaceEvaluator::LOD_triangle(REAL A[2], REAL B[2], REAL C[2], 
-			 int level)     
-{
-  int k,j;
-  int pow2_level;
-  /*compute 2^level*/
-  pow2_level = 1;
-
-  for(j=0; j<level; j++)
-    pow2_level *= 2;
-  for(j=0; j<=pow2_level-1; j++)
-    {
-      REAL u,v;
-
-/*      beginCallBack(GL_TRIANGLE_STRIP);*/
-glBegin(GL_TRIANGLE_STRIP);
-      LOD_interpolate(A,B,C, j+1, j+1, pow2_level, u,v);
-#ifdef USE_LOD
-      LOD_EVAL_COORD(u,v);
-//      glEvalCoord2f(u,v);
-#else
-      inDoEvalCoord2EM(u,v);
-#endif
-
-      for(k=0; k<=j; k++)
-	{
-	  LOD_interpolate(A,B,C,j,j-k,pow2_level, u,v);
-#ifdef USE_LOD
-          LOD_EVAL_COORD(u,v);
-//	  glEvalCoord2f(u,v);
-#else
-	  inDoEvalCoord2EM(u,v);
-#endif
-
-	  LOD_interpolate(A,B,C,j+1,j-k,pow2_level, u,v);
-
-#ifdef USE_LOD
-	  LOD_EVAL_COORD(u,v);
-//	  glEvalCoord2f(u,v);
-#else
-	  inDoEvalCoord2EM(u,v);
-#endif
-	}
-//      endCallBack();	
-glEnd();
-    }
-}
-
-void OpenGLSurfaceEvaluator::LOD_eval(int num_vert, REAL* verts, int type,
-		     int level
-		     )
-{
-  int i,k;
-  switch(type){
-  case GL_TRIANGLE_STRIP:
-  case GL_QUAD_STRIP:
-    for(i=2, k=4; i<=num_vert-2; i+=2, k+=4)
-      {
-	LOD_triangle(verts+k-4, verts+k-2, verts+k,
-		     level
-		     );
-	LOD_triangle(verts+k-2, verts+k+2, verts+k,
-		     level
-		     );
-      }
-    if(num_vert % 2 ==1) 
-      {
-	LOD_triangle(verts+2*(num_vert-3), verts+2*(num_vert-2), verts+2*(num_vert-1),
-		     level
-		     );
-      }
-    break;      
-  case GL_TRIANGLE_FAN:
-    for(i=1, k=2; i<=num_vert-2; i++, k+=2)
-      {
-	LOD_triangle(verts,verts+k, verts+k+2,
-		     level
-		     );
-      }
-    break;
-  
-  default:
-    fprintf(stderr, "typy not supported in LOD_\n");
-  }
-}
-	
-#endif // USE_LOD
-
 void OpenGLSurfaceEvaluator::inBPMListEval(bezierPatchMesh* list)
 {
-  bezierPatchMesh* temp;
-  for(temp = list; temp != NULL; temp = temp->next)
-    {
+   bezierPatchMesh* temp;
+   for(temp=list; temp!=NULL; temp=temp->next)
+   {
       inBPMEval(temp);
-    }
+   }
 }
 
 void OpenGLSurfaceEvaluator::inBPMEval(bezierPatchMesh* bpm)
 {
-  int i,j,k,l;
-  float u,v;
+   int i, j, k, l;
+   float u, v;
 
-  int ustride = bpm->bpatch->dimension * bpm->bpatch->vorder;
-  int vstride = bpm->bpatch->dimension;
-  inMap2f( 
-	  (bpm->bpatch->dimension == 3)? GLU_MAP2_VERTEX_3 : GLU_MAP2_VERTEX_4,
-	  bpm->bpatch->umin,
-	  bpm->bpatch->umax,
-	  ustride,
-	  bpm->bpatch->uorder,
-	  bpm->bpatch->vmin,
-	  bpm->bpatch->vmax,
-	  vstride,
-	  bpm->bpatch->vorder,
-	  bpm->bpatch->ctlpoints);
-  
-  bpm->vertex_array = (float*) malloc(sizeof(float)* (bpm->index_UVarray/2) * 3+1); /*in case the origional dimenion is 4, then we need 4 space to pass to evaluator.*/
-  assert(bpm->vertex_array);
-  bpm->normal_array = (float*) malloc(sizeof(float)* (bpm->index_UVarray/2) * 3);
-  assert(bpm->normal_array);
+   int ustride=bpm->bpatch->dimension*bpm->bpatch->vorder;
+   int vstride=bpm->bpatch->dimension;
 
-  k=0;
-  l=0;
+   inMap2f((bpm->bpatch->dimension == 3)? GLU_MAP2_VERTEX_3 : GLU_MAP2_VERTEX_4,
+            bpm->bpatch->umin, bpm->bpatch->umax, ustride, bpm->bpatch->uorder,
+            bpm->bpatch->vmin, bpm->bpatch->vmax, vstride, bpm->bpatch->vorder,
+            bpm->bpatch->ctlpoints);
 
-  for(i=0; i<bpm->index_length_array; i++)
-    {
+   /* in case the origional dimenion is 4, then we need 4 space to pass to evaluator. */
+   bpm->vertex_array=(float*)malloc(sizeof(float)*(bpm->index_UVarray/2)*3+1);
+   assert(bpm->vertex_array);
+   bpm->normal_array=(float*)malloc(sizeof(float)*(bpm->index_UVarray/2)*3);
+   assert(bpm->normal_array);
+
+   k=0;
+   l=0;
+
+   for(i=0; i<bpm->index_length_array; i++)
+   {
       beginCallBack(bpm->type_array[i], userData);
       for(j=0; j<bpm->length_array[i]; j++)
-	{
-	  u = bpm->UVarray[k];
-	  v = bpm->UVarray[k+1];
-	  inDoEvalCoord2NOGE(u,v,
-			     bpm->vertex_array+l,
-			     bpm->normal_array+l);
+      {
+         u=bpm->UVarray[k];
+         v=bpm->UVarray[k+1];
+         inDoEvalCoord2NOGE(u,v, bpm->vertex_array+l, bpm->normal_array+l);
 
-	  normalCallBack(bpm->normal_array+l, userData);
-	  vertexCallBack(bpm->vertex_array+l, userData);
+         normalCallBack(bpm->normal_array+l, userData);
+         vertexCallBack(bpm->vertex_array+l, userData);
 
-	  k += 2;
-	  l += 3;
-	}
+         k+=2;
+         l+=3;
+      }
       endCallBack(userData);
-    }
+   }
 }
 
 void OpenGLSurfaceEvaluator::inEvalPoint2(int i, int j)
@@ -251,15 +117,10 @@ void OpenGLSurfaceEvaluator::inEvalPoint2(int i, int j)
    inDoEvalCoord2(u, v, point, normal);
 }
 
-void OpenGLSurfaceEvaluator::inEvalCoord2f(REAL u, REAL v)
+void OpenGLSurfaceEvaluator::inEvalCoord2f(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
-   REAL point[4];
-   REAL normal[3];
-
-   inDoEvalCoord2(u, v, point, normal);
+   inDoEvalCoord2(u, v, retPoint, retNormal);
 }
-
-
 
 /* define a grid. store the values into the global variabls:
  *  global_grid_*
@@ -332,7 +193,14 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
          {
             REAL v1=(j==global_grid_nv)?global_grid_v1:(global_grid_v0+j*dv);
 
-            inDoEvalCoord2(u1, v1, point, normal);
+            if (((it%4==2) || (it%4==3)) && (output_style==N_MESHLINE))
+            {
+               inDoEvalCoord2(u2, v1, point, normal);
+            }
+            else
+            {
+               inDoEvalCoord2(u1, v1, point, normal);
+            }
             if (!output_triangles)
             {
                vertices[it*3+0]=point[0];
@@ -343,7 +211,14 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
                normals[it*3+2]=normal[2];
                it++;
             }
-            inDoEvalCoord2(u2, v1, point, normal);
+            if (((it%4==2) || (it%4==3)) && (output_style==N_MESHLINE))
+            {
+               inDoEvalCoord2(u1, v1, point, normal);
+            }
+            else
+            {
+               inDoEvalCoord2(u2, v1, point, normal);
+            }
             if (!output_triangles)
             {
                vertices[it*3+0]=point[0];
@@ -366,7 +241,14 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
                     glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
                     break;
                case N_MESHLINE:
-                    glDrawArrays(GL_LINE_LOOP, 0, it);
+                    {
+                       int jt;
+
+                       for (jt=0; jt<=it-4; jt+=2)
+                       {
+                          glDrawArrays(GL_LINE_LOOP, jt, 4);
+                       }
+                    }
                     break;
             }
          }
@@ -386,7 +268,15 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
          for(j=highU; j>=lowU; j--)
          {
             REAL u1=(j==global_grid_nu)?global_grid_u1:(global_grid_u0+j*du);
-            inDoEvalCoord2(u1, v2, point, normal);
+
+            if (((it%4==2) || (it%4==3)) && (output_style==N_MESHLINE))
+            {
+               inDoEvalCoord2(u1, v1, point, normal);
+            }
+            else
+            {
+               inDoEvalCoord2(u1, v2, point, normal);
+            }
             if (!output_triangles)
             {
                vertices[it*3+0]=point[0];
@@ -397,7 +287,14 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
                normals[it*3+2]=normal[2];
                it++;
             }
-            inDoEvalCoord2(u1, v1, point, normal);
+            if (((it%4==2) || (it%4==3)) && (output_style==N_MESHLINE))
+            {
+               inDoEvalCoord2(u1, v2, point, normal);
+            }
+            else
+            {
+               inDoEvalCoord2(u1, v1, point, normal);
+            }
             if (!output_triangles)
             {
                vertices[it*3+0]=point[0];
@@ -420,7 +317,14 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
                     glDrawArrays(GL_TRIANGLE_STRIP, 0, it);
                     break;
                case N_MESHLINE:
-                    glDrawArrays(GL_LINE_LOOP, 0, it);
+                    {
+                       int jt;
+
+                       for (jt=0; jt<=it-4; jt+=2)
+                       {
+                          glDrawArrays(GL_LINE_LOOP, jt, 4);
+                       }
+                    }
                     break;
             }
          }
@@ -469,51 +373,54 @@ void OpenGLSurfaceEvaluator::inEvalMesh2(int lowU, int lowV, int highU, int high
    free(normals);
 }
 
-void OpenGLSurfaceEvaluator::inMap2f(int k,
-	     REAL ulower,
-	     REAL uupper,
-	     int ustride,
-	     int uorder,
-	     REAL vlower,
-	     REAL vupper,
-	     int vstride,
-	     int vorder,
-	     REAL *ctlPoints)
+void OpenGLSurfaceEvaluator::inMap2f(int k, REAL ulower, REAL uupper, int ustride,
+                                     int uorder, REAL vlower, REAL vupper, int vstride,
+                                     int vorder, REAL* ctlPoints)
 {
-  int i,j,x;
-  REAL *data = global_ev_ctlPoints;
-  
+   int i, j, x;
+   REAL* data=global_ev_ctlPoints;
 
-
-  if(k == GLU_MAP2_VERTEX_3) k=3;
-  else if (k==GLU_MAP2_VERTEX_4) k =4;
-  else {
-    printf("error in inMap2f, maptype=%i is wrong, k,map is not updated\n", k);
-    return;
-  }
-  
-  global_ev_k = k;
-  global_ev_u1 = ulower;
-  global_ev_u2 = uupper;
-  global_ev_ustride = ustride;
-  global_ev_uorder = uorder;
-  global_ev_v1 = vlower;
-  global_ev_v2 = vupper;
-  global_ev_vstride = vstride;
-  global_ev_vorder = vorder;
-
-  /*copy the contrl points from ctlPoints to global_ev_ctlPoints*/
-  for (i=0; i<uorder; i++) {
-    for (j=0; j<vorder; j++) {
-      for (x=0; x<k; x++) {
-	data[x] = ctlPoints[x];
+   if (k==GLU_MAP2_VERTEX_3)
+   {
+      k=3;
+   }
+   else
+   {
+      if (k==GLU_MAP2_VERTEX_4)
+      {
+         k=4;
       }
-      ctlPoints += vstride;
-      data += k;
-    }
-    ctlPoints += ustride - vstride * vorder;
-  }
+      else
+      {
+         printf("error in inMap2f, maptype=%i is wrong, k, map is not updated\n", k);
+         return;
+      }
+   }
 
+   global_ev_k=k;
+   global_ev_u1=ulower;
+   global_ev_u2=uupper;
+   global_ev_ustride=ustride;
+   global_ev_uorder=uorder;
+   global_ev_v1=vlower;
+   global_ev_v2=vupper;
+   global_ev_vstride=vstride;
+   global_ev_vorder=vorder;
+
+   /* copy the contrl points from ctlPoints to global_ev_ctlPoints */
+   for (i=0; i<uorder; i++)
+   {
+      for (j=0; j<vorder; j++)
+      {
+         for (x=0; x<k; x++)
+         {
+            data[x]=ctlPoints[x];
+         }
+         ctlPoints+=vstride;
+         data+=k;
+      }
+      ctlPoints+=ustride-vstride*vorder;
+   }
 }
 
 
@@ -608,7 +515,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2(REAL u, REAL v, REAL* retPoint, REAL
       {
          v=v-MYDELTA*(v2-v1);
       }
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
+      inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
    }
 #endif /* AVOID_ZERO_NORMAL */
 
@@ -636,140 +543,147 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2(REAL u, REAL v, REAL* retPoint, REAL
 //  glVertex3fv(retPoint);
 }
 
-/*Compute point and normal
- *see the head of inDoDomain2WithDerivs
- *for the meaning of the arguments
+/* Compute point and normal
+ * see the head of inDoDomain2WithDerivs
+ * for the meaning of the arguments
  */
 void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE_BU(REAL u, REAL v,
-			   REAL *retPoint, REAL *retNormal)
+                                                   REAL* retPoint, REAL* retNormal)
 {
+   REAL du[4];
+   REAL dv[4];
 
-  REAL du[4];
-  REAL dv[4];
-
- 
-  assert(global_ev_k>=3 && global_ev_k <= 4);
-  /*compute homegeneous point and partial derivatives*/
-//   inPreEvaluateBU(global_ev_k, global_ev_uorder, global_ev_vorder, (u-global_ev_u1)/(global_ev_u2-global_ev_u1), global_ev_ctlPoints);
-  inDoDomain2WithDerivsBU(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
-
+   assert(global_ev_k>=3 && global_ev_k<=4);
+   /* compute homegeneous point and partial derivatives */
+   inDoDomain2WithDerivsBU(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
 
 #ifdef AVOID_ZERO_NORMAL
-
-  if(myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
-    {
-
+   if (myabs(dv[0])<=MYZERO && myabs(dv[1])<=MYZERO && myabs(dv[2])<=MYZERO)
+   {
       REAL tempdu[4];
       REAL tempdata[4];
       REAL u1 = global_ev_u1;
       REAL u2 = global_ev_u2;
-      if(u-MYDELTA*(u2-u1) < u1)
-	u = u+ MYDELTA*(u2-u1);
+
+      if (u-MYDELTA*(u2-u1)<u1)
+      {
+         u=u+MYDELTA*(u2-u1);
+      }
       else
-	u = u-MYDELTA*(u2-u1);
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
-    }
-  if(myabs(du[0]) <= MYZERO && myabs(du[1]) <= MYZERO && myabs(du[2]) <= MYZERO)
-    {
+      {
+         u=u-MYDELTA*(u2-u1);
+      }
+      inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
+   }
+
+   if(myabs(du[0])<=MYZERO && myabs(du[1])<=MYZERO && myabs(du[2])<=MYZERO)
+   {
       REAL tempdv[4];
       REAL tempdata[4];
-      REAL v1 = global_ev_v1;
-      REAL v2 = global_ev_v2;
-      if(v-MYDELTA*(v2-v1) < v1)
-	v = v+ MYDELTA*(v2-v1);
-      else
-	v = v-MYDELTA*(v2-v1);
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
-    }
-#endif
+      REAL v1=global_ev_v1;
+      REAL v2=global_ev_v2;
 
-  /*compute normal*/
-  switch(global_ev_k){
-  case 3:
-    inComputeNormal2(du, dv, retNormal);
-    break;
-  case 4:
-    inComputeFirstPartials(retPoint, du, dv);
-    inComputeNormal2(du, dv, retNormal);
-    /*transform the homegeneous coordinate of retPoint into inhomogenous one*/
-    retPoint[0] /= retPoint[3];
-    retPoint[1] /= retPoint[3];
-    retPoint[2] /= retPoint[3];
-    break;
-  }
+      if (v-MYDELTA*(v2-v1)<v1)
+      {
+         v=v+MYDELTA*(v2-v1);
+      }
+      else
+      {
+        v=v-MYDELTA*(v2-v1);
+      }
+      inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
+    }
+#endif /* AVOID_ZERO_NORMAL */
+
+   /* compute normal */
+   switch(global_ev_k)
+   {
+      case 3:
+           inComputeNormal2(du, dv, retNormal);
+           break;
+      case 4:
+           inComputeFirstPartials(retPoint, du, dv);
+           inComputeNormal2(du, dv, retNormal);
+           /* transform the homegeneous coordinate of retPoint into inhomogenous one */
+           retPoint[0]/=retPoint[3];
+           retPoint[1]/=retPoint[3];
+           retPoint[2]/=retPoint[3];
+           break;
+   }
 }
 
-/*Compute point and normal
- *see the head of inDoDomain2WithDerivs
- *for the meaning of the arguments
+/* Compute point and normal
+ * see the head of inDoDomain2WithDerivs
+ * for the meaning of the arguments
  */
 void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE_BV(REAL u, REAL v,
-			   REAL *retPoint, REAL *retNormal)
+                                                   REAL* retPoint, REAL* retNormal)
 {
+   REAL du[4];
+   REAL dv[4];
 
-  REAL du[4];
-  REAL dv[4];
-
- 
-  assert(global_ev_k>=3 && global_ev_k <= 4);
-  /*compute homegeneous point and partial derivatives*/
-//   inPreEvaluateBV(global_ev_k, global_ev_uorder, global_ev_vorder, (v-global_ev_v1)/(global_ev_v2-global_ev_v1), global_ev_ctlPoints);
-
-  inDoDomain2WithDerivsBV(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
-
+   assert(global_ev_k>=3 && global_ev_k<=4);
+   /* compute homegeneous point and partial derivatives */
+   inDoDomain2WithDerivsBV(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
 
 #ifdef AVOID_ZERO_NORMAL
-
-  if(myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
-    {
-
+   if (myabs(dv[0])<=MYZERO && myabs(dv[1])<=MYZERO && myabs(dv[2])<=MYZERO)
+   {
       REAL tempdu[4];
       REAL tempdata[4];
-      REAL u1 = global_ev_u1;
-      REAL u2 = global_ev_u2;
-      if(u-MYDELTA*(u2-u1) < u1)
-	u = u+ MYDELTA*(u2-u1);
+      REAL u1=global_ev_u1;
+      REAL u2=global_ev_u2;
+      if (u-MYDELTA*(u2-u1)<u1)
+      {
+         u=u+MYDELTA*(u2-u1);
+      }
       else
-	u = u-MYDELTA*(u2-u1);
+      {
+         u=u-MYDELTA*(u2-u1);
+      }
       inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
-    }
-  if(myabs(du[0]) <= MYZERO && myabs(du[1]) <= MYZERO && myabs(du[2]) <= MYZERO)
-    {
+   }
+
+   if (myabs(du[0])<=MYZERO && myabs(du[1])<=MYZERO && myabs(du[2])<=MYZERO)
+   {
       REAL tempdv[4];
       REAL tempdata[4];
-      REAL v1 = global_ev_v1;
-      REAL v2 = global_ev_v2;
-      if(v-MYDELTA*(v2-v1) < v1)
-	v = v+ MYDELTA*(v2-v1);
+      REAL v1=global_ev_v1;
+      REAL v2=global_ev_v2;
+      if (v-MYDELTA*(v2-v1)<v1)
+      {
+         v=v+MYDELTA*(v2-v1);
+      }
       else
-	v = v-MYDELTA*(v2-v1);
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
-    }
-#endif
+      {
+         v=v-MYDELTA*(v2-v1);
+      }
+      inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
+   }
+#endif /* AVOID_ZERO_NORMAL */
 
-  /*compute normal*/
-  switch(global_ev_k){
-  case 3:
-    inComputeNormal2(du, dv, retNormal);
-    break;
-  case 4:
-    inComputeFirstPartials(retPoint, du, dv);
-    inComputeNormal2(du, dv, retNormal);
-    /*transform the homegeneous coordinate of retPoint into inhomogenous one*/
-    retPoint[0] /= retPoint[3];
-    retPoint[1] /= retPoint[3];
-    retPoint[2] /= retPoint[3];
-    break;
-  }
+   /* compute normal */
+   switch(global_ev_k)
+   {
+      case 3:
+           inComputeNormal2(du, dv, retNormal);
+           break;
+      case 4:
+           inComputeFirstPartials(retPoint, du, dv);
+           inComputeNormal2(du, dv, retNormal);
+           /* transform the homegeneous coordinate of retPoint into inhomogenous one */
+           retPoint[0]/=retPoint[3];
+           retPoint[1]/=retPoint[3];
+           retPoint[2]/=retPoint[3];
+           break;
+   }
 }
- 
 
-/*Compute point and normal
- *see the head of inDoDomain2WithDerivs
- *for the meaning of the arguments
+/* Compute point and normal
+ * see the head of inDoDomain2WithDerivs
+ * for the meaning of the arguments
  */
-void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE(REAL u, REAL v,
-			   REAL *retPoint, REAL *retNormal)
+void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
 
   REAL du[4];
@@ -808,7 +722,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE(REAL u, REAL v,
 	v = v-MYDELTA*(v2-v1);
       inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
     }
-#endif
+#endif /* AVOID_ZERO_NORMAL */
 
   /*compute normal*/
   switch(global_ev_k){
@@ -824,8 +738,6 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE(REAL u, REAL v,
     retPoint[2] /= retPoint[3];
     break;
   }
-//  glNormal3fv(retNormal);
-//  glVertex3fv(retPoint);
 }
  
 void OpenGLSurfaceEvaluator::inPreEvaluateBV(int k, int uorder, int vorder, REAL vprime, REAL *baseData)
@@ -1204,9 +1116,9 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
    assert(lowerXYZ);
    REAL3* lowerNormal=(REAL3*)malloc(sizeof(REAL3)*n_lower);
    assert(lowerNormal);
-   REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_lower>n_upper?n_lower:n_upper)+3));
+   REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_lower>n_upper?n_lower:n_upper)*3));
    assert(normals);
-   REAL3* vertices=(REAL3*)malloc(sizeof(REAL3)*((n_lower>n_upper?n_lower:n_upper)+3));
+   REAL3* vertices=(REAL3*)malloc(sizeof(REAL3)*((n_lower>n_upper?n_lower:n_upper)*3));
    assert(vertices);
 
    inEvalULine(n_upper, v_upper, upper_val, 1, upperXYZ, upperNormal);
@@ -1289,6 +1201,28 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
             while(j<n_lower)
             {
+               if ((output_style==N_MESHLINE) && (it%3==0))
+               {
+                  if (!output_triangles)
+                  {
+                     /* Fill up start vertex for triangle fan */
+                     *((REAL*)(normals+it)+0)=*((REAL*)leftMostNormal+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)leftMostNormal+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)leftMostNormal+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)leftMostXYZ+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)leftMostXYZ+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)leftMostXYZ+2);
+                     it++;
+                     /* Fill up previous vertex */
+                     *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+j-1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+j-1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+j-1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+j-1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+j-1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+j-1)+2);
+                     it++;
+                  }
+               }
                if (!output_triangles)
                {
                   *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+j)+0);
@@ -1306,7 +1240,22 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
             if (!output_triangles)
             {
-               glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               switch (output_style)
+               {
+                  case N_MESHFILL:
+                       glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                       break;
+                  case N_MESHLINE:
+                       {
+                          int jt;
+
+                          for (jt=0; jt<it; jt+=3)
+                          {
+                             glDrawArrays(GL_LINE_LOOP, jt, 3);
+                          }
+                       }
+                       break;
+               }
             }
          }
          break; /* exit the main loop */
@@ -1335,6 +1284,25 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
                for(k=n_upper-1; k>=i; k--) /* reverse order for two-side lighting */
                {
+                  if ((output_style==N_MESHLINE) && (it%3==0))
+                  {
+                     /* Fill up start vertex for triangle fan */
+                     *((REAL*)(normals+it)+0)=*((REAL*)leftMostNormal+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)leftMostNormal+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)leftMostNormal+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)leftMostXYZ+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)leftMostXYZ+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)leftMostXYZ+2);
+                     it++;
+                     /* Fill up previous vertex */
+                     *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+k-1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+k-1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+k-1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+k-1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+k-1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+k-1)+2);
+                     it++;
+                  }
                   if (!output_triangles)
                   {
                      *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+k)+0);
@@ -1351,7 +1319,22 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
                if (!output_triangles)
                {
-                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                  switch (output_style)
+                  {
+                     case N_MESHFILL:
+                          glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                          break;
+                     case N_MESHLINE:
+                          {
+                             int jt;
+
+                             for (jt=0; jt<it; jt+=3)
+                             {
+                                glDrawArrays(GL_LINE_LOOP, jt, 3);
+                             }
+                          }
+                          break;
+                  }
                }
             }
             break; /*exit the main loop*/
@@ -1393,6 +1376,28 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
                for(l=k; l>=i; l--) /* the reverse is for two-side lighting */
                {
+                  if ((output_style==N_MESHLINE) && (it%3==0))
+                  {
+                     if (!output_triangles)
+                     {
+                        /* Fill up start vertex for triangle fan */
+                        *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+j)+0);
+                        *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+j)+1);
+                        *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+j)+2);
+                        *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+j)+0);
+                        *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+j)+1);
+                        *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+j)+2);
+                        it++;
+                        /* Fill up previous vertex */
+                        *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+l+1)+0);
+                        *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+l+1)+1);
+                        *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+l+1)+2);
+                        *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+l+1)+0);
+                        *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+l+1)+1);
+                        *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+l+1)+2);
+                        it++;
+                     }
+                  }
                   if (!output_triangles)
                   {
                      *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+l)+0);
@@ -1401,6 +1406,29 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
                      *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+l)+0);
                      *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+l)+1);
                      *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+l)+2);
+                     it++;
+                  }
+               }
+
+               if ((output_style==N_MESHLINE) && (it%3==0))
+               {
+                  if (!output_triangles)
+                  {
+                     /* Fill up start vertex for triangle fan */
+                     *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+j)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+j)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+j)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+j)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+j)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+j)+2);
+                     it++;
+                     /* Fill up previous vertex */
+                     *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+l+1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+l+1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+l+1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+l+1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+l+1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+l+1)+2);
                      it++;
                   }
                }
@@ -1420,7 +1448,22 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
                if (!output_triangles)
                {
-                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                  switch (output_style)
+                  {
+                     case N_MESHFILL:
+                          glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                          break;
+                     case N_MESHLINE:
+                          {
+                             int jt;
+
+                             for (jt=0; jt<it; jt+=3)
+                             {
+                                glDrawArrays(GL_LINE_LOOP, jt, 3);
+                             }
+                          }
+                          break;
+                  }
                }
 
                /* update i and leftMostV for next loop */
@@ -1471,6 +1514,29 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
                      break;
                   }
 
+                  if ((output_style==N_MESHLINE) && (it%3==0))
+                  {
+                     if (!output_triangles)
+                     {
+                        /* Fill up start vertex for triangle fan */
+                        *((REAL*)(normals+it)+0)=*((REAL*)(upperNormal+i)+0);
+                        *((REAL*)(normals+it)+1)=*((REAL*)(upperNormal+i)+1);
+                        *((REAL*)(normals+it)+2)=*((REAL*)(upperNormal+i)+2);
+                        *((REAL*)(vertices+it)+0)=*((REAL*)(upperXYZ+i)+0);
+                        *((REAL*)(vertices+it)+1)=*((REAL*)(upperXYZ+i)+1);
+                        *((REAL*)(vertices+it)+2)=*((REAL*)(upperXYZ+i)+2);
+                        it++;
+                        /* Fill up previous vertex */
+                        *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+k-1)+0);
+                        *((REAL*)(normals+it)+1)=*((REAL*)(lowerNormal+k-1)+1);
+                        *((REAL*)(normals+it)+2)=*((REAL*)(lowerNormal+k-1)+2);
+                        *((REAL*)(vertices+it)+0)=*((REAL*)(lowerXYZ+k-1)+0);
+                        *((REAL*)(vertices+it)+1)=*((REAL*)(lowerXYZ+k-1)+1);
+                        *((REAL*)(vertices+it)+2)=*((REAL*)(lowerXYZ+k-1)+2);
+                        it++;
+                     }
+                  }
+
                   if (!output_triangles)
                   {
                      *((REAL*)(normals+it)+0)=*((REAL*)(lowerNormal+k)+0);
@@ -1488,7 +1554,22 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
 
                if (!output_triangles)
                {
-                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                  switch (output_style)
+                  {
+                     case N_MESHFILL:
+                          glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                          break;
+                     case N_MESHLINE:
+                          {
+                             int jt;
+
+                             for (jt=0; jt<it; jt+=3)
+                             {
+                                glDrawArrays(GL_LINE_LOOP, jt, 3);
+                             }
+                          }
+                          break;
+                  }
                }
 
                /* update j and leftMostV for next loop */
@@ -1575,9 +1656,9 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
    assert(rightXYZ);
    REAL3* rightNormal = (REAL3*) malloc(sizeof(REAL3) * n_right);
    assert(rightNormal);
-   REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)+3));
+   REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)*3));
    assert(normals);
-   REAL3* vertices=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)+3));
+   REAL3* vertices=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)*3));
    assert(vertices);
 
    inEvalVLine(n_left, u_left, left_val,  1, leftXYZ, leftNormal);
@@ -1658,6 +1739,25 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
             while(j<n_right)
             {
+               if ((output_style==N_MESHLINE) && (it%3==0))
+               {
+                  if (!output_triangles)
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(botMostNormal+0)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(botMostNormal+0)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(botMostNormal+0)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(botMostXYZ+0)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(botMostXYZ+0)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(botMostXYZ+0)+2);
+                     it++;
+                     *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+j-1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+j-1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+j-1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+j-1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+j-1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+j-1)+2);
+                  }
+               }
                if (!output_triangles)
                {
                   *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+j)+0);
@@ -1675,16 +1775,31 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
             if (!output_triangles)
             {
-               glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+               switch (output_style)
+               {
+                  case N_MESHFILL:
+                       glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                       break;
+                  case N_MESHLINE:
+                       {
+                          int jt;
+
+                          for (jt=0; jt<it; jt+=3)
+                          {
+                             glDrawArrays(GL_LINE_LOOP, jt, 3);
+                          }
+                       }
+                       break;
+               }
             }
          }
          break; /* exit the main loop */
       }
       else
       {
-         if(j>=n_right) /* case2: no more in right */
+         if (j>=n_right) /* case2: no more in right */
          {
-            if(i<n_left-1) /* at least two vertices in left */
+            if (i<n_left-1) /* at least two vertices in left */
             {
                int it=0;
 
@@ -1701,8 +1816,25 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
                   it++;
                }
 
-               for(k=n_left-1; k>=i; k--) /* reverse order for two-side lighting */
+               for (k=n_left-1; k>=i; k--) /* reverse order for two-side lighting */
                {
+                  if ((output_style==N_MESHLINE) && (it%3==0))
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(botMostNormal+0)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(botMostNormal+0)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(botMostNormal+0)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(botMostXYZ+0)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(botMostXYZ+0)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(botMostXYZ+0)+2);
+                     it++;
+                     *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+k+1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+k+1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+k+1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+k+1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+k+1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+k+1)+2);
+                     it++;
+                  }
                   if (!output_triangles)
                   {
                      *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+k)+0);
@@ -1719,7 +1851,22 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
                if (!output_triangles)
                {
-                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                  switch (output_style)
+                  {
+                     case N_MESHFILL:
+                          glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                          break;
+                     case N_MESHLINE:
+                          {
+                             int jt;
+
+                             for (jt=0; jt<it; jt+=3)
+                             {
+                                glDrawArrays(GL_LINE_LOOP, jt, 3);
+                             }
+                          }
+                          break;
+                  }
                }
             }
             break; /* exit the main loop */
@@ -1760,6 +1907,23 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
                for(l=k; l>=i; l--) /* the reverse is for two-side lighting */
                {
+                  if ((output_style==N_MESHLINE) && (it%3==0))
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+j)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+j)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+j)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+j)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+j)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+j)+2);
+                     it++;
+                     *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+l+1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+l+1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+l+1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+l+1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+l+1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+l+1)+2);
+                     it++;
+                  }
                   if (!output_triangles)
                   {
                      *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+l)+0);
@@ -1770,6 +1934,24 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
                      *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+l)+2);
                      it++;
                   }
+               }
+
+               if ((output_style==N_MESHLINE) && (it%3==0))
+               {
+                  *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+j)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+j)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+j)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+j)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+j)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+j)+2);
+                  it++;
+                  *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+l+1)+0);
+                  *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+l+1)+1);
+                  *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+l+1)+2);
+                  *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+l+1)+0);
+                  *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+l+1)+1);
+                  *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+l+1)+2);
+                  it++;
                }
 
                if (!output_triangles)
@@ -1787,7 +1969,22 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
                if (!output_triangles)
                {
-                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                  switch (output_style)
+                  {
+                     case N_MESHFILL:
+                          glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                          break;
+                     case N_MESHLINE:
+                          {
+                             int jt;
+
+                             for (jt=0; jt<it; jt+=3)
+                             {
+                                glDrawArrays(GL_LINE_LOOP, jt, 3);
+                             }
+                          }
+                          break;
+                  }
                }
 
                /* update i and botMostV for next loop */
@@ -1837,6 +2034,24 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
                      break;
                   }
 
+                  if ((output_style==N_MESHLINE) && (it%3==0))
+                  {
+                     *((REAL*)(normals+it)+0)=*((REAL*)(leftNormal+i)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(leftNormal+i)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(leftNormal+i)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(leftXYZ+i)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(leftXYZ+i)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(leftXYZ+i)+2);
+                     it++;
+                     *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+k-1)+0);
+                     *((REAL*)(normals+it)+1)=*((REAL*)(rightNormal+k-1)+1);
+                     *((REAL*)(normals+it)+2)=*((REAL*)(rightNormal+k-1)+2);
+                     *((REAL*)(vertices+it)+0)=*((REAL*)(rightXYZ+k-1)+0);
+                     *((REAL*)(vertices+it)+1)=*((REAL*)(rightXYZ+k-1)+1);
+                     *((REAL*)(vertices+it)+2)=*((REAL*)(rightXYZ+k-1)+2);
+                     it++;
+                  }
+
                   if (!output_triangles)
                   {
                      *((REAL*)(normals+it)+0)=*((REAL*)(rightNormal+k)+0);
@@ -1854,7 +2069,22 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 
                if (!output_triangles)
                {
-                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                  switch (output_style)
+                  {
+                     case N_MESHFILL:
+                          glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+                          break;
+                     case N_MESHLINE:
+                          {
+                             int jt;
+
+                             for (jt=0; jt<it; jt+=3)
+                             {
+                                glDrawArrays(GL_LINE_LOOP, jt, 3);
+                             }
+                          }
+                          break;
+                  }
                }
 
                /* update j and botMostV for next loop */
@@ -2027,8 +2257,8 @@ void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsEM(surfEvalMachine *em, REAL u
 	    retdu[j] += em->ucoeffDeriv[row] * p;
 	    retdv[j] += em->ucoeff[row] * pdv;
 	}
-    }  
-}  
+    }
+}
 
 void OpenGLSurfaceEvaluator::inDoDomain2EM(surfEvalMachine *em, REAL u, REAL v, 
 				REAL *retPoint)
@@ -2043,7 +2273,7 @@ void OpenGLSurfaceEvaluator::inDoDomain2EM(surfEvalMachine *em, REAL u, REAL v,
 	return;
     the_uprime = (u - em->u1) / (em->u2 - em->u1);
     the_vprime = (v - em->v1) / (em->v2 - em->v1);
-    
+
     /* Compute coefficients for values and derivs */
 
     /* Use already cached values if possible */
@@ -2119,7 +2349,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
     {
       REAL du[4];
       REAL dv[4];
-      
+
       /*compute homegeneous point and partial derivatives*/
       inDoDomain2WithDerivsEM(&em_vertex, u,v,temp_vertex,du,dv);
 
@@ -2356,8 +2586,8 @@ void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
 	}
       endCallBack(userData);
 
-#endif //USE_LOD
-    }
+#endif // USE_LOD
+   }
 }
 
 void OpenGLSurfaceEvaluator::inBPMListEvalEM(bezierPatchMesh* list)

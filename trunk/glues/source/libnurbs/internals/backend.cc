@@ -37,8 +37,7 @@
  *
  */
 
-/* Bezier surface backend
-	- interprets display mode (wireframe,shaded,...)
+/* Bezier surface backend - interprets display mode (wireframe, shaded, ...)
 */
 #include <stdio.h>
 #include "glimports.h"
@@ -48,8 +47,8 @@
 #include "basicsurfeval.h"
 #include "nurbsconsts.h"
 
-#define NOWIREFRAME
-
+#include "gles_evaluator.h"
+#include "glues.h"
 
 /*-------------------------------------------------------------------------
  * bgnsurf - preamble to surface definition and evaluations
@@ -133,73 +132,49 @@ Backend::surfgrid( REAL u0, REAL u1, long nu, REAL v0, REAL v1, long nv )
  * surfmesh - evaluate a mesh of points on lattice
  *-------------------------------------------------------------------------
  */
-void
-Backend::surfmesh( long u, long v, long n, long m )
+void Backend::surfmesh(long u, long v, long n, long m)
 {
-#ifndef NOWIREFRAME
-    if( wireframequads ) {
-	long v0,  v1;
-	long u0f = u, u1f = u+n;
-	long v0f = v, v1f = v+m;
-	long parity = (u & 1);
-
-        for( v0 = v0f, v1 = v0f++ ; v0<v1f; v0 = v1, v1++ ) {
-	    surfaceEvaluator.bgnline();
-	    for( long u = u0f; u<=u1f; u++ ) {
-		if( parity ) {
-		    surfaceEvaluator.evalpoint2i( u, v0 );
-		    surfaceEvaluator.evalpoint2i( u, v1 );
-		} else {
-		    surfaceEvaluator.evalpoint2i( u, v1 );
-		    surfaceEvaluator.evalpoint2i( u, v0 );
-		}
-		parity = 1 - parity;
-	    }
-	    surfaceEvaluator.endline();
-	}
-    } else {
-	surfaceEvaluator.mapmesh2f( N_MESHFILL, u, u+n, v, v+m );
-    }
-#else
-    if( wireframequads ) {
-
-	surfaceEvaluator.mapmesh2f( N_MESHLINE, u, u+n, v, v+m );
-    } else {
-
-	surfaceEvaluator.mapmesh2f( N_MESHFILL, u, u+n, v, v+m );
-    }
-#endif
+   if (wireframequads)
+   {
+      surfaceEvaluator.mapmesh2f(N_MESHLINE, u, u+n, v, v+m);
+   }
+   else
+   {
+      surfaceEvaluator.mapmesh2f(N_MESHFILL, u, u+n, v, v+m);
+   }
 }
 
 /*-------------------------------------------------------------------------
  * endsurf - postamble to surface
  *-------------------------------------------------------------------------
  */
-void
-Backend::endsurf( void )
+void Backend::endsurf(void)
 {
-    surfaceEvaluator.endmap2f();
+   surfaceEvaluator.endmap2f();
 }
 
 /***************************************/
 void Backend::bgntfan(void)
 {
-  surfaceEvaluator.bgntfan();
+   printf("Backend::bgntfan\n");
+   surfaceEvaluator.bgntfan();
 }
 
 void Backend::endtfan(void)
 {
+   printf("Backend::endtfan\n");
    surfaceEvaluator.endtfan();
 }
 
-void Backend::bgnqstrip( void )
+void Backend::bgnqstrip(void)
 {
+   printf("Backend::bgnqstrip\n");
    surfaceEvaluator.bgnqstrip();
 }
 
-void
-Backend::endqstrip( void )
+void Backend::endqstrip(void)
 {
+   printf("Backend::endqstrip\n");
    surfaceEvaluator.endqstrip();
 }
 
@@ -230,227 +205,122 @@ Backend::evalVStrip(int n_left, REAL u_left, REAL* left_val,
  */
 void Backend::bgntmesh(const char*)
 {
-#ifndef NOWIREFRAME
-    meshindex = 0;	/* I think these need to be initialized to zero */
-    npts = 0;
-
-    if( !wireframetris ) {
-        surfaceEvaluator.bgntmesh();
-    }
-#else
-
-    if( wireframetris ) {
-        surfaceEvaluator.bgntmesh();
-	surfaceEvaluator.polymode( N_MESHLINE );
-    } else {
-        surfaceEvaluator.bgntmesh();
-	surfaceEvaluator.polymode( N_MESHFILL );
-    }
-#endif
-}
-
-void
-Backend::tmeshvert( GridTrimVertex *v )
-{
-    if( v->isGridVert() ) {
-	tmeshvert( v->g );
-    } else {
-	tmeshvert( v->t );
+   if (wireframetris)
+   {
+      surfaceEvaluator.bgntmesh();
+      surfaceEvaluator.polymode(N_MESHLINE);
+   }
+   else
+   {
+      surfaceEvaluator.bgntmesh();
+      surfaceEvaluator.polymode(N_MESHFILL);
     }
 }
 
-void
-Backend::tmeshvertNOGE(TrimVertex *t)
+void Backend::tmeshvert(GridTrimVertex* v)
 {
-//	surfaceEvaluator.inDoEvalCoord2NOGE( t->param[0], t->param[1], temp, ttt);
+   REAL retPoint[4];
+   REAL retNormal[3];
+
+   if (v->isGridVert())
+   {
+      tmeshvert(v->g);
+   }
+   else
+   {
+      tmeshvert(v->t, retPoint, retNormal);
+   }
+}
+
+void Backend::tmeshvertNOGE(TrimVertex* t)
+{
 #ifdef USE_OPTTT
-	surfaceEvaluator.inDoEvalCoord2NOGE( t->param[0], t->param[1], t->cache_point, t->cache_normal);    
+   surfaceEvaluator.inDoEvalCoord2NOGE(t->param[0], t->param[1], t->cache_point, t->cache_normal);
 #endif
 }
 
-//opt for a line with the same u.
-void
-Backend::tmeshvertNOGE_BU(TrimVertex *t)
+// opt for a line with the same u.
+void Backend::tmeshvertNOGE_BU(TrimVertex* t)
 {
 #ifdef USE_OPTTT
-	surfaceEvaluator.inDoEvalCoord2NOGE_BU( t->param[0], t->param[1], t->cache_point, t->cache_normal);    
+   surfaceEvaluator.inDoEvalCoord2NOGE_BU(t->param[0], t->param[1], t->cache_point, t->cache_normal);
 #endif
 }
 
-//opt for a line with the same v.
-void
-Backend::tmeshvertNOGE_BV(TrimVertex *t)
+// opt for a line with the same v.
+void Backend::tmeshvertNOGE_BV(TrimVertex* t)
 {
 #ifdef USE_OPTTT
-	surfaceEvaluator.inDoEvalCoord2NOGE_BV( t->param[0], t->param[1], t->cache_point, t->cache_normal);    
+   surfaceEvaluator.inDoEvalCoord2NOGE_BV(t->param[0], t->param[1], t->cache_point, t->cache_normal);
 #endif
 }
 
-void
-Backend::preEvaluateBU(REAL u)
+void Backend::preEvaluateBU(REAL u)
 {
-	surfaceEvaluator.inPreEvaluateBU_intfac(u);
+   surfaceEvaluator.inPreEvaluateBU_intfac(u);
 }
 
-void 
-Backend::preEvaluateBV(REAL v)
+void Backend::preEvaluateBV(REAL v)
 {
-	surfaceEvaluator.inPreEvaluateBV_intfac(v);
+   surfaceEvaluator.inPreEvaluateBV_intfac(v);
 }
-
 
 /*-------------------------------------------------------------------------
  * tmeshvert - evaluate a point on a triangle mesh
  *-------------------------------------------------------------------------
  */
-void
-Backend::tmeshvert( TrimVertex *t )
+void Backend::tmeshvert(TrimVertex* t, REAL* retPoint, REAL* retNormal)
 {
+   printf("Backend::tmeshvert TrimVertex\n");
 
-#ifndef NOWIREFRAME
-    const long nuid = t->nuid;
-#endif
-    const REAL u = t->param[0];
-    const REAL v = t->param[1];
+   const REAL u=t->param[0];
+   const REAL v=t->param[1];
 
-#ifndef NOWIREFRAME
-    npts++;
-    if( wireframetris ) {
-	if( npts >= 3 ) {
-	    surfaceEvaluator.bgnclosedline();
-	    if( mesh[0][2] == 0 )
-		surfaceEvaluator.evalcoord2f( mesh[0][3], mesh[0][0], mesh[0][1] );
-	    else
-		surfaceEvaluator.evalpoint2i( (long) mesh[0][0], (long) mesh[0][1] );
-	    if( mesh[1][2] == 0 )
-		surfaceEvaluator.evalcoord2f( mesh[1][3], mesh[1][0], mesh[1][1] );
-	    else
-		surfaceEvaluator.evalpoint2i( (long) mesh[1][0], (long) mesh[1][1] );
-	    surfaceEvaluator.evalcoord2f( nuid, u, v );
-	    surfaceEvaluator.endclosedline();
-	}
-        mesh[meshindex][0] = u;
-        mesh[meshindex][1] = v;
-	mesh[meshindex][2] = 0;
-	mesh[meshindex][3] = nuid;
-        meshindex = (meshindex+1) % 2;
-    } else {
-	surfaceEvaluator.evalcoord2f( nuid, u, v );
-    }
-#else
-          
-          surfaceEvaluator.evalcoord2f( 0, u, v );
-//for uninitial memory read          surfaceEvaluator.evalcoord2f( nuid, u, v );
-#endif
+   surfaceEvaluator.evalcoord2f(0, u, v, retPoint, retNormal);
 }
 
-//the same as tmeshvert(trimvertex), for efficiency purpose
-void
-Backend::tmeshvert( REAL u, REAL v )
+// the same as tmeshvert(trimvertex), for efficiency purpose
+void Backend::tmeshvert(REAL u, REAL v)
 {
-#ifndef NOWIREFRAME
-    const long nuid = 0;
-    
-    npts++;
-    if( wireframetris ) {
-	if( npts >= 3 ) {
-	    surfaceEvaluator.bgnclosedline();
-	    if( mesh[0][2] == 0 )
-		surfaceEvaluator.evalcoord2f( mesh[0][3], mesh[0][0], mesh[0][1] );
-	    else
-		surfaceEvaluator.evalpoint2i( (long) mesh[0][0], (long) mesh[0][1] );
-	    if( mesh[1][2] == 0 )
-		surfaceEvaluator.evalcoord2f( mesh[1][3], mesh[1][0], mesh[1][1] );
-	    else
-		surfaceEvaluator.evalpoint2i( (long) mesh[1][0], (long) mesh[1][1] );
-	    surfaceEvaluator.evalcoord2f( nuid, u, v );
-	    surfaceEvaluator.endclosedline();
-	}
-        mesh[meshindex][0] = u;
-        mesh[meshindex][1] = v;
-	mesh[meshindex][2] = 0;
-	mesh[meshindex][3] = nuid;
-        meshindex = (meshindex+1) % 2;
-    } else {
-	surfaceEvaluator.evalcoord2f( nuid, u, v );
-    }
-#else
-          
-          surfaceEvaluator.evalcoord2f( 0, u, v );
-#endif
+   REAL retPoint[4];
+   REAL retNormal[3];
+
+   printf("Backend::tmeshvert REAL, REAL\n");
+
+   surfaceEvaluator.evalcoord2f(0, u, v, retPoint, retNormal);
 }
 
 /*-------------------------------------------------------------------------
  * tmeshvert - evaluate a grid point of a triangle mesh
  *-------------------------------------------------------------------------
  */
-void
-Backend::tmeshvert( GridVertex *g )
+void Backend::tmeshvert(GridVertex* g)
 {
-    const long u = g->gparam[0];
-    const long v = g->gparam[1];
+   const long u=g->gparam[0];
+   const long v=g->gparam[1];
 
-#ifndef NOWIREFRAME
-    npts++;
-    if( wireframetris ) {
-	if( npts >= 3 ) {
-	    surfaceEvaluator.bgnclosedline();
-	    if( mesh[0][2] == 0 )
-		surfaceEvaluator.evalcoord2f( (long) mesh[0][3], mesh[0][0], mesh[0][1] );
-	    else
-		surfaceEvaluator.evalpoint2i( (long) mesh[0][0], (long) mesh[0][1] );
-	    if( mesh[1][2] == 0 )
-		surfaceEvaluator.evalcoord2f( (long) mesh[1][3], mesh[1][0], mesh[1][1] );
-	    else
-		surfaceEvaluator.evalpoint2i( (long) mesh[1][0], (long) mesh[1][1] );
-	    surfaceEvaluator.evalpoint2i( u, v );
-	    surfaceEvaluator.endclosedline();
-	}
-        mesh[meshindex][0] = u;
-        mesh[meshindex][1] = v;
-	mesh[meshindex][2] = 1;
-        meshindex = (meshindex+1) % 2;
-    } else {
-        surfaceEvaluator.evalpoint2i( u, v );
-    }
-#else
-    surfaceEvaluator.evalpoint2i( u, v );
-#endif
+   printf("Backend::tmeshvert gVertex\n");
+
+   surfaceEvaluator.evalpoint2i(u, v);
 }
 
 /*-------------------------------------------------------------------------
  * swaptmesh - perform a swap of the triangle mesh pointers
  *-------------------------------------------------------------------------
  */
-void
-Backend::swaptmesh( void )
+void Backend::swaptmesh(void)
 {
-#ifndef NOWIREFRAME
-    if( wireframetris ) {
-        meshindex = 1 - meshindex;
-    } else {
-	surfaceEvaluator.swaptmesh();
-    }
-#else
-    surfaceEvaluator.swaptmesh();
-#endif
+   surfaceEvaluator.swaptmesh();
 }
 
 /*-------------------------------------------------------------------------
  * endtmesh - postamble to triangle mesh
  *-------------------------------------------------------------------------
  */
-void
-Backend::endtmesh( void )
+void Backend::endtmesh(void)
 {
-#ifndef NOWIREFRAME
-    if( ! wireframetris )
-        surfaceEvaluator.endtmesh();
-#else
-    surfaceEvaluator.endtmesh();
-#endif
+   surfaceEvaluator.endtmesh();
 }
-
 
 /*-------------------------------------------------------------------------
  * bgnoutline - preamble to outlined rendering
@@ -458,6 +328,7 @@ Backend::endtmesh( void )
  */
 void Backend::bgnoutline(void)
 {
+   printf("Backend::bgnoutline\n");
    surfaceEvaluator.bgnline();
 }
 
@@ -465,9 +336,10 @@ void Backend::bgnoutline(void)
  * linevert - evaluate a point on an outlined contour
  *-------------------------------------------------------------------------
  */
-void Backend::linevert(TrimVertex* t)
+void Backend::linevert(TrimVertex* t, REAL* retPoint, REAL* retNormal)
 {
-   surfaceEvaluator.evalcoord2f(t->nuid, t->param[0], t->param[1]);
+printf("Backend::linevert TrimVertex\n");
+   surfaceEvaluator.evalcoord2f(t->nuid, t->param[0], t->param[1], retPoint, retNormal);
 }
 
 /*-------------------------------------------------------------------------
@@ -476,6 +348,7 @@ void Backend::linevert(TrimVertex* t)
  */
 void Backend::linevert(GridVertex* g)
 {
+printf("Backend::linevert GridVertex\n");
    surfaceEvaluator.evalpoint2i(g->gparam[0], g->gparam[1]);
 }
 
@@ -483,86 +356,160 @@ void Backend::linevert(GridVertex* g)
  * endoutline - postamble to outlined rendering
  *-------------------------------------------------------------------------
  */
-void
-Backend::endoutline( void )
+void Backend::endoutline(void)
 {
-    surfaceEvaluator.endline();
+   printf("Backend::endoutline\n");
+   surfaceEvaluator.endline();
 }
 
 /*-------------------------------------------------------------------------
- * triangle - output a triangle 
+ * triangle - output a triangle
  *-------------------------------------------------------------------------
  */
-void
-Backend::triangle( TrimVertex *a, TrimVertex *b, TrimVertex *c )
+void Backend::triangle(TrimVertex* a, TrimVertex* b, TrimVertex* c)
 {
-/*    bgntmesh( "spittriangle" );*/
-    bgntfan();
-    tmeshvert( a );
-    tmeshvert( b );
-    tmeshvert( c );
-    endtfan();
-/*    endtmesh();*/
+   REAL retPoint[4];
+   REAL retNormal[3];
+   REAL vertices[3*3];
+   REAL normals[3*3];
+
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
+
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
+
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, vertices);
+   glEnableClientState(GL_NORMAL_ARRAY);
+   glNormalPointer(GL_FLOAT, 0, normals);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+
+   bgntfan();
+   tmeshvert(a, retPoint, retNormal);
+   vertices[0]=retPoint[0];
+   vertices[1]=retPoint[1];
+   vertices[2]=retPoint[2];
+   normals[0]=retNormal[0];
+   normals[1]=retNormal[1];
+   normals[2]=retNormal[2];
+   tmeshvert(b, retPoint, retNormal);
+   vertices[3]=retPoint[0];
+   vertices[4]=retPoint[1];
+   vertices[5]=retPoint[2];
+   normals[3]=retNormal[0];
+   normals[4]=retNormal[1];
+   normals[5]=retNormal[2];
+   tmeshvert(c, retPoint, retNormal);
+   vertices[6]=retPoint[0];
+   vertices[7]=retPoint[1];
+   vertices[8]=retPoint[2];
+   normals[6]=retNormal[0];
+   normals[7]=retNormal[1];
+   normals[8]=retNormal[2];
+   endtfan();
+
+   glDrawArrays(GL_TRIANGLE_FAN, 0, 3);
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
 }
 
-void 
-Backend::bgncurv( void )
+void Backend::bgncurv(void)
 {
-    curveEvaluator.bgnmap1f( 0 );
+   curveEvaluator.bgnmap1f(0);
 }
 
-void
-Backend::segment( REAL ulo, REAL uhi )
+void Backend::segment(REAL ulo, REAL uhi)
 {
-    curveEvaluator.domain1f( ulo, uhi );
-} 
-
-void 
-Backend::curvpts( 
-    long type,		 	/* geometry, color, texture, normal */
-    REAL *pts, 			/* control points */
-    long stride, 		/* distance to next point */
-    int order,			/* parametric order */
-    REAL ulo,			/* lower parametric bound */
-    REAL uhi )			/* upper parametric bound */
-
-{
-    curveEvaluator.map1f( type, ulo, uhi, stride, order, pts );
-    curveEvaluator.enable( type );
+   curveEvaluator.domain1f(ulo, uhi);
 }
 
-void 
-Backend::curvgrid( REAL u0, REAL u1, long nu )
+void Backend::curvpts(long type,        /* geometry, color, texture, normal */
+                      REAL* pts,        /* control points */
+                      long stride,      /* distance to next point */
+                      int order,        /* parametric order */
+                      REAL ulo,         /* lower parametric bound */
+                      REAL uhi)         /* upper parametric bound */
+
 {
-    curveEvaluator.mapgrid1f( nu, u0, u1 );
+   curveEvaluator.map1f(type, ulo, uhi, stride, order, pts);
+   curveEvaluator.enable(type);
 }
 
-void 
-Backend::curvmesh( long from, long n )
+void Backend::curvgrid(REAL u0, REAL u1, long nu)
 {
-    curveEvaluator.mapmesh1f( N_MESHFILL, from, from+n );
+   curveEvaluator.mapgrid1f(nu, u0, u1);
 }
 
-void 
-Backend::curvpt(REAL u)
+void Backend::curvmesh(long from, long n)
 {
-    curveEvaluator.evalcoord1f( 0, u );
+   curveEvaluator.mapmesh1f(N_MESHFILL, from, from+n);
 }
 
-void 
-Backend::bgnline( void )		
+void Backend::curvpt(REAL u)
 {
-    curveEvaluator.bgnline();
+   curveEvaluator.evalcoord1f(0, u);
 }
 
-void 
-Backend::endline( void )
+void Backend::bgnline(void)
 {
-    curveEvaluator.endline();
+   printf("Backend::bgnline\n");
+
+   curveEvaluator.bgnline();
 }
 
-void 
-Backend::endcurv( void )
+void Backend::endline(void)
 {
-    curveEvaluator.endmap1f();
+   printf("Backend::endline\n");
+
+   curveEvaluator.endline();
+}
+
+void Backend::endcurv(void)
+{
+   printf("Backend::endcurv\n");
+   curveEvaluator.endmap1f();
 }

@@ -224,6 +224,7 @@ void OpenGLSurfaceEvaluator::polymode(long style)
 
 void OpenGLSurfaceEvaluator::bgnline(void)
 {
+printf("OpenGLSurfaceEvaluator::bgnline\n");
    if (output_triangles)
    {
       bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
@@ -232,6 +233,7 @@ void OpenGLSurfaceEvaluator::bgnline(void)
 
 void OpenGLSurfaceEvaluator::endline(void)
 {
+printf("OpenGLSurfaceEvaluator::endline\n");
    if (output_triangles)
    {
       bezierPatchMeshEndStrip(global_bpm);
@@ -615,7 +617,6 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 #endif /* USE_INTERNAL_EVAL */
 }
 
-
 void OpenGLSurfaceEvaluator::bgnqstrip(void)
 {
    if (output_triangles)
@@ -684,39 +685,15 @@ OpenGLSurfaceEvaluator::bgnmap2f(long)
  * endmap2f - postamble to a map
  *-------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::endmap2f(void)
+void OpenGLSurfaceEvaluator::endmap2f(void)
 {
-
-  if(output_triangles)
-    {
+   if (output_triangles)
+   {
       inBPMListEvalEM(global_bpm);
 
-#ifdef USE_LOD
-#else
-    bezierPatchMeshListDelete(global_bpm);
-    global_bpm = NULL;
-#endif
-// MIKE: TODO
-//	glPopAttrib();
-  }
-else
-  {
-#ifndef USE_LOD
-// MIKE: TODO
-//    glPopAttrib();
-#endif
-
-    /*to restore the gl_polygon_mode
-     */
-#ifndef USE_LOD
-// MIKE: TODO
-//    glPolygonMode( GL_FRONT, (GLenum) gl_polygon_mode[0]);
-// MIKE: TODO
-//    glPolygonMode( GL_BACK,  (GLenum) gl_polygon_mode[1]);
-#endif
-}
-
+      bezierPatchMeshListDelete(global_bpm);
+      global_bpm = NULL;
+   }
 }
 
 /*-------------------------------------------------------------------------
@@ -886,121 +863,110 @@ else
  * evalcoord2f - evaluate a point on a surface
  *-------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::evalcoord2f(long, REAL u, REAL v)
+void OpenGLSurfaceEvaluator::evalcoord2f(long, REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
-    newtmeshvert(u, v);
+   newtmeshvert(u, v, retPoint, retNormal);
 }
 
 /*-------------------------------------------------------------------------
  * evalpoint2i - evaluate a grid point
  *-------------------------------------------------------------------------
  */
-void
-OpenGLSurfaceEvaluator::evalpoint2i(long u, long v)
+void OpenGLSurfaceEvaluator::evalpoint2i(long u, long v)
 {
-    newtmeshvert(u, v);
+   newtmeshvert(u, v);
 }
 
-void
-OpenGLSurfaceEvaluator::point2i( long u, long v )
+void OpenGLSurfaceEvaluator::point2i(long u, long v)
 {
 #ifdef USE_INTERNAL_EVAL
-    inEvalPoint2( (int)u,  (int)v);
+   inEvalPoint2((int)u, (int)v);
 #else
-
-
-if(output_triangles)
-{
-
-  REAL du, dv;
-  REAL fu,fv;
-  du = (global_grid_u1 - global_grid_u0) / (REAL)global_grid_nu;
-  dv = (global_grid_v1 - global_grid_v0) / (REAL)global_grid_nv;
-  fu = (u==global_grid_nu)? global_grid_u1:(global_grid_u0 + u*du);
-  fv = (v == global_grid_nv)? global_grid_v1: (global_grid_v0 +v*dv);
-  coord2f(fu,fv);
-}
-else
-{
-    gluEvalPoint2((GLint) u, (GLint) v);
-}
-
-
-#endif
-
+   if (output_triangles)
+   {
+      REAL du, dv;
+      REAL fu, fv;
+      du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
+      dv=(global_grid_v1-global_grid_v0)/(REAL)global_grid_nv;
+      fu=(u==global_grid_nu)?global_grid_u1:(global_grid_u0+u*du);
+      fv=(v==global_grid_nv)?global_grid_v1:(global_grid_v0+v*dv);
+      coord2f(fu, fv);
+   }
+   else
+   {
+      gluEvalPoint2((GLint)u, (GLint)v);
+   }
+#endif /* USE_INTERNAL_EVAL */
 }
 
-void
-OpenGLSurfaceEvaluator::coord2f( REAL u, REAL v )
+void OpenGLSurfaceEvaluator::coord2f(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
 #ifdef USE_INTERNAL_EVAL
-    inEvalCoord2f( u, v);
+   inEvalCoord2f(u, v, retPoint, retNormal);
 #else
-
-
-if(output_triangles)
-{
-    bezierPatchMeshInsertUV(global_bpm, u,v);
-}
-else
-{
-    gluEvalCoord2f((GLfloat) u, (GLfloat) v);
-}
-
-
-#endif
+   if (output_triangles)
+   {
+      bezierPatchMeshInsertUV(global_bpm, u, v);
+   }
+   else
+   {
+      gluEvalCoord2f((GLfloat)u, (GLfloat)v);
+   }
+#endif /* USE_INTERNAL_EVAL */
 }
 
-void
-OpenGLSurfaceEvaluator::newtmeshvert( long u, long v )
+void OpenGLSurfaceEvaluator::newtmeshvert(long u, long v)
 {
-    if (tmeshing) {
+   if (tmeshing)
+   {
+      if (vcount==2)
+      {
+         vertexCache[0]->invoke(this);
+         vertexCache[1]->invoke(this);
+         point2i(u, v);
+      }
+      else
+      {
+         vcount++;
+      }
 
-	if (vcount == 2) {
-	    vertexCache[0]->invoke(this);
-	    vertexCache[1]->invoke(this);
-	    point2i( u,  v);
-
-	} else {
-	    vcount++;
-	}
-
-	vertexCache[which]->saveEvalPoint(u, v);
-	which = 1 - which;
-    } else {
-	point2i( u,  v);
-    }
+      vertexCache[which]->saveEvalPoint(u, v);
+      which=1-which;
+   }
+   else
+   {
+      point2i(u, v);
+   }
 }
 
-void
-OpenGLSurfaceEvaluator::newtmeshvert( REAL u, REAL v )
+void OpenGLSurfaceEvaluator::newtmeshvert(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
-    if (tmeshing) {
+   if (tmeshing)
+   {
+      if (vcount==2)
+      {
+         vertexCache[0]->invoke(this);
+         vertexCache[1]->invoke(this);
+         coord2f(u, v, retPoint, retNormal);
+      }
+      else
+      {
+         vcount++;
+      }
 
-
-	if (vcount == 2) {
-	    vertexCache[0]->invoke(this);
-	    vertexCache[1]->invoke(this);
-	    coord2f(u,v);
-
-	} else {
-	    vcount++;
-	}
-
-	vertexCache[which]->saveEvalCoord(u, v);
-	which = 1 - which;
-    } else {
-
-	coord2f( u,  v);
-    }
-
+      vertexCache[which]->saveEvalCoord(u, v);
+      which=1-which;
+   }
+   else
+   {
+      coord2f(u, v, retPoint, retNormal);
+   }
 }
 
 #ifdef _WIN32
-void OpenGLSurfaceEvaluator::putCallBack(GLenum which, void (APIENTRY *fn)() )
+void OpenGLSurfaceEvaluator::putCallBack(GLenum which, void (APIENTRY* fn)())
 #else
-void OpenGLSurfaceEvaluator::putCallBack(GLenum which, _GLUfuncptr fn )
+void OpenGLSurfaceEvaluator::putCallBack(GLenum which, _GLUfuncptr fn)
 #endif
 {
   switch(which)
@@ -1045,14 +1011,19 @@ void OpenGLSurfaceEvaluator::putCallBack(GLenum which, _GLUfuncptr fn )
     }
 }
 
-
-void
-OpenGLSurfaceEvaluator::beginCallBack(GLenum which, void *data)
+void OpenGLSurfaceEvaluator::beginCallBack(GLenum which, void* data)
 {
-  if(beginCallBackData)
-    beginCallBackData(which, data);
-  else if(beginCallBackN)
-    beginCallBackN(which);
+   if(beginCallBackData)
+   {
+      beginCallBackData(which, data);
+   }
+   else
+   {
+      if(beginCallBackN)
+      {
+         beginCallBackN(which);
+      }
+   }
 }
 
 void

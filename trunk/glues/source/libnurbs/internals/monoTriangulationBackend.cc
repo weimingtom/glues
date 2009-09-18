@@ -43,37 +43,19 @@
 void reflexChain::outputFan(Real v[2], Backend* backend)
 {
   Int i;
-  /*
-  TrimVertex trimVert;
-  */
   backend->bgntfan();
 
-  /*
-  trimVert.param[0]=v[0];
-  trimVert.param[1]=v[1];
-  backend->tmeshvert(&trimVert);
-  */
   backend->tmeshvert(v[0], v[1]);
 
   if(isIncreasing) {
     for(i=0; i<index_queue; i++)
       {
-	/*
-	trimVert.param[0]=queue[i][0];
-	trimVert.param[1]=queue[i][1];
-	backend->tmeshvert(&trimVert);
-	*/
 	backend->tmeshvert(queue[i][0], queue[i][1]);
       }
   }
   else {
     for(i=index_queue-1; i>=0; i--)
       {
-	/*
-	trimVert.param[0]=queue[i][0];
-	trimVert.param[1]=queue[i][1];
-	backend->tmeshvert(&trimVert);
-	*/
 	backend->tmeshvert(queue[i][0], queue[i][1]);
       }
   }
@@ -136,11 +118,6 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
       else {
 	for(k=j; k>=i; k--)
 	  {
-	    /*
-	    trimVert.param[0]=queue[k][0];
-	    trimVert.param[1]=queue[k][1];
-	    backend->tmeshvert(& trimVert);
-	    */
 	    backend->tmeshvert(queue[k][0], queue[k][1]);
 	  }
       }

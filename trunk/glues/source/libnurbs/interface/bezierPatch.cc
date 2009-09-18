@@ -130,7 +130,7 @@ bezierPatch* bezierPatchInsert(bezierPatch* list, bezierPatch* b)
 }
 
 /* print the data stored in this patch */
-void bezierPatchPrint(bezierPatch *b)
+void bezierPatchPrint(bezierPatch* b)
 {
    printf("bezierPatch:\n");
    printf("umin,umax=(%f,%f), (vmin, vmax)=(%f,%f)\n", b->umin, b->umax, b->vmin, b->vmax);
@@ -139,7 +139,7 @@ void bezierPatchPrint(bezierPatch *b)
 }
 
 /* print the whole list */
-void bezierPatchPrintList(bezierPatch *list)
+void bezierPatchPrintList(bezierPatch* list)
 {
    bezierPatch* temp;
 
@@ -149,7 +149,7 @@ void bezierPatchPrintList(bezierPatch *list)
    }
 }
 
-void bezierPatchEval(bezierPatch *b, float u, float v, float ret[])
+void bezierPatchEval(bezierPatch* b, float u, float v, float ret[])
 {
    if (u>=b->umin && u<=b->umax && v>=b->vmin && v<=b->vmax)
    {
@@ -193,15 +193,16 @@ void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float ret[])
 
 void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso)
 {
+printf("patch draw\n");
    if (bpatch->dimension==3)
    {
 // MIKE: TODO
-//      glMap2f(GLU_MAP2_VERTEX_3, bpatch->umin, bpatch->umax, 3*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*) bpatch->ctlpoints);
+//      glMap2f(GLU_MAP2_VERTEX_3, bpatch->umin, bpatch->umax, 3*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*)bpatch->ctlpoints);
    }
    else
    {
 // MIKE: TODO
-//      glMap2f(GLU_MAP2_VERTEX_4, bpatch->umin, bpatch->umax, 4*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*) bpatch->ctlpoints);
+//      glMap2f(GLU_MAP2_VERTEX_4, bpatch->umin, bpatch->umax, 4*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*)bpatch->ctlpoints);
    }
 
 // MIKE: TODO
@@ -213,6 +214,8 @@ void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso)
 void bezierPatchListDraw(bezierPatch *list, int u_reso, int v_reso)
 {
    bezierPatch* temp;
+
+printf("patch list draw\n");
 
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);

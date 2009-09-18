@@ -62,12 +62,12 @@ public:
     void		bgntmesh( const char * );
     void		endtmesh( void );
     void		swaptmesh( void );
-    void		tmeshvert( GridTrimVertex * );
-    void		tmeshvert( TrimVertex * );
-    void		tmeshvert( GridVertex * );
-    void		tmeshvert( REAL u,  REAL v );
-    void		linevert( TrimVertex * );
-    void		linevert( GridVertex * );
+    void		tmeshvert(GridTrimVertex * );
+    void		tmeshvert(TrimVertex*, REAL*, REAL*);
+    void		tmeshvert(GridVertex*);
+    void		tmeshvert(REAL u,  REAL v );
+    void		linevert(TrimVertex*, REAL*, REAL*);
+    void		linevert(GridVertex*);
     void		bgnoutline( void );
     void		endoutline( void );
     void		endsurf( void );

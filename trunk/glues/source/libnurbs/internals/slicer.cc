@@ -52,30 +52,23 @@
 #include "trimvertex.h"
 #include "varray.h"
 
-#include "polyUtil.h" //for area()
+#include "polyUtil.h" // for area()
 
-//static int count=0;
-
-/*USE_OPTTT is initiated in trimvertex.h*/
+#include "gles_evaluator.h"
+#include "glues.h"
 
 #ifdef USE_OPTTT
-	#include <GL/gl.h>
+   #include <GL/gl.h>
 #endif
 
-//#define USE_READ_FLAG //whether to use new or old tesselator
-                          //if defined, it reads "flagFile", 
-                          // if the number is 1, then use new tess
-                          // otherwise, use the old tess.
-                         //if not defined, then use new tess.
+//#define USE_READ_FLAG  // whether to use new or old tesselator
+                         // if defined, it reads "flagFile",
+                         // if the number is 1, then use new tess
+                         // otherwise, use the old tess.
+                         // if not defined, then use new tess.
 #ifdef USE_READ_FLAG
-static Int read_flag(char* name);
-Int newtess_flag = read_flag("flagFile");
-#endif
-
-//#define COUNT_TRIANGLES
-#ifdef COUNT_TRIANGLES
-Int num_triangles = 0;
-Int num_quads = 0;
+   static Int read_flag(char* name);
+   Int newtess_flag=read_flag("flagFile");
 #endif
 
 #define max(a,b) ((a>b)? a:b)
@@ -256,18 +249,17 @@ static void evalLineNOGE(TrimVertex *verts, int n, Backend& backend)
 }
 #endif
 
-inline void  OPT_OUTVERT(TrimVertex& vv, Backend& backend) 
+inline void OPT_OUTVERT(TrimVertex& vv, Backend& backend) 
 {
-
 #ifdef USE_OPTTT
-  glNormal3fv(vv.cache_normal);                         
-  glVertex3fv(vv.cache_point);
+   glNormal3fv(vv.cache_normal);
+   glVertex3fv(vv.cache_point);
 #else
+   REAL retPoint[4];
+   REAL retNormal[3];
 
-  backend.tmeshvert(&vv);
-
-#endif
-
+   backend.tmeshvert(&vv, retPoint, retNormal);
+#endif /* USE_OPTTT */
 }
 
 static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* right, Backend& backend);
@@ -520,8 +512,6 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
 	backend.bgnqstrip();
 	for(j=botd_left, i=topd_left; i>=topd_right; i--,j++)
 	  {
-	    //	  backend.tmeshvert(& top->pts[i]);
-	    //	  backend.tmeshvert(& bot->pts[j]);
 	    OPT_OUTVERT(top->pts[i], backend);
 	    OPT_OUTVERT(bot->pts[j], backend);
 	  }
@@ -531,7 +521,6 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
     }
 }
 
-  
 static void triangulateRectCenter(int n_ulines, REAL* u_val, 
 				  int n_vlines, REAL* v_val,
 				  Backend& backend)
@@ -547,25 +536,6 @@ static void triangulateRectCenter(int n_ulines, REAL* u_val,
   }
 
   return;
-
-  /*
-  for(i=0; i<n_vlines-1; i++)
-    {
-
-      backend.bgnqstrip();
-      for(j=0; j<n_ulines; j++)
-	{
-	  trimVert.param[0] = u_val[j];
-	  trimVert.param[1] = v_val[i+1];
-	  backend.tmeshvert(& trimVert);	  
-
-	  trimVert.param[1] = v_val[i];
-	  backend.tmeshvert(& trimVert);	  
-	}
-      backend.endqstrip();
-
-    }
-    */
 }
 
 //it works for top, bot, left ad right, you need ot select correct arguments
@@ -633,100 +603,6 @@ static void triangulateRectTopGen(Arc_ptr arc, int n_ulines, REAL* u_val, Real v
       free(left_val);
       return;
     }
-	
-  //the following is a different version of the above code. If you comment
-  //the above code, the following code will still work. The reason to leave
-  //the folliwng code here is purely for testing purpose.
-  /*
-  int i,j;
-  PwlArc* parc = arc->pwlArc;
-  int d1 = parc->npts-1;
-  int d2 = 0;
-  TrimVertex trimVert;
-  trimVert.nuid = 0;//????
-  REAL* temp_u_val = u_val;
-  if(dir ==0) //have to reverse u_val
-    {
-      temp_u_val = (REAL*) malloc(sizeof(REAL) * n_ulines);
-      assert(temp_u_val);
-      for(i=0; i<n_ulines; i++)
-	temp_u_val[i] = u_val[n_ulines-1-i];
-    }
-  u_val = temp_u_val;
-
-  if(parc->npts > n_ulines)
-    {
-      d1 = n_ulines-1;
-
-      backend.bgntfan();
-      if(is_u){
-	trimVert.param[0] = u_val[0];
-	trimVert.param[1] = v;
-      }
-      else
-	{
-	trimVert.param[1] = u_val[0];
-	trimVert.param[0] = v;
-      }
-	  
-      backend.tmeshvert(& trimVert);
-      for(i=d1; i< parc->npts; i++)
-	backend.tmeshvert(& parc->pts[i]);
-      backend.endtfan();
-
-
-    }
-  else if(parc->npts < n_ulines)
-    {
-      d2 = n_ulines-parc->npts;
-
-
-      backend.bgntfan();
-      backend.tmeshvert(& parc->pts[parc->npts-1]);
-      for(i=0; i<= d2; i++)
-	{
-	  if(is_u){
-	    trimVert.param[0] = u_val[i];
-	    trimVert.param[1] = v;
-	  }
-	  else
-	    {
-	      trimVert.param[1] = u_val[i];
-	      trimVert.param[0] = v;
-	    }
-	  backend.tmeshvert(&trimVert);
-	}
-      backend.endtfan();
-
-    }
-  if(d1>0){
-
-
-    backend.bgnqstrip();
-    for(i=d1, j=d2; i>=0; i--, j++)
-      {
-	backend.tmeshvert(& parc->pts[i]);
-
-	if(is_u){
-	  trimVert.param[0] = u_val[j];
-	  trimVert.param[1] = v;
-	}
-	else{
-	  trimVert.param[1] = u_val[j];
-	  trimVert.param[0] = v;
-	}
-	backend.tmeshvert(&trimVert);
-
-
-	
-      }
-    backend.endqstrip();
-
-
-  }
-  if(dir == 0)  //temp_u_val was mallocated
-    free(temp_u_val);
- */
 }
 
 //n_ulines is the number of ulines inside, and n_vlines is the number of vlines
@@ -770,15 +646,6 @@ static void triangulateRectGen(Arc_ptr loop, int n_ulines, int n_vlines, Backend
   bot  = left->next;
   right= bot->next;
 
-#ifdef COUNT_TRIANGLES
-  num_triangles += loop->pwlArc->npts + 
-                 left->pwlArc->npts + 
-                 bot->pwlArc->npts + 
-		  right->pwlArc->npts 
-		      + 2*n_ulines + 2*n_vlines 
-			-8;
-  num_quads += (n_ulines-1)*(n_vlines-1);
-#endif
 /*
   backend.surfgrid(left->tail()[0], right->tail()[0], n_ulines+1, 
 		   top->tail()[1], bot->tail()[1], n_vlines+1);
@@ -898,61 +765,25 @@ directedLine* arcToMultDLines(directedLine* original, Arc_ptr arc)
       return ret;
     }
 }
-  
-     
-	
+
 directedLine* arcLoopToDLineLoop(Arc_ptr loop)
 {
-  directedLine* ret;
+   directedLine* ret;
 
-  if(loop == NULL)
-    return NULL;
-  ret = arcToMultDLines(NULL, loop);
-//ret->printSingle();
-  for(Arc_ptr temp = loop->next; temp != loop; temp = temp->next){
-    ret = arcToMultDLines(ret, temp);
-//ret->printSingle();
-  }
+   if (loop==NULL)
+   {
+      return NULL;
+   }
 
-  return ret;
+   ret=arcToMultDLines(NULL, loop);
+
+   for (Arc_ptr temp=loop->next; temp!=loop; temp=temp->next)
+   {
+      ret=arcToMultDLines(ret, temp);
+   }
+
+   return ret;
 }
-
-/*
-void Slicer::evalRBArray(rectBlockArray* rbArray, gridWrap* grid)
-{
-  TrimVertex *trimVert = (TrimVertex*)malloc(sizeof(TrimVertex));
-  trimVert -> nuid = 0;//????
-
-  Real* u_values = grid->get_u_values();
-  Real* v_values = grid->get_v_values();
-
-  Int i,j,k,l;
-
-  for(l=0; l<rbArray->get_n_elements(); l++)
-    {
-      rectBlock* block = rbArray->get_element(l);
-      for(k=0, i=block->get_upGridLineIndex(); i>block->get_lowGridLineIndex(); i--, k++)
-	{
-
-	  backend.bgnqstrip();
-	  for(j=block->get_leftIndices()[k+1]; j<= block->get_rightIndices()[k+1]; j++)
-	    {
-	      trimVert->param[0] = u_values[j];
-	      trimVert->param[1] = v_values[i];
-	      backend.tmeshvert(trimVert);
-
-	      trimVert->param[1] = v_values[i-1];
-	      backend.tmeshvert(trimVert);
-
-	    }
-	  backend.endqstrip();
-
-	}
-    }
-  
-  free(trimVert);
-}
-*/
 
 void Slicer::evalRBArray(rectBlockArray* rbArray, gridWrap* grid)
 {
@@ -979,15 +810,17 @@ void Slicer::evalRBArray(rectBlockArray* rbArray, gridWrap* grid)
     }
 }
 
-
 void Slicer::evalStream(primStream* pStream)
 {
   Int i,j,k;
   k=0;
-/*  TrimVertex X;*/
   TrimVertex *trimVert =/*&X*/  (TrimVertex*)malloc(sizeof(TrimVertex));
   trimVert -> nuid = 0;//???
   Real* vertices = pStream->get_vertices(); //for efficiency
+
+   REAL retPoint[4];
+   REAL retNormal[3];
+
   for(i=0; i<pStream->get_n_prims(); i++)
     {
 
@@ -1001,8 +834,8 @@ void Slicer::evalStream(primStream* pStream)
 	  {	    
 	    trimVert->param[0] = vertices[k];
 	    trimVert->param[1] = vertices[k+1];
-	    backend.tmeshvert(trimVert);	   
-	    
+	    backend.tmeshvert(trimVert, retPoint, retNormal);
+
 //	    backend.tmeshvert(vertices[k], vertices[k+1]);
 	    k += 2;
 	  }
@@ -1104,18 +937,9 @@ void Slicer::slice_new(Arc_ptr loop)
       evalStream(&pStream);
 
       evalRBArray(&rbArray, &grid);
-      
-#ifdef COUNT_TRIANGLES
-      num_triangles += pStream.num_triangles();
-      num_quads += rbArray.num_quads();
-#endif
-      poly->deleteSinglePolygonWithSline();      
+
+      poly->deleteSinglePolygonWithSline();
     }
-  
-#ifdef COUNT_TRIANGLES
-  printf("num_triangles=%i\n", num_triangles);
-  printf("num_quads = %i\n", num_quads);
-#endif
 }
 
 void Slicer::slice(Arc_ptr loop)
@@ -1214,43 +1038,135 @@ Slicer::slice_old( Arc_ptr loop )
 }
 
 
-void
-Slicer::outline( void )
+void Slicer::outline(void)
 {
-    GridTrimVertex upper, lower;
-    Hull::init( );
+   REAL retPoint[4];
+   REAL retNormal[3];
 
-    backend.bgnoutline();
-    while( (nextupper( &upper )) ) {
-	if( upper.isGridVert() )
-	    backend.linevert( upper.g );
-	else
-	    backend.linevert( upper.t );
-    }
-    backend.endoutline();
+   GridTrimVertex upper, lower;
+   Hull::init();
+printf("Slicer::outline\n");
+   backend.bgnoutline();
+   while((nextupper(&upper)))
+   {
+      if (upper.isGridVert())
+      {
+         backend.linevert(upper.g);
+      }
+      else
+      {
+         backend.linevert(upper.t, retPoint, retNormal);
+      }
+   }
+   backend.endoutline();
 
-    backend.bgnoutline();
-    while( (nextlower( &lower )) ) {
-	if( lower.isGridVert() )
-	    backend.linevert( lower.g );
-	else
-	    backend.linevert( lower.t );
-    }
-    backend.endoutline();
+   backend.bgnoutline();
+   while((nextlower(&lower)))
+   {
+      if (lower.isGridVert())
+      {
+         backend.linevert(lower.g);
+      }
+      else
+      {
+         backend.linevert(lower.t, retPoint, retNormal);
+      }
+   }
+   backend.endoutline();
 }
 
 
-void
-Slicer::outline( Arc_ptr jarc )
+void Slicer::outline(Arc_ptr jarc)
 {
-    jarc->markverts();
+   REAL retPoint[4];
+   REAL retNormal[3];
 
-    if( jarc->pwlArc->npts >= 2 ) {
-	backend.bgnoutline();
-	for( int j = jarc->pwlArc->npts-1; j >= 0; j--  )
-	    backend.linevert( &(jarc->pwlArc->pts[j]) );
-	backend.endoutline();
-    }
+   jarc->markverts();
+
+   if (jarc->pwlArc->npts>=2)
+   {
+      REAL* vertices=(REAL*)malloc(sizeof(REAL)*3*jarc->pwlArc->npts);
+      assert(vertices);
+      REAL* normals=(REAL*)malloc(sizeof(REAL)*3*jarc->pwlArc->npts);
+      assert(normals);
+      int it=0;
+
+      GLboolean texcoord_enabled;
+      GLboolean normal_enabled;
+      GLboolean vertex_enabled;
+      GLboolean color_enabled;
+
+      /* Store status of enabled arrays */
+      texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+      normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+      vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+      color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
+
+      /* Enable needed and disable unneeded arrays */
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glVertexPointer(3, GL_FLOAT, 0, vertices);
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glNormalPointer(GL_FLOAT, 0, normals);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisableClientState(GL_COLOR_ARRAY);
+
+      backend.bgnoutline();
+      for(int j=jarc->pwlArc->npts-1; j>=0; j--)
+      {
+         backend.linevert(&(jarc->pwlArc->pts[j]), retPoint, retNormal);
+
+         vertices[it*3+0]=retPoint[0];
+         vertices[it*3+1]=retPoint[1];
+         vertices[it*3+2]=retPoint[2];
+         normals[it*3+0]=retNormal[0];
+         normals[it*3+1]=retNormal[1];
+         normals[it*3+2]=retNormal[2];
+         it++;
+      }
+      backend.endoutline();
+
+      glDrawArrays(GL_LINE_STRIP, 0, it);
+
+      /* Disable or re-enable arrays */
+      if (vertex_enabled)
+      {
+         /* Re-enable vertex array */
+         glEnableClientState(GL_VERTEX_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_VERTEX_ARRAY);
+      }
+
+      if (texcoord_enabled)
+      {
+         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+
+      if (normal_enabled)
+      {
+         glEnableClientState(GL_NORMAL_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_NORMAL_ARRAY);
+      }
+
+      if (color_enabled)
+      {
+         glEnableClientState(GL_COLOR_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_COLOR_ARRAY);
+      }
+
+      /* cleanup */
+      free(normals);
+      free(vertices);
+   }
 }
-
-

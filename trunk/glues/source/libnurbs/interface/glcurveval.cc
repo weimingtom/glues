@@ -102,10 +102,10 @@ void OpenGLCurveEvaluator::domain1f(REAL ulo, REAL uhi)
 
 void OpenGLCurveEvaluator::bgnline(void)
 {
+   printf("OpenGLCurveEvaluator::bgnline\n");
    if (output_triangles)
    {
-// MIKE: TODO
-//      beginCallBack(GL_LINE_STRIP, userData);
+      beginCallBack(GL_LINE_STRIP, userData);
    }
    else
    {
@@ -118,8 +118,7 @@ void OpenGLCurveEvaluator::endline(void)
 {
    if (output_triangles)
    {
-// MIKE: TODO
-//      endCallBack(userData);
+      endCallBack(userData);
    }
    else
    {
@@ -425,11 +424,17 @@ OpenGLCurveEvaluator::colorCallBack(const GLfloat *color, void* data)
     colorCallBackN(color);
 }
 
-void
-OpenGLCurveEvaluator::texcoordCallBack(const GLfloat *texcoord, void* data)
+void OpenGLCurveEvaluator::texcoordCallBack(const GLfloat* texcoord, void* data)
 {
-  if(texcoordCallBackData)
-    texcoordCallBackData(texcoord, data);
-  else if(texcoordCallBackN)
-    texcoordCallBackN(texcoord);
+   if(texcoordCallBackData)
+   {
+      texcoordCallBackData(texcoord, data);
+   }
+   else
+   {
+      if(texcoordCallBackN)
+      {
+         texcoordCallBackN(texcoord);
+      }
+   }
 }
