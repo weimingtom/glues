@@ -86,7 +86,7 @@ void BasicSurfaceEvaluator::mapmesh2f(long, long, long, long, long)
 {
 }
 
-void BasicSurfaceEvaluator::evalcoord2f(long, REAL, REAL)
+void BasicSurfaceEvaluator::evalcoord2f(long, REAL, REAL, REAL*, REAL*)
 {
 }
 

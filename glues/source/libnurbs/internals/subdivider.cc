@@ -203,9 +203,9 @@ void Subdivider::drawSurfaces(long nuid)
    REAL from[2], to[2];
    qlist->getRange(from, to, spbrkpts, tpbrkpts);
 
-   //perform optimization only when the samplng method is
-   //DOMAIN_DISTANCE and the display methdo is either
-   //fill or outline_polygon.
+   // perform optimization only when the samplng method is
+   // DOMAIN_DISTANCE and the display methdo is either
+   // fill or outline_polygon.
    int optimize=(is_domain_distance_sampling && (renderhints.display_method!=N_OUTLINE_PATCH));
 
    if (!initialbin.isnonempty())

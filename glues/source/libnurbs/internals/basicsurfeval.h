@@ -53,7 +53,7 @@ class BasicSurfaceEvaluator: public CachingEvaluator
       virtual void map2f(long, REAL, REAL, long, long, REAL, REAL, long, long, REAL*);
       virtual void mapgrid2f(long, REAL, REAL, long,  REAL, REAL);
       virtual void mapmesh2f(long, long, long, long, long);
-      virtual void evalcoord2f(long, REAL, REAL);
+      virtual void evalcoord2f(long, REAL, REAL, REAL*, REAL*);
       virtual void evalpoint2i(long, long);
       virtual void endmap2f(void);
 

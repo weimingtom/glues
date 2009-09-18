@@ -156,7 +156,7 @@ void OpenGLCurveEvaluator::inDoDomain1(curveEvalMachine *em, REAL u, REAL *retPo
 	retPoint[j] += em->ucoeff[row] * (*data);
 	data += em->k;
       }
-  } 
+  }
 }
 
 void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
@@ -191,6 +191,7 @@ void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
 void OpenGLCurveEvaluator::inMapMesh1f(int umin, int umax)
 {
   REAL du, u;
+  printf("OpenGLCurveEvaluator::inMapMesh1f\n");
   int i;
   if(global_grid_nu == 0)
     return; //no points to output

@@ -18,16 +18,13 @@
 #define WINDOW_WIDTH  640
 #define WINDOW_HEIGHT 480
 
-GLfloat mat_red_diffuse[]={0.7f, 0.0f, 0.1f, 1.0f};
-GLfloat mat_green_diffuse[]={0.0f, 0.7f, 0.1f, 1.0f};
-GLfloat mat_blue_diffuse[]={0.0f, 0.1f, 0.7f, 1.0f};
-GLfloat mat_yellow_diffuse[]={0.7f, 0.8f, 0.1f, 1.0f};
 GLfloat mat_ambient[4]={0.2f, 0.2f, 0.2f, 0.2f};
+GLfloat mat_diffuse[]={0.7f, 0.7f, 0.7f, 1.0f};
 GLfloat mat_specular[]={1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat mat_shininess[]={100.0f};
-GLfloat knots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-GLfloat pts1[4][4][3], pts2[4][4][3];
-GLfloat pts3[4][4][3], pts4[4][4][3];
+
+GLfloat ctlpoints[4][4][3];
+
 GLUnurbsObj* nurb;
 
 void init_scene(int width, int height)
@@ -39,7 +36,11 @@ void init_scene(int width, int height)
    /* Setup our viewport for GLU ES (required when using OpenGL ES 1.0 only) */
    gluViewport(0, 0, (GLint)width, (GLint)height);
 
+   /* Set black background color */
+   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 
@@ -55,140 +56,58 @@ void init_scene(int width, int height)
    gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 25.0f);
    gluNurbsProperty(nurb, GLU_DISPLAY_MODE, GLU_FILL);
 
-   /* Build control points for NURBS mole hills. */
-   for(u=0; u<4; u++)
+   for (u=0; u<4; u++)
    {
-      for(v=0; v<4; v++)
+      for (v=0; v<4; v++)
       {
-         /* Red. */
-         pts1[u][v][0]=2.0f*((GLfloat)u);
-         pts1[u][v][1]=2.0f*((GLfloat)v);
+         ctlpoints[u][v][0]=2.0*((GLfloat)u-1.5);
+         ctlpoints[u][v][1]=2.0*((GLfloat)v-1.5);
+
          if ((u==1 || u==2) && (v==1 || v==2))
          {
-            /* Stretch up middle. */
-            pts1[u][v][2]=6.0f;
+            ctlpoints[u][v][2]=3.0;
          }
          else
          {
-            pts1[u][v][2]=0.0f;
-         }
-
-         /* Green. */
-         pts2[u][v][0]=2.0f*((GLfloat)u-3.0f);
-         pts2[u][v][1]=2.0f*((GLfloat)v-3.0f);
-         if ((u==1 || u==2) && (v==1 || v==2))
-         {
-            if (u==1 && v==1)
-            {
-               /* Pull hard on single middle square. */
-               pts2[u][v][2]=15.0f;
-            }
-            else
-            {
-                /* Push down on other middle squares. */
-                pts2[u][v][2]=-2.0f;
-            }
-         }
-         else
-         {
-            pts2[u][v][2]=0.0f;
-         }
-
-         /* Blue. */
-         pts3[u][v][0]=2.0f*((GLfloat)u-3.0f);
-         pts3[u][v][1]=2.0f*((GLfloat)v);
-         if ((u==1 || u==2) && (v==1 || v==2))
-         {
-            if (u==1 && v==2)
-            {
-               /* Pull up on single middple square. */
-               pts3[u][v][2]=11.0f;
-            }
-            else
-            {
-               /* Pull up slightly on other middle squares. */
-               pts3[u][v][2]=2.0f;
-            }
-         }
-         else
-         {
-            pts3[u][v][2]=0.0f;
-         }
-
-         /* Yellow. */
-         pts4[u][v][0]=2.0f*((GLfloat)u);
-         pts4[u][v][1]=2.0f*((GLfloat)v-3.0f);
-         if ((u==1 || u==2 || u==3) && (v==1 || v==2))
-         {
-            if (v==1)
-            {
-               /* Push down front middle and right squares. */
-               pts4[u][v][2]=-2.0f;
-            }
-            else
-            {
-               /* Pull up back middle and right squares. */
-               pts4[u][v][2]=5.0f;
-            }
-         }
-         else
-         {
-            pts4[u][v][2]=0.0f;
+            ctlpoints[u][v][2]=-3.0;
          }
       }
    }
 
-   /* Stretch up red's far right corner. */
-   pts1[3][3][2]=6;
-   /* Pull down green's near left corner a little. */
-   pts2[0][0][2]=-2;
-   /* Turn up meeting of four corners. */
-   pts1[0][0][2]=1;
-   pts2[3][3][2]=1;
-   pts3[3][0][2]=1;
-   pts4[0][3][2]=1;
-
    glMatrixMode(GL_PROJECTION);
-   gluPerspective(55.0f, 1.0f, 2.0f, 24.0f);
+   glLoadIdentity();
+   gluPerspective(45.0f, (GLfloat)WINDOW_WIDTH/(GLfloat)WINDOW_HEIGHT, 3.0f, 8.0f);
+
    glMatrixMode(GL_MODELVIEW);
-   glTranslatef(0.0f, 0.0f, -15.0f);
-   glRotatef(330.0f, 1.0f, 0.0f, 0.0f);
+   glLoadIdentity();
+   glTranslatef(0.0f, 0.0f, -5.0f);
+   glRotatef(330.0f, 1.0f ,0.0f, 0.0f);
+   glScalef(0.5f, 0.5f, 0.5f);
 }
+
+GLfloat knots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+/* counter clockwise */
+GLfloat edgePt[5][2]={{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f}};
+/* clockwise */
+GLfloat curvePt[4][2]={{0.25f, 0.5f}, {0.25f, 0.75f}, {0.75f, 0.75f}, {0.75f, 0.5f}};
+GLfloat curveKnots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+/* clockwise */
+GLfloat pwlPt[4][2]={{0.75f, 0.5f}, {0.5f, 0.25f}, {0.25f, 0.5f}};
 
 void render_scene()
 {
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   /* Render red hill. */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_red_diffuse);
+   /* Render trimmed surface */
    gluBeginSurface(nurb);
-      gluNurbsSurface(nurb, 8, knots, 8, knots,
-                      4 * 3, 3, &pts1[0][0][0],
-                      4, 4, GLU_MAP2_VERTEX_3);
-   gluEndSurface(nurb);
-
-   /* Render green hill. */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_green_diffuse);
-   gluBeginSurface(nurb);
-      gluNurbsSurface(nurb, 8, knots, 8, knots,
-                      4 * 3, 3, &pts2[0][0][0],
-                      4, 4, GLU_MAP2_VERTEX_3);
-   gluEndSurface(nurb);
-
-   /* Render blue hill. */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_blue_diffuse);
-   gluBeginSurface(nurb);
-      gluNurbsSurface(nurb, 8, knots, 8, knots,
-                      4 * 3, 3, &pts3[0][0][0],
-                      4, 4, GLU_MAP2_VERTEX_3);
-   gluEndSurface(nurb);
-
-   /* Render yellow hill. */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_yellow_diffuse);
-   gluBeginSurface(nurb);
-      gluNurbsSurface(nurb, 8, knots, 8, knots,
-                      4 * 3, 3, &pts4[0][0][0],
-                      4, 4, GLU_MAP2_VERTEX_3);
+      gluNurbsSurface(nurb, 8, knots, 8, knots, 4*3, 3, &ctlpoints[0][0][0], 4, 4, GLU_MAP2_VERTEX_3);
+      gluBeginTrim(nurb);
+         gluPwlCurve(nurb, 5, &edgePt[0][0], 2, GLU_MAP1_TRIM_2);
+      gluEndTrim(nurb);
+      gluBeginTrim(nurb);
+         gluNurbsCurve(nurb, 8, curveKnots, 2, &curvePt[0][0], 4, GLU_MAP1_TRIM_2);
+         gluPwlCurve (nurb, 3, &pwlPt[0][0], 2, GLU_MAP1_TRIM_2);
+      gluEndTrim(nurb);
    gluEndSurface(nurb);
 
    /* Flush all drawings */
