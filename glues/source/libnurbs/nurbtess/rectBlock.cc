@@ -88,6 +88,8 @@ void rectBlock::draw(Real* u_values, Real* v_values)
 {
   Int i,j,k;
 
+  printf("rectBlock::draw()\n");
+
   //upgrid line to bot grid line
   for(k=0, i=upGridLineIndex; i > lowGridLineIndex; i--, k++)
     {

@@ -40,28 +40,28 @@
 #endif
 
 #if defined(GLBUILD)
-#define M_SQRT2		1.41421356237309504880
-#define ceilf		myceilf
-#define floorf		myfloorf	
-#define sqrtf		sqrt
-extern "C" double	sqrt(double);
-extern "C" float	ceilf(float);
-extern "C" float	floorf(float);
+#define M_SQRT2         1.41421356237309504880
+#define ceilf           myceilf
+#define floorf          myfloorf
+#define sqrtf           sqrt
+extern "C" double       sqrt(double);
+extern "C" float        ceilf(float);
+extern "C" float        floorf(float);
 #define NEEDCEILF
 #endif
 
 #ifdef LIBRARYBUILD
-#include <math.h>
+   #include <math.h>
 #endif
 
 #if !defined sqrtf
-#    define sqrtf(x)    ((float)sqrt(x))
+   #define sqrtf(x)    ((float)sqrt(x))
 #endif
 #if !defined ceilf
-#    define ceilf(x)    ((float)ceil(x))
+   #define ceilf(x)    ((float)ceil(x))
 #endif
 #if !defined floorf
-#    define floorf(x)   ((float)floor(x))
+   #define floorf(x)   ((float)floor(x))
 #endif
 
 #endif /* __glumymath_h_ */

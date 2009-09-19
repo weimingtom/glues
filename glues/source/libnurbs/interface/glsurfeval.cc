@@ -222,6 +222,11 @@ void OpenGLSurfaceEvaluator::polymode(long style)
    }
 }
 
+long OpenGLSurfaceEvaluator::get_output_style()
+{
+   return output_style;
+}
+
 void OpenGLSurfaceEvaluator::bgnline(void)
 {
 printf("OpenGLSurfaceEvaluator::bgnline\n");
@@ -500,8 +505,6 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	      coord2f(botMostV[0], botMostV[1]);
 	      while(j<n_right){
 		coord2f(u_right, right_val[j]);
-//		glNormal3fv(rightNormal[j]);
-//		glVertex3fv(rightXYZ[j]);
 		j++;
 
 	      }
@@ -515,14 +518,10 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	    {
 	      bgntfan();
 	      coord2f(botMostV[0], botMostV[1]);
-//	      glNormal3fv(botMostNormal);
-//	      glVertex3fv(botMostXYZ);
         
 	      for(k=n_left-1; k>=i; k--) /*reverse order for two-side lighting*/
 		{
 		  coord2f(u_left, left_val[k]);
-//		  glNormal3fv(leftNormal[k]);
-//		  glVertex3fv(leftXYZ[k]);
 		}
 
 	      endtfan();
@@ -535,8 +534,6 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	    {
 	      bgntfan();
 	      coord2f(u_right, right_val[j]);
-//	      glNormal3fv(rightNormal[j]);
-//	      glVertex3fv(rightXYZ[j]);
 
 	      /*find the last k>=i such that
 	       *leftverts[k][0] <= rightverts[j][0]
@@ -556,13 +553,9 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	      for(l=k; l>=i; l--)/*the reverse is for two-side lighting*/
 		{
 		  coord2f(u_left, left_val[l]);
-//		  glNormal3fv(leftNormal[l]);
-//		  glVertex3fv(leftXYZ[l]);
 
 		}
 	      coord2f(botMostV[0], botMostV[1]);
-//	      glNormal3fv(botMostNormal);
-//	      glVertex3fv(botMostXYZ);
 
 	      endtfan();
 
@@ -572,19 +565,13 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 
 	      botMostV[0] = u_left;
 	      botMostV[1] = left_val[k];
-//	      botMostNormal = leftNormal[k];
-//	      botMostXYZ = leftXYZ[k];
 	    }
 	  else /*left_val[i] > right_val[j])*/
 	    {
 	      bgntfan();
 	      coord2f(u_left, left_val[i]);
-//	      glNormal3fv(leftNormal[i]);
-//	      glVertex3fv(leftXYZ[i]);
         
 	      coord2f(botMostV[0], botMostV[1]);
-//	      glNormal3fv(botMostNormal);
-//	      glVertex3fv(botMostXYZ);
         
 
 	      /*find the last k>=j such that
@@ -596,8 +583,6 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 		  if(right_val[k] >= left_val[i])
 		    break;
 		  coord2f(u_right, right_val[k]);
-//		  glNormal3fv(rightNormal[k]);
-//		  glVertex3fv(rightXYZ[k]);
 
 		  k++;
 		}
@@ -608,9 +593,6 @@ OpenGLSurfaceEvaluator::evalVStrip(int n_left, REAL u_left, REAL* left_val, int 
 	      j=k;
 	      botMostV[0] = u_right;
 	      botMostV[1] = right_val[j-1];
-
-//	      botMostNormal = rightNormal[j-1];
-//	      botMostXYZ = rightXYZ[j-1];
 	    }
 	}
     }

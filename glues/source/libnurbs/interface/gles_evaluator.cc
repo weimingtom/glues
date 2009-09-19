@@ -179,7 +179,7 @@ GLAPI void APIENTRY gluGetFloatv(GLenum pname, GLfloat* params)
                     {
                        for (int it=0; it<16; it++)
                        {
-                          params[it]=FX2F(mantissa[it]*lg2table[exponent[it]]);
+                          params[it]=FX2F(mantissa[it])*lg2table[exponent[it]];
                        }
                     }
 

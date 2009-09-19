@@ -116,6 +116,7 @@ void OpenGLCurveEvaluator::bgnline(void)
 
 void OpenGLCurveEvaluator::endline(void)
 {
+   printf("OpenGLCurveEvaluator::endline\n");
    if (output_triangles)
    {
       endCallBack(userData);
@@ -133,6 +134,7 @@ void OpenGLCurveEvaluator::endline(void)
  */
 void OpenGLCurveEvaluator::disable(long type)
 {
+   printf("OpenGLCurveEvaluator::disable\n");
 // MIKE: TODO
 //    glDisable((GLenum) type);
 }
@@ -143,6 +145,7 @@ void OpenGLCurveEvaluator::disable(long type)
  */
 void OpenGLCurveEvaluator::enable(long type)
 {
+   printf("OpenGLCurveEvaluator::enable\n");
 // MIKE: TODO
 //    glEnable((GLenum) type);
 }
@@ -153,6 +156,7 @@ void OpenGLCurveEvaluator::enable(long type)
  */
 void OpenGLCurveEvaluator::mapgrid1f(long nu, REAL u0, REAL u1)
 {
+   printf("OpenGLCurveEvaluator::mapgrid1f\n");
    if (output_triangles)
    {
       global_grid_u0=u0;
@@ -172,6 +176,7 @@ void OpenGLCurveEvaluator::mapgrid1f(long nu, REAL u0, REAL u1)
  */
 void OpenGLCurveEvaluator::bgnmap1f(long)
 {
+   printf("OpenGLCurveEvaluator::bgnmap1f\n");
    if (output_triangles)
    {
       // initialized so that no maps are set initially
@@ -194,6 +199,7 @@ void OpenGLCurveEvaluator::bgnmap1f(long)
  */
 void OpenGLCurveEvaluator::endmap1f(void)
 {
+   printf("OpenGLCurveEvaluator::endmap1f\n");
    if(output_triangles)
    {
    }
@@ -216,6 +222,7 @@ void OpenGLCurveEvaluator::map1f(
      long  order,       /* parametric order */
      REAL* pts)         /* control points */
 {
+   printf("OpenGLCurveEvaluator::map1f\n");
    if(output_triangles)
    {
       int dimension=0;
@@ -276,6 +283,7 @@ void OpenGLCurveEvaluator::map1f(
  */
 void OpenGLCurveEvaluator::mapmesh1f(long style, long from, long to)
 {
+   printf("OpenGLCurveEvaluator::mapmesh1f\n");
    if(output_triangles)
    {
       inMapMesh1f((int)from, (int)to);
@@ -314,6 +322,7 @@ void OpenGLCurveEvaluator::evalpoint1i(long i)
  */
 void OpenGLCurveEvaluator::evalcoord1f(long, REAL u)
 {
+   printf("OpenGLCurveEvaluator::evalcoord1f\n");
 // MIKE: TODO
 //    glEvalCoord1f((GLfloat) u);
 }
@@ -415,13 +424,19 @@ OpenGLCurveEvaluator::normalCallBack(const GLfloat *normal, void* data)
     normalCallBackN(normal);
 }
 
-void
-OpenGLCurveEvaluator::colorCallBack(const GLfloat *color, void* data)
+void OpenGLCurveEvaluator::colorCallBack(const GLfloat* color, void* data)
 {
-  if(colorCallBackData)
-    colorCallBackData(color, data);
-  else if(colorCallBackN)
-    colorCallBackN(color);
+   if(colorCallBackData)
+   {
+      colorCallBackData(color, data);
+   }
+   else
+   {
+      if(colorCallBackN)
+      {
+         colorCallBackN(color);
+      }
+   }
 }
 
 void OpenGLCurveEvaluator::texcoordCallBack(const GLfloat* texcoord, void* data)

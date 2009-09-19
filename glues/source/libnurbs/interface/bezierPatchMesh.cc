@@ -51,6 +51,9 @@ static int isDegenerate(float A[2], float B[2], float C[2]);
 void drawStrips(float* vertex_array, float* normal_array, int* length_array, GLenum* type_array, int num_strips)
 {
    int i,j,k;
+
+   printf("drawStrips\n");
+
    k=0; /* k is the index of the first component of the current vertex */
    for (i=0; i<num_strips; i++)
    {
@@ -230,33 +233,40 @@ void bezierPatchMeshPutPatch(bezierPatchMesh *bpm, int maptype, float umin, floa
     fprintf(stderr, "error in bezierPatchMeshPutPatch, maptype=%i is wrong, maptype,map is invalid\n", maptype);
   }
 }
-  
 
-/*delete everything including the arrays. So if you want to output the
- *pointers of the arrays, you should not use this function to deallocate space.
- *you should dealocate manually
+/* delete everything including the arrays. So if you want to output the
+ * pointers of the arrays, you should not use this function to deallocate space.
+ * you should dealocate manually
  */
-void bezierPatchMeshDelete(bezierPatchMesh *bpm)
+void bezierPatchMeshDelete(bezierPatchMesh* bpm)
 {
-  if(bpm->bpatch != NULL)
-    bezierPatchDelete(bpm->bpatch);
-  if(bpm->bpatch_normal != NULL)
-    bezierPatchDelete(bpm->bpatch_normal);
-  if(bpm->bpatch_color != NULL)
-    bezierPatchDelete(bpm->bpatch_color);
-  if(bpm->bpatch_texcoord != NULL)
-    bezierPatchDelete(bpm->bpatch_texcoord);
-  
-  free(bpm->UVarray);
-  free(bpm->length_array);
-  free(bpm->vertex_array);
-  free(bpm->normal_array);
-  free(bpm->type_array);
-  free(bpm);
+   if(bpm->bpatch!=NULL)
+   {
+      bezierPatchDelete(bpm->bpatch);
+   }
+   if (bpm->bpatch_normal!=NULL)
+   {
+      bezierPatchDelete(bpm->bpatch_normal);
+   }
+   if (bpm->bpatch_color!=NULL)
+   {
+      bezierPatchDelete(bpm->bpatch_color);
+   }
+   if (bpm->bpatch_texcoord!=NULL)
+   {
+      bezierPatchDelete(bpm->bpatch_texcoord);
+   }
+
+   free(bpm->UVarray);
+   free(bpm->length_array);
+   free(bpm->vertex_array);
+   free(bpm->normal_array);
+   free(bpm->type_array);
+   free(bpm);
 }
- 
-/*begin a strip
- *type is the primitive type:
+
+/* begin a strip
+ * type is the primitive type:
  */
 void bezierPatchMeshBeginStrip(bezierPatchMesh *bpm, GLenum type)
 {
@@ -281,7 +291,7 @@ void bezierPatchMeshEndStrip(bezierPatchMesh *bpm)
       assert(temp_type);
       /*update the size*/
       bpm->size_length_array = bpm->size_length_array*2 + 1;
-      
+
       /*copy*/
       for(i=0; i<bpm->index_length_array; i++)
 	{
@@ -311,19 +321,19 @@ void bezierPatchMeshInsertUV(bezierPatchMesh *bpm, float u, float v)
     {
       float *temp = (float*) malloc(sizeof(float) * (bpm->size_UVarray * 2 + 2));
       assert(temp);
-      
+
       /*update the size*/
       bpm->size_UVarray = bpm->size_UVarray*2 + 2;
-      
+
       /*copy*/
       for(i=0; i<bpm->index_UVarray; i++)
 	{
 	  temp[i] = bpm->UVarray[i];
 	}
-      
+
       /*deallocate old array*/
       free(bpm->UVarray);
-      
+
       /*pointing to the new arrays*/
       bpm->UVarray = temp;
     }
@@ -424,6 +434,8 @@ int bezierPatchMeshNumTriangles(bezierPatchMesh* bpm)
    int i;
    int sum=0;
 
+   printf("bezierPatchMeshNumTriangles()\n");
+
    for(i=0; i<bpm->index_length_array; i++)
    {
       switch(bpm->type_array[i])
@@ -496,7 +508,7 @@ void bezierPatchMeshDelDeg(bezierPatchMesh* bpm)
       {
 	k += 6;
       }
-  }  
+  }
   free(bpm->UVarray);
   free(bpm->length_array);
   free(bpm->type_array);
@@ -505,7 +517,6 @@ void bezierPatchMeshDelDeg(bezierPatchMesh* bpm)
   bpm->type_array=new_type_array;
   bpm->index_UVarray = index_new_UVarray;
   bpm->index_length_array = index_new_length_array;
-  
 }
 
 /*(u,v) to XYZ
@@ -526,7 +537,7 @@ void bezierPatchMeshEval(bezierPatchMesh* bpm)
   int ustride = dimension * vorder;
   int vstride = dimension;
   float *ctlpoints = bpm->bpatch->ctlpoints;
-  
+
   bpm->vertex_array = (float*) malloc(sizeof(float)* (bpm->index_UVarray/2) * 3);
   assert(bpm->vertex_array);
   bpm->normal_array = (float*) malloc(sizeof(float)* (bpm->index_UVarray/2) * 3);
@@ -547,7 +558,7 @@ void bezierPatchMeshEval(bezierPatchMesh* bpm)
 	}
     }
 }
-    
+
 void bezierPatchMeshListEval(bezierPatchMesh* list)
 {
   bezierPatchMesh* temp;

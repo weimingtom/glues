@@ -95,6 +95,7 @@ void OpenGLCurveEvaluator::inMap1f(int which, //0: vert, 1: norm, 2: color, 3: t
 				   int uorder,
 				   REAL *ctlpoints)
 {
+  printf("OpenGLCurveEvaluator::inMap1f\n");
   int i,x;
   curveEvalMachine *temp_em;
   switch(which){
@@ -165,6 +166,7 @@ void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
   REAL temp_normal[3];
   REAL temp_color[4];
   REAL temp_texcoord[4];
+  printf("OpenGLCurveEvaluator::inDoEvalCoord1\n");
   if(texcoord_flag) //there is a texture map
     {
       inDoDomain1(&em_texcoord, u, temp_texcoord);

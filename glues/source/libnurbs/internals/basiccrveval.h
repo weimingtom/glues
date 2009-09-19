@@ -43,7 +43,7 @@
 class BasicCurveEvaluator: public CachingEvaluator
 {
    public:
-      virtual      ~BasicCurveEvaluator() { /* silence warning*/ }
+      virtual ~BasicCurveEvaluator() { /* silence warning*/ }
       virtual void domain1f(REAL, REAL);
       virtual void range1f(long, REAL*, REAL*);
 

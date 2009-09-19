@@ -256,11 +256,11 @@ void triangulateConvexPoly(directedLine* polygon, Int ulinear, Int vlinear, prim
       else
 	triangulateConvexPolyVertical(topV, botV, pStream);
     }
-}	      
+}
 
 /*for debug purpose*/
 void drawCorners(
-		 Real* topV, Real* botV,		 
+		 Real* topV, Real* botV,
 		 vertexArray* leftChain,
 		 vertexArray* rightChain,
 		 gridBoundaryChain* leftGridChain,
@@ -280,6 +280,8 @@ void drawCorners(
   Real* rightCornerV;
   Real* bot_leftCornerV;
   Real* bot_rightCornerV;
+
+  printf("drawCorners()\n");
 
   if(leftCornerWhere == 1)
     leftCornerV = topV;

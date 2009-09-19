@@ -53,6 +53,11 @@ void BasicSurfaceEvaluator::polymode(long)
 {
 }
 
+long BasicSurfaceEvaluator::get_output_style()
+{
+   return N_MESHFILL;
+}
+
 void BasicSurfaceEvaluator::range2f(long type, REAL* from, REAL* to)
 {
 }

@@ -25,6 +25,17 @@ GLfloat mat_shininess[]={100.0f};
 
 GLfloat ctlpoints[4][4][3];
 
+GLfloat knots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+/* counter clockwise */
+GLfloat edgePt[5][2]={{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f}};
+/* clockwise */
+GLfloat curvePt[4][2]={{0.25f, 0.5f}, {0.25f, 0.75f}, {0.75f, 0.75f}, {0.75f, 0.5f}};
+GLfloat curveKnots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+/* clockwise */
+GLfloat pwlPt[4][2]={{0.75f, 0.5f}, {0.5f, 0.25f}, {0.25f, 0.5f}};
+
+GLfloat zrot=3.0f;
+
 GLUnurbsObj* nurb;
 
 void init_scene(int width, int height)
@@ -53,7 +64,7 @@ void init_scene(int width, int height)
    gluEnable(GLU_AUTO_NORMAL);
 
    nurb=gluNewNurbsRenderer();
-   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 25.0f);
+   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 150.0f);
    gluNurbsProperty(nurb, GLU_DISPLAY_MODE, GLU_FILL);
 
    for (u=0; u<4; u++)
@@ -80,23 +91,16 @@ void init_scene(int width, int height)
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
-   glTranslatef(0.0f, 0.0f, -5.0f);
-   glRotatef(330.0f, 1.0f ,0.0f, 0.0f);
+   glTranslatef(0.0f, 0.5f, -5.5f);
+   glRotatef(330.0f, 1.0f, 0.0f, 0.0f);
    glScalef(0.5f, 0.5f, 0.5f);
 }
-
-GLfloat knots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-/* counter clockwise */
-GLfloat edgePt[5][2]={{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f}};
-/* clockwise */
-GLfloat curvePt[4][2]={{0.25f, 0.5f}, {0.25f, 0.75f}, {0.75f, 0.75f}, {0.75f, 0.5f}};
-GLfloat curveKnots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-/* clockwise */
-GLfloat pwlPt[4][2]={{0.75f, 0.5f}, {0.5f, 0.25f}, {0.25f, 0.5f}};
 
 void render_scene()
 {
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   glRotatef(zrot, 0.0f, 0.0f, 1.0f);
 
    /* Render trimmed surface */
    gluBeginSurface(nurb);
@@ -137,7 +141,7 @@ int main(int argc, char** argv)
       exit(-1);
    }
 
-   window=SDL_CreateWindow("SDL GLU ES Nurbs test",
+   window=SDL_CreateWindow("SDL GLU ES Nurbs Trim test",
       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
       SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);

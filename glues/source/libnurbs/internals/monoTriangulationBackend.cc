@@ -40,9 +40,13 @@
 #include "backend.h"
 #include "arc.h"
 
+#include <stdio.h>
+
 void reflexChain::outputFan(Real v[2], Backend* backend)
 {
   Int i;
+
+  printf("reflexChain::outputFan\n");
   backend->bgntfan();
 
   backend->tmeshvert(v[0], v[1]);
@@ -66,6 +70,9 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
 {
   Int i,j,k;
   Int isReflex;
+
+   printf("reflexChain::processNewVertex\n");
+
   /*TrimVertex trimVert;*/
   /*if there are at most one vertex in the queue, then simply insert
    */
