@@ -46,33 +46,36 @@ class Backend;
 class Arc;
 class TrimVertex;
 
-class Slicer : public CoveAndTiler, public Mesher {
-public:
-    			Slicer( Backend & );
-			~Slicer( void );
-    void		slice( Arc_ptr );
-    void		slice_old( Arc_ptr);
-    void		slice_new( Arc_ptr );
-    void                evalStream(primStream* );
-    void                evalRBArray(rectBlockArray* rbArray, gridWrap* grid);
+class Slicer: public CoveAndTiler, public Mesher
+{
+   public:
+      Slicer(Backend&);
+      ~Slicer(void);
+      void slice(Arc_ptr);
+      void slice_old(Arc_ptr);
+      void slice_new(Arc_ptr);
+      void evalStream(primStream*);
+      void evalRBArray(rectBlockArray* rbArray, gridWrap* grid);
 
-    void		outline( Arc_ptr );
-    void		setstriptessellation( REAL, REAL );
-    void		setisolines( int );
+      void outline(Arc_ptr);
+      void setstriptessellation(REAL, REAL);
+      void setisolines(int);
 
-    void                set_ulinear(int ulinear_flag)
+      void set_ulinear(int ulinear_flag)
       {
-	ulinear = ulinear_flag;
+         ulinear=ulinear_flag;
       }
-    void                set_vlinear(int vlinear_flag)
+
+      void set_vlinear(int vlinear_flag)
       {
-	vlinear = vlinear_flag;
+         vlinear=vlinear_flag;
       }
-private:
-    Backend&		backend;
-    REAL		oneOverDu;
-    REAL		du, dv;
-    int			isolines;
+
+   private:
+      Backend& backend;
+      REAL     oneOverDu;
+      REAL     du, dv;
+      int      isolines;
 
     void		outline( void );
     void		initGridlines( void );

@@ -166,9 +166,8 @@ vert_interp( TrimVertex *n, TrimVertex *l, TrimVertex *r, int p, REAL val )
 	n->param[1-p] = l->param[1-p];
     }
 }
-	
-int
-Subdivider::arc_split( Arc_ptr jarc, int param, REAL value, int dir )
+
+int Subdivider::arc_split(Arc_ptr jarc, int param, REAL value, int dir)
 {
     int		maxvertex = jarc->pwlArc->npts;
     Arc_ptr	jarc1;

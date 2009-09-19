@@ -379,20 +379,19 @@ CoveAndTiler::coveLL()
     }
 }
 
-void
-CoveAndTiler::coveLowerRight( void )
+void CoveAndTiler::coveLowerRight(void)
 {
-    GridVertex bgv( bot.uend, bot.vindex );
-    GridVertex gv( bot.uend, top.vindex );
+   GridVertex bgv(bot.uend, bot.vindex);
+   GridVertex gv(bot.uend, top.vindex);
 
-    right.last();
-    backend.bgntmesh( "coveLowerRight" );       
-    output( bgv );
-    output( right.prev() );
-    output( gv );
-    backend.swaptmesh();
-	coveLR();
-    backend.endtmesh( );
+   right.last();
+   backend.bgntmesh("coveLowerRight");
+   output(bgv);
+   output(right.prev());
+   output(gv);
+   backend.swaptmesh();
+   coveLR();
+   backend.endtmesh();
 }
 
 void

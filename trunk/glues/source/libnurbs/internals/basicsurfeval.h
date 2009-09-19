@@ -43,7 +43,7 @@
 class BasicSurfaceEvaluator: public CachingEvaluator
 {
    public:
-      virtual      ~BasicSurfaceEvaluator() { /* silence warning*/ }
+      virtual ~BasicSurfaceEvaluator() { /* silence warning*/ }
       virtual void range2f(long, REAL*, REAL*);
       virtual void domain2f(REAL, REAL, REAL, REAL);
 
@@ -58,6 +58,7 @@ class BasicSurfaceEvaluator: public CachingEvaluator
       virtual void endmap2f(void);
 
       virtual void polymode(long);
+      virtual long get_output_style();
       virtual void bgnline(void);
       virtual void endline(void);
       virtual void bgnclosedline(void);

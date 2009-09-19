@@ -89,29 +89,25 @@ Mesher::pop( long )
 {
 }
 
-inline void
-Mesher::openMesh()
+inline void Mesher::openMesh()
 {
-    backend.bgntmesh( "addedge" );
+   backend.bgntmesh("addedge");
 }
 
-inline void
-Mesher::closeMesh()
+inline void Mesher::closeMesh()
 {
-    backend.endtmesh();
+   backend.endtmesh();
 }
 
-inline void
-Mesher::swapMesh()
+inline void Mesher::swapMesh()
 {
-    backend.swaptmesh();
+   backend.swaptmesh();
 }
 
-inline void
-Mesher::clearStack()
+inline void Mesher::clearStack()
 {
-    itop = -1;
-    last[0] = 0;
+   itop = -1;
+   last[0] = 0;
 }
 
 void

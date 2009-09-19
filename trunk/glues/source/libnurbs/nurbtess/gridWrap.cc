@@ -131,6 +131,8 @@ gridWrap::~gridWrap()
 void gridWrap::draw()
 {
   int i,j;
+
+  printf("gridWrap::draw()\n");
 // MIKE: TODO
 //  glBegin(GL_POINTS);
   for(i=0; i<n_ulines; i++)
@@ -219,6 +221,7 @@ gridBoundaryChain::gridBoundaryChain(
 
 void gridBoundaryChain::draw()
 {
+  printf("gridBoundaryChain::draw()\n");
   Int i;
 // MIKE: TODO
 //  glBegin(GL_LINE_STRIP);
@@ -233,6 +236,7 @@ void gridBoundaryChain::draw()
 
 void gridBoundaryChain::drawInner()
 {
+  printf("gridBoundaryChain::drawInner()\n");
   Int i;
   for(i=1; i<nVlines; i++)
     {
@@ -285,7 +289,6 @@ void gridBoundaryChain::rightEndFan(Int i, primStream* pStream)
     }
   //otherside, the two are equal, so there is no fan to output
 }
-		      
 
 /*output the fan of the left end between grid line i-1 and grid line i*/
 void gridBoundaryChain::leftEndFan(Int i, primStream* pStream)

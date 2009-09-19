@@ -101,6 +101,7 @@ class OpenGLSurfaceEvaluator: public BasicSurfaceEvaluator
       OpenGLSurfaceEvaluator();
       virtual ~OpenGLSurfaceEvaluator(void);
       void polymode(long style);
+      long get_output_style();
       void		range2f( long, REAL *, REAL * );
       void		domain2f( REAL, REAL, REAL, REAL );
       void		addMap( SurfaceMap * ) { }

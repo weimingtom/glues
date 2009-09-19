@@ -43,10 +43,6 @@ class TrimVertex
 {
    public:
       REAL param[2];        /* parametric space coords */
-#ifdef USE_OPTTT
-      REAL cache_point[4];  /* only when USE_OPTTT is on in slicer.c++ */
-      REAL cache_normal[3];
-#endif
       long nuid;
 };
 

@@ -43,71 +43,67 @@
 class BasicCurveEvaluator;
 class BasicSurfaceEvaluator;
 
-class Backend {
-private:
-    BasicCurveEvaluator&	curveEvaluator;
-    BasicSurfaceEvaluator&	surfaceEvaluator;
-public:
-  			Backend( BasicCurveEvaluator &c, BasicSurfaceEvaluator& e )
-			: curveEvaluator(c), surfaceEvaluator(e) {}
+class Backend
+{
+   private:
+      BasicCurveEvaluator&   curveEvaluator;
+      BasicSurfaceEvaluator& surfaceEvaluator;
 
-    /* surface backend routines */
-    void		bgnsurf( int, int, long  );
-    void		patch( REAL, REAL, REAL, REAL );
-    void		surfpts( long, REAL *, long, long, int, int,
-          			 REAL, REAL, REAL, REAL );
-    void		surfbbox( long, REAL *, REAL * );
-    void		surfgrid( REAL, REAL, long, REAL, REAL, long ); 
-    void		surfmesh( long, long, long, long ); 
-    void		bgntmesh( const char * );
-    void		endtmesh( void );
-    void		swaptmesh( void );
-    void		tmeshvert(GridTrimVertex * );
-    void		tmeshvert(TrimVertex*, REAL*, REAL*);
-    void		tmeshvert(GridVertex*);
-    void		tmeshvert(REAL u,  REAL v );
-    void		linevert(TrimVertex*, REAL*, REAL*);
-    void		linevert(GridVertex*);
-    void		bgnoutline( void );
-    void		endoutline( void );
-    void		endsurf( void );
-    void		triangle( TrimVertex*, TrimVertex*, TrimVertex* );
+   public:
+      Backend(BasicCurveEvaluator& c, BasicSurfaceEvaluator& e):
+              curveEvaluator(c), surfaceEvaluator(e) { }
 
-    void                bgntfan();
-    void                endtfan();
-    void                bgnqstrip();
-    void                endqstrip();
-    void                evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, 
-				   int n_lower, REAL v_lower, REAL* lower_val
-				   );
-    void                evalVStrip(int n_left, REAL u_left, REAL* left_val, 
-				   int n_right, REAL v_right, REAL* right_val
-				   );
-    void                tmeshvertNOGE(TrimVertex *t);
-    void                tmeshvertNOGE_BU(TrimVertex *t);
-    void                tmeshvertNOGE_BV(TrimVertex *t);
-    void                preEvaluateBU(REAL u);
-    void                preEvaluateBV(REAL v);
-	
+      /* surface backend routines */
+      void bgnsurf(int, int, long);
+      void patch(REAL, REAL, REAL, REAL);
+      void surfpts(long, REAL*, long, long, int, int, REAL, REAL, REAL, REAL);
+      void surfbbox(long, REAL*, REAL*);
+      void surfgrid(REAL, REAL, long, REAL, REAL, long);
+      void surfmesh(long, long, long, long);
+      void bgntmesh(const char*);
+      void endtmesh(void);
+      void swaptmesh(void);
+      void tmeshvert(GridTrimVertex*);
+      void tmeshvert(TrimVertex*, REAL*, REAL*);
+      void tmeshvert(GridVertex*);
+      void tmeshvert(REAL u, REAL v);
+      void linevert(TrimVertex*, REAL*, REAL*);
+      void linevert(GridVertex*);
+      void bgnoutline(void);
+      void endoutline(void);
+      void endsurf(void);
+      void triangle(TrimVertex*, TrimVertex*, TrimVertex*);
+      long get_output_style(void);
 
-    /* curve backend routines */
-    void		bgncurv( void );
-    void		segment( REAL, REAL );
-    void		curvpts( long, REAL *, long, int, REAL, REAL );
-    void		curvgrid( REAL, REAL, long );
-    void		curvmesh( long, long );
-    void		curvpt( REAL  );  
-    void		bgnline( void );
-    void		endline( void );
-    void		endcurv( void );
-private:
-#ifndef NOWIREFRAME
-    int			wireframetris;
-    int			wireframequads;
-    int			npts;
-    REAL		mesh[3][4];
-    int			meshindex;
-#endif
+      void bgntfan();
+      void endtfan();
+      void bgnqstrip();
+      void endqstrip();
+      void evalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val);
+      void evalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL v_right, REAL* right_val);
+      void tmeshvertNOGE(TrimVertex* t);
+      void tmeshvertNOGE_BU(TrimVertex* t);
+      void tmeshvertNOGE_BV(TrimVertex* t);
+      void preEvaluateBU(REAL u);
+      void preEvaluateBV(REAL v);
+
+      /* curve backend routines */
+      void bgncurv(void);
+      void segment(REAL, REAL);
+      void curvpts(long, REAL*, long, int, REAL, REAL);
+      void curvgrid(REAL, REAL, long);
+      void curvmesh(long, long);
+      void curvpt(REAL);
+      void bgnline(void);
+      void endline(void);
+      void endcurv(void);
+
+   private:
+      int  wireframetris;
+      int  wireframequads;
+      int  npts;
+      REAL mesh[3][4];
+      int  meshindex;
 };
 
 #endif /* __glubackend_h_ */

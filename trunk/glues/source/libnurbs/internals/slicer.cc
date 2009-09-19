@@ -51,15 +51,12 @@
 #include "simplemath.h"
 #include "trimvertex.h"
 #include "varray.h"
+#include "displaymode.h"
 
 #include "polyUtil.h" // for area()
 
 #include "gles_evaluator.h"
 #include "glues.h"
-
-#ifdef USE_OPTTT
-   #include <GL/gl.h>
-#endif
 
 //#define USE_READ_FLAG  // whether to use new or old tesselator
                          // if defined, it reads "flagFile",
@@ -209,57 +206,12 @@ if(loop->next->tail()[1] == loop->next->head()[1])
 }
 
 
-//a line with the same u for opt
-#ifdef USE_OPTTT
-static void evalLineNOGE_BU(TrimVertex *verts, int n, Backend& backend)
-{
-  int i;
-  backend.preEvaluateBU(verts[0].param[0]);
-  for(i=0; i<n; i++)
-    backend.tmeshvertNOGE_BU(&verts[i]);
-}
-#endif
-
-//a line with the same v for opt
-#ifdef USE_OPTTT
-static void evalLineNOGE_BV(TrimVertex *verts, int n, Backend& backend)
-{
-  int i;
-  backend.preEvaluateBV(verts[0].param[1]);
-
-  for(i=0; i<n; i++)
-    backend.tmeshvertNOGE_BV(&verts[i]);
-}
-#endif
-
-#ifdef USE_OPTTT
-static void evalLineNOGE(TrimVertex *verts, int n, Backend& backend)
-{
-
-  if(verts[0].param[0] == verts[n-1].param[0]) //all u;s are equal
-    evalLineNOGE_BU(verts, n, backend);
-  else if(verts[0].param[1] == verts[n-1].param[1]) //all v's are equal
-    evalLineNOGE_BV(verts, n, backend);
-  else
-    {
-      int i;
-      for(i=0; i<n; i++)
-	backend.tmeshvertNOGE(&verts[i]);
-    }
-}
-#endif
-
 inline void OPT_OUTVERT(TrimVertex& vv, Backend& backend) 
 {
-#ifdef USE_OPTTT
-   glNormal3fv(vv.cache_normal);
-   glVertex3fv(vv.cache_point);
-#else
    REAL retPoint[4];
    REAL retNormal[3];
 
    backend.tmeshvert(&vv, retPoint, retNormal);
-#endif /* USE_OPTTT */
 }
 
 static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* right, Backend& backend);
@@ -341,12 +293,7 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
       Int d, topd_left, topd_right, botd_left, botd_right, i,j;
       d = left->npts /2;
 
-#ifdef USE_OPTTT
-      evalLineNOGE(top->pts, top->npts, backend);
-      evalLineNOGE(bot->pts, bot->npts, backend);
-      evalLineNOGE(left->pts, left->npts, backend);
-      evalLineNOGE(right->pts, right->npts, backend);
-#endif
+printf("triangulateRectAux\n");
 
       if(top->npts == 2) {
 	backend.bgntfan();
@@ -392,7 +339,7 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
 	
 	for(i=0; i<=d; i++)
 	  {
-	    OPT_OUTVERT(left->pts[i], backend);	  
+	    OPT_OUTVERT(left->pts[i], backend);
 	  }
 	backend.endtfan();
 	
@@ -403,8 +350,8 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
 	OPT_OUTVERT(top->pts[top->npts-2], backend);
 	
 	for(i=d; i< left->npts; i++)
-	  {      
-	    OPT_OUTVERT(left->pts[i], backend);      
+	  {
+	    OPT_OUTVERT(left->pts[i], backend);
 	  }
 	backend.endtfan();
 
@@ -437,7 +384,7 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
 	  }
 	
 	//      backend.tmeshvert(& top->pts[1]);
-	OPT_OUTVERT(top->pts[1], backend);      
+	OPT_OUTVERT(top->pts[1], backend);
 	
 	backend.endtfan();
 
@@ -454,7 +401,7 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
 	    int delta=bot->npts - top->npts;
 	    int u = delta/2;
 	    botd_left = 1+ u;
-	    botd_right = bot->npts-2-( delta-u);	    
+	    botd_right = bot->npts-2-(delta-u);
 	
 	    if(botd_left >1)
 	      {
@@ -735,7 +682,7 @@ directedLine* arcToMultDLines(directedLine* original, Arc_ptr arc)
     is_linear = 1;
   else if(area(arc->pwlArc->pts[0].param, arc->pwlArc->pts[1].param, arc->pwlArc->pts[arc->pwlArc->npts-1].param) == 0.0)
     is_linear = 1;
-  
+
   if(is_linear)
     {
       directedLine *dline = arcToDLine(arc);
@@ -804,78 +751,236 @@ void Slicer::evalRBArray(rectBlockArray* rbArray, gridWrap* grid)
       Int high = block->get_upGridLineIndex();
 
       for(k=0, i=high; i>low; i--, k++)
-	{
-	  backend.surfmesh(block->get_leftIndices()[k+1], n_vlines-1-i, block->get_rightIndices()[k+1]-block->get_leftIndices()[k+1], 1);
-	}
-    }
+      {
+         backend.surfmesh(block->get_leftIndices()[k+1], n_vlines-1-i, block->get_rightIndices()[k+1]-block->get_leftIndices()[k+1], 1);
+      }
+   }
 }
+
+#define DEFAULT_EVAL_STREAM_ALLOCS 512
 
 void Slicer::evalStream(primStream* pStream)
 {
-  Int i,j,k;
-  k=0;
-  TrimVertex *trimVert =/*&X*/  (TrimVertex*)malloc(sizeof(TrimVertex));
-  trimVert -> nuid = 0;//???
-  Real* vertices = pStream->get_vertices(); //for efficiency
+   Int i, j, k;
 
+   k=0;
+   TrimVertex* trimVert=(TrimVertex*)malloc(sizeof(TrimVertex));
+   trimVert->nuid=0;
+   Real* tvertices=pStream->get_vertices(); // for efficiency
    REAL retPoint[4];
    REAL retNormal[3];
 
-  for(i=0; i<pStream->get_n_prims(); i++)
-    {
+   REAL* normals=(REAL*)malloc(sizeof(REAL)*3*DEFAULT_EVAL_STREAM_ALLOCS);
+   assert(normals);
+   REAL* vertices=(REAL*)malloc(sizeof(REAL)*3*DEFAULT_EVAL_STREAM_ALLOCS);
+   assert(vertices);
+   int alloc_size=DEFAULT_EVAL_STREAM_ALLOCS;
 
-     //ith primitive  has #vertices = lengths[i], type=types[i]
-      switch(pStream->get_type(i)){
-      case PRIMITIVE_STREAM_FAN:
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
 
-	backend.bgntfan();
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
 
-	for(j=0; j<pStream->get_length(i); j++)
-	  {	    
-	    trimVert->param[0] = vertices[k];
-	    trimVert->param[1] = vertices[k+1];
-	    backend.tmeshvert(trimVert, retPoint, retNormal);
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, vertices);
+   glEnableClientState(GL_NORMAL_ARRAY);
+   glNormalPointer(GL_FLOAT, 0, normals);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
 
-//	    backend.tmeshvert(vertices[k], vertices[k+1]);
-	    k += 2;
-	  }
-	backend.endtfan();
-	break;
-	
-      default:
-	fprintf(stderr, "evalStream: not implemented yet\n");
-	exit(1);
+   for (i=0; i<pStream->get_n_prims(); i++)
+   {
+      // ith primitive has #tvertices = lengths[i], type=types[i]
+      switch(pStream->get_type(i))
+      {
+         case PRIMITIVE_STREAM_FAN:
+              backend.bgntfan();
 
+              if (backend.get_output_style()==N_MESHLINE)
+              {
+                 int startk=k;
+                 int it=0;
+                 int jt;
+
+                 if (pStream->get_length(i)>(alloc_size/3))
+                 {
+                    normals=(REAL*)realloc(normals, pStream->get_length(i)*3);
+                    assert(normals);
+                    vertices=(REAL*)realloc(vertices, pStream->get_length(i)*3);
+                    assert(vertices);
+                    alloc_size=pStream->get_length(i)*3;
+                 }
+
+                 /* Fill up the first vertex */
+                 trimVert->param[0]=tvertices[startk];
+                 trimVert->param[1]=tvertices[startk+1];
+                 backend.tmeshvert(trimVert, retPoint, retNormal);
+                 vertices[it*3+0]=retPoint[0];
+                 vertices[it*3+1]=retPoint[1];
+                 vertices[it*3+2]=retPoint[2];
+                 normals[it*3+0]=retNormal[0];
+                 normals[it*3+1]=retNormal[1];
+                 normals[it*3+2]=retNormal[2];
+                 it++;
+                 k+=2;
+
+                 for (j=1; j<pStream->get_length(i); j++)
+                 {
+                    if (it%3==0)
+                    {
+                       /* Fill up the first vertex again */
+                       trimVert->param[0]=tvertices[startk];
+                       trimVert->param[1]=tvertices[startk+1];
+                       backend.tmeshvert(trimVert, retPoint, retNormal);
+                       vertices[it*3+0]=retPoint[0];
+                       vertices[it*3+1]=retPoint[1];
+                       vertices[it*3+2]=retPoint[2];
+                       normals[it*3+0]=retNormal[0];
+                       normals[it*3+1]=retNormal[1];
+                       normals[it*3+2]=retNormal[2];
+                       it++;
+
+                       /* Fill up the previous vertex */
+                       trimVert->param[0]=tvertices[k-2];
+                       trimVert->param[1]=tvertices[k-1];
+                       backend.tmeshvert(trimVert, retPoint, retNormal);
+                       vertices[it*3+0]=retPoint[0];
+                       vertices[it*3+1]=retPoint[1];
+                       vertices[it*3+2]=retPoint[2];
+                       normals[it*3+0]=retNormal[0];
+                       normals[it*3+1]=retNormal[1];
+                       normals[it*3+2]=retNormal[2];
+                       it++;
+                    }
+
+                    /* Fill up the current vertex */
+                    trimVert->param[0]=tvertices[k];
+                    trimVert->param[1]=tvertices[k+1];
+                    backend.tmeshvert(trimVert, retPoint, retNormal);
+                    vertices[it*3+0]=retPoint[0];
+                    vertices[it*3+1]=retPoint[1];
+                    vertices[it*3+2]=retPoint[2];
+                    normals[it*3+0]=retNormal[0];
+                    normals[it*3+1]=retNormal[1];
+                    normals[it*3+2]=retNormal[2];
+                    it++;
+                    k+=2;
+                 }
+
+                 for (jt=0; jt<it; jt+=3)
+                 {
+                    glDrawArrays(GL_LINE_LOOP, jt, 3);
+                 }
+              }
+              else
+              {
+                 int it=0;
+
+                 if (pStream->get_length(i)>(alloc_size))
+                 {
+                    normals=(REAL*)realloc(normals, pStream->get_length(i));
+                    assert(normals);
+                    vertices=(REAL*)realloc(vertices, pStream->get_length(i));
+                    assert(vertices);
+                    alloc_size=pStream->get_length(i);
+                 }
+
+                 for(j=0; j<pStream->get_length(i); j++)
+                 {
+                    trimVert->param[0]=tvertices[k];
+                    trimVert->param[1]=tvertices[k+1];
+                    backend.tmeshvert(trimVert, retPoint, retNormal);
+                    vertices[it*3+0]=retPoint[0];
+                    vertices[it*3+1]=retPoint[1];
+                    vertices[it*3+2]=retPoint[2];
+                    normals[it*3+0]=retNormal[0];
+                    normals[it*3+1]=retNormal[1];
+                    normals[it*3+2]=retNormal[2];
+                    it++;
+                    k+=2;
+                 }
+
+                 glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+
+              }
+
+              backend.endtfan();
+
+              break;
+         default:
+              fprintf(stderr, "evalStream: not implemented yet\n");
+              exit(1);
       }
-    }
-  free(trimVert);
+   }
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
+
+   free(normals);
+   free(vertices);
+   free(trimVert);
 }
-	   
-	   
-	    
 
 void Slicer::slice_new(Arc_ptr loop)
 {
-//count++;
-//if(count == 78) count=1;
-//printf("count=%i\n", count);
-//if( ! (4<= count && count <=4)) return;
+   Int num_ulines;
+   Int num_vlines;
+   Real uMin, uMax, vMin, vMax;
+   Real mydu, mydv;
 
+   uMin=uMax=loop->tail()[0];
+   vMin=vMax=loop->tail()[1];
+   mydu=(du>0)?du:-du;
+   mydv=(dv>0)?dv:-dv;
 
-  Int num_ulines;
-  Int num_vlines;
-  Real uMin, uMax, vMin, vMax;
-  Real mydu, mydv;
-  uMin = uMax = loop->tail()[0];
-  vMin = vMax = loop->tail()[1];
-  mydu = (du>0)? du: -du;
-  mydv = (dv>0)? dv: -dv;
-
-  for(Arc_ptr jarc=loop->next; jarc != loop; jarc = jarc->next)
+   for(Arc_ptr jarc=loop->next; jarc!=loop; jarc=jarc->next)
    {
-
-     if(jarc->tail()[0] < uMin)
-       uMin = jarc->tail()[0];
+      if (jarc->tail()[0]<uMin)
+      {
+         uMin=jarc->tail()[0];
+      }
      if(jarc->tail()[0] > uMax)
        uMax = jarc->tail()[0];
      if(jarc->tail()[1] < vMin)
@@ -956,23 +1061,19 @@ void Slicer::slice(Arc_ptr loop)
 
 }
 
-  
-
-Slicer::Slicer( Backend &b ) 
-	: CoveAndTiler( b ), Mesher( b ), backend( b )
+Slicer::Slicer(Backend& b): CoveAndTiler(b), Mesher(b), backend(b)
 {
-    ulinear = 0;
-    vlinear = 0;
+   ulinear=0;
+   vlinear=0;
 }
 
 Slicer::~Slicer()
 {
 }
 
-void
-Slicer::setisolines( int x )
+void Slicer::setisolines(int x)
 {
-    isolines = x;
+   isolines=x;
 }
 
 void
@@ -998,10 +1099,8 @@ Slicer::slice_old( Arc_ptr loop )
     Mesher::init( npts );
 
     long ulines = uarray.init( du, extrema[1], extrema[3] );
-//printf("ulines = %i\n", ulines);
     Varray varray;
     long vlines = varray.init( dv, extrema[0], extrema[2] );
-//printf("vlines = %i\n", vlines);
     long botv = 0;
     long topv;
     TrimRegion::init( varray.varray[botv] );

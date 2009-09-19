@@ -45,23 +45,23 @@
 
 Int primStream::num_triangles()
 {
-  Int i;
-  Int ret=0;
-  for(i=0; i<index_lengths; i++)
-    {
-      ret += lengths[i]-2;
-    }
-  return ret;
-}
+   Int i;
+   Int ret=0;
 
-	  
+   for(i=0; i<index_lengths; i++)
+   {
+     ret+=lengths[i]-2;
+   }
+
+   return ret;
+}
 
 /*the begining of inserting a new primitive. 
  *reset counter to be 0.
  */
 void primStream::begin()
 {
-  counter = 0;
+   counter=0;
 }
 
 void primStream::insert(Real u, Real v)
@@ -169,6 +169,7 @@ void primStream::draw()
 {
   Int i,j,k;
   k=0;
+  printf("primStream::draw()\n");
   for(i=0; i<index_lengths; i++)
     {
       switch(types[i]){
@@ -181,7 +182,7 @@ void primStream::draw()
 //	glBegin(GL_TRIANGLE_STRIP);
 	break;
       }
-      
+
       for(j=0; j<lengths[i]; j++){
 // MIKE: TODO
 //	glVertex2fv(vertices+k);
