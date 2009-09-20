@@ -32,14 +32,11 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
-/*
-*/
 
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "glcurveval.h"
-
 
 /*
  *compute the Bezier polynomials C[n,j](v) for all j at v with 
@@ -54,92 +51,104 @@
  *   C[n,j](v) = (1-v)*C[n-1,j](v) + v*C[n-1,j-1](v), n>=1
  *This code is copied from opengl/soft/so_eval.c:PreEvaluate
  */
-void OpenGLCurveEvaluator::inPreEvaluate(int order, REAL vprime, REAL *coeff)
+void OpenGLCurveEvaluator::inPreEvaluate(int order, REAL vprime, REAL* coeff)
 {
-  int i, j;
-  REAL oldval, temp;
-  REAL oneMinusvprime;
-  
-  /*
-   * Minor optimization
-   * Compute orders 1 and 2 outright, and set coeff[0], coeff[1] to
-     * their i==1 loop values to avoid the initialization and the i==1 loop.
-     */
-  if (order == 1) {
-    coeff[0] = 1.0;
-    return;
-  }
-  
-  oneMinusvprime = 1-vprime;
-  coeff[0] = oneMinusvprime;
-  coeff[1] = vprime;
-  if (order == 2) return;
-  
-  for (i = 2; i < order; i++) {
-    oldval = coeff[0] * vprime;
-    coeff[0] = oneMinusvprime * coeff[0];
-    for (j = 1; j < i; j++) {
-      temp = oldval;
-      oldval = coeff[j] * vprime;
-	    coeff[j] = temp + oneMinusvprime * coeff[j];
-    }
-    coeff[j] = oldval;
-  }
+   int i, j;
+   REAL oldval, temp;
+   REAL oneMinusvprime;
+
+   /*
+    * Minor optimization
+    * Compute orders 1 and 2 outright, and set coeff[0], coeff[1] to
+    * their i==1 loop values to avoid the initialization and the i==1 loop.
+    */
+   if (order==1)
+   {
+      coeff[0]=1.0;
+      return;
+   }
+
+   oneMinusvprime=1-vprime;
+   coeff[0]=oneMinusvprime;
+   coeff[1]=vprime;
+
+   if (order==2)
+   {
+      return;
+   }
+
+   for (i=2; i<order; i++)
+   {
+      oldval=coeff[0]*vprime;
+      coeff[0]=oneMinusvprime*coeff[0];
+      for (j=1; j<i; j++)
+      {
+         temp=oldval;
+         oldval=coeff[j]*vprime;
+         coeff[j]=temp+oneMinusvprime*coeff[j];
+      }
+      coeff[j]=oldval;
+   }
 }
 
-void OpenGLCurveEvaluator::inMap1f(int which, //0: vert, 1: norm, 2: color, 3: tex
-				   int k, //dimension
-				   REAL ulower,
-				   REAL uupper,
-				   int ustride,
-				   int uorder,
-				   REAL *ctlpoints)
+void OpenGLCurveEvaluator::inMap1f(int which,   // 0: vert, 1: norm, 2: color, 3: tex
+                                   int k,       // dimension
+                                   REAL ulower,
+                                   REAL uupper,
+                                   int ustride,
+                                   int uorder,
+                                   REAL* ctlpoints)
 {
-  printf("OpenGLCurveEvaluator::inMap1f\n");
-  int i,x;
-  curveEvalMachine *temp_em;
-  switch(which){
-  case 0: //vertex
-    vertex_flag = 1;
-    temp_em = &em_vertex;
-    break;
-  case 1: //normal
-    normal_flag = 1;
-    temp_em = &em_normal;
-    break;
-  case 2: //color
-    color_flag = 1;
-    temp_em = &em_color;
-    break;
-  default:
-    texcoord_flag = 1;
-    temp_em = &em_texcoord;
-    break;
-  }
-  
-  REAL *data = temp_em->ctlpoints;
-  temp_em->uprime = -1; //initialized
-  temp_em->k = k;
-  temp_em->u1 = ulower;
-  temp_em->u2 = uupper;
-  temp_em->ustride = ustride;
-  temp_em->uorder = uorder;
-  /*copy the control points*/
-  for(i=0; i<uorder; i++){
-    for(x=0; x<k; x++){
-      data[x] = ctlpoints[x];
-    }
-    ctlpoints += ustride;
-    data += k;
-  }     
+   printf("OpenGLCurveEvaluator::inMap1f\n");
+   int i, x;
+   curveEvalMachine* temp_em;
+
+   switch(which)
+   {
+      case 0: // vertex
+           vertex_flag=1;
+           temp_em=&em_vertex;
+           break;
+      case 1: // normal
+           normal_flag=1;
+           temp_em=&em_normal;
+           break;
+      case 2: // color
+           color_flag=1;
+           temp_em=&em_color;
+           break;
+      default:
+           texcoord_flag=1;
+           temp_em=&em_texcoord;
+           break;
+   }
+
+   REAL* data=temp_em->ctlpoints;
+   temp_em->uprime=-1; // initialized
+   temp_em->k=k;
+   temp_em->u1=ulower;
+   temp_em->u2=uupper;
+   temp_em->ustride=ustride;
+   temp_em->uorder=uorder;
+
+   /* copy the control points */
+   for(i=0; i<uorder; i++)
+   {
+      for(x=0; x<k; x++)
+      {
+         data[x]=ctlpoints[x];
+      }
+      ctlpoints+=ustride;
+      data+=k;
+   }
 }
 
-void OpenGLCurveEvaluator::inDoDomain1(curveEvalMachine *em, REAL u, REAL *retPoint)
+void OpenGLCurveEvaluator::inDoDomain1(curveEvalMachine* em, REAL u, REAL* retPoint)
 {
-  int j, row;
-  REAL the_uprime;
-  REAL *data;
-  
+   int j, row;
+   REAL the_uprime;
+   REAL* data;
+
   if(em->u2 == em->u1)
     return;
   the_uprime = (u-em->u1) / (em->u2-em->u1);
@@ -148,7 +157,7 @@ void OpenGLCurveEvaluator::inDoDomain1(curveEvalMachine *em, REAL u, REAL *retPo
     inPreEvaluate(em->uorder, the_uprime, em->ucoeff);
     em->uprime = the_uprime;
   }
-  
+
   for(j=0; j<em->k; j++){
     data = em->ctlpoints+j;
     retPoint[j] = 0.0;

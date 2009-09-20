@@ -44,113 +44,107 @@ class CurveMap;
 
 /*for internal evaluator callback stuff*/
 #ifndef IN_MAX_BEZIER_ORDER
-#define IN_MAX_BEZIER_ORDER 40 /*XXX should be bigger than machine order*/
-#endif
-			
-#ifndef IN_MAX_DIMENSION
-#define IN_MAX_DIMENSION 4 
+   #define IN_MAX_BEZIER_ORDER 40 /* XXX should be bigger than machine order */
 #endif
 
-typedef struct curveEvalMachine{
-  REAL uprime; //cached previously evaluated uprime
-  int k; //the dimension
-  REAL u1;
-  REAL u2;
-  int ustride;
-  int uorder;
-  REAL ctlpoints[IN_MAX_BEZIER_ORDER*IN_MAX_DIMENSION];
-  REAL ucoeff[IN_MAX_BEZIER_ORDER];//cache the polynomial values
+#ifndef IN_MAX_DIMENSION
+   #define IN_MAX_DIMENSION 4
+#endif
+
+typedef struct curveEvalMachine
+{
+   REAL uprime; // cached previously evaluated uprime
+   int k; // the dimension
+   REAL u1;
+   REAL u2;
+   int ustride;
+   int uorder;
+   REAL ctlpoints[IN_MAX_BEZIER_ORDER*IN_MAX_DIMENSION];
+   REAL ucoeff[IN_MAX_BEZIER_ORDER]; // cache the polynomial values
 } curveEvalMachine;
 
-class OpenGLCurveEvaluator : public BasicCurveEvaluator  {  
-public:
-			OpenGLCurveEvaluator(void);
-			virtual ~OpenGLCurveEvaluator(void);
-    void		range1f(long, REAL *, REAL *);
-    void		domain1f(REAL, REAL);
-    void		addMap(CurveMap *);
+class OpenGLCurveEvaluator: public BasicCurveEvaluator
+{
+   public:
+      OpenGLCurveEvaluator(void);
+      virtual ~OpenGLCurveEvaluator(void);
+      void range1f(long, REAL*, REAL*);
+      void domain1f(REAL, REAL);
+      void addMap(CurveMap*);
 
-    void		enable(long);
-    void		disable(long);
-    void		bgnmap1f(long);
-    void		map1f(long, REAL, REAL, long, long, REAL *);
-    void		mapgrid1f(long, REAL, REAL);
-    void		mapmesh1f(long, long, long);
-    void		evalpoint1i(long);
-    void		evalcoord1f(long, REAL);
-    void		endmap1f(void);
+      void enable(long);
+      void disable(long);
+      void bgnmap1f(long);
+      void map1f(long, REAL, REAL, long, long, REAL*);
+      void mapgrid1f(long, REAL, REAL);
+      void mapmesh1f(long, long, long);
+      void evalpoint1i(long);
+      void evalcoord1f(long, REAL);
+      void endmap1f(void);
 
-    void		bgnline(void);
-    void		endline(void);
+      void bgnline(void);
+      void endline(void);
 
-    void                put_vertices_call_back(int flag)
+      void put_vertices_call_back(int flag)
       {
-	output_triangles = flag;
+         output_triangles=flag;
       }
 #ifdef _WIN32
-    void               putCallBack(GLenum which, void (GLAPIENTRY *fn)() );
+      void putCallBack(GLenum which, void (GLAPIENTRY* fn)());
 #else
-    void               putCallBack(GLenum which, _GLUfuncptr fn );
+      void putCallBack(GLenum which, _GLUfuncptr fn);
 #endif
-    void               set_callback_userData(void *data)
+      void set_callback_userData(void* data)
       {
-	userData = data;
+         userData=data;
       }
 
-/*------------------begin for curveEvalMachine------------*/
-curveEvalMachine em_vertex;
-curveEvalMachine em_normal;
-curveEvalMachine em_color;
-curveEvalMachine em_texcoord;
-int vertex_flag; //whether there is a vertex map or not
-int normal_flag; //whether there is a normal map or not
-int color_flag; //whether there is a color map or not
-int texcoord_flag; //whether there is a texture map or not
+      /*------------------begin for curveEvalMachine------------*/
+      curveEvalMachine em_vertex;
+      curveEvalMachine em_normal;
+      curveEvalMachine em_color;
+      curveEvalMachine em_texcoord;
+      int vertex_flag;   // whether there is a vertex map or not
+      int normal_flag;   // whether there is a normal map or not
+      int color_flag;    // whether there is a color map or not
+      int texcoord_flag; // whether there is a texture map or not
 
-REAL global_grid_u0;
-REAL global_grid_u1;
-int global_grid_nu;
+      REAL global_grid_u0;
+      REAL global_grid_u1;
+      int global_grid_nu;
 
-void inMap1f(int which, //0: vert, 1: norm, 2: color, 3: tex
-	     int dimension,
-	     REAL ulower,
-	     REAL uupper,
-	     int ustride,
-	     int uorder,
-	     REAL *ctlpoints);
+      void inMap1f(int which, int dimension, REAL ulower, REAL uupper, int ustride, int uorder, REAL* ctlpoints);
+      void inPreEvaluate(int order, REAL vprime, REAL* coeff);
+      void inDoDomain1(curveEvalMachine* em, REAL u, REAL* retPoint);
+      void inDoEvalCoord1(REAL u);
+      void inMapMesh1f(int umin, int umax);
 
-void inPreEvaluate(int order, REAL vprime, REAL *coeff);
-void inDoDomain1(curveEvalMachine *em, REAL u, REAL *retPoint);
-void inDoEvalCoord1(REAL u);
-void inMapMesh1f(int umin, int umax);
+      void (APIENTRY* beginCallBackN)(GLenum type);
+      void (APIENTRY* endCallBackN)(void);
+      void (APIENTRY* vertexCallBackN)(const GLfloat* vert);
+      void (APIENTRY* normalCallBackN)(const GLfloat* normal);
+      void (APIENTRY* colorCallBackN)(const GLfloat* color);
+      void (APIENTRY* texcoordCallBackN)(const GLfloat* texcoord);
 
-void     (APIENTRY *beginCallBackN) (GLenum type);
-void     (APIENTRY *endCallBackN)   (void);
-void     (APIENTRY *vertexCallBackN) (const GLfloat *vert);
-void     (APIENTRY *normalCallBackN) (const GLfloat *normal);
-void     (APIENTRY *colorCallBackN) (const GLfloat *color);
-void     (APIENTRY *texcoordCallBackN) (const GLfloat *texcoord);
+      void (APIENTRY* beginCallBackData)GLenum type, void* data);
+      void (APIENTRY* endCallBackData)(void* data);
+      void (APIENTRY* vertexCallBackData)(const GLfloat* vert, void* data);
+      void (APIENTRY* normalCallBackData)(const GLfloat* normal, void* data);
+      void (APIENTRY* colorCallBackData)(const GLfloat* color, void* data);
+      void (APIENTRY* texcoordCallBackData)(const GLfloat* texcoord, void* data);
 
-void     (APIENTRY *beginCallBackData) (GLenum type, void* data);
-void     (APIENTRY *endCallBackData)   (void* data);
-void     (APIENTRY *vertexCallBackData) (const GLfloat *vert, void* data);
-void     (APIENTRY *normalCallBackData) (const GLfloat *normal, void* data);
-void     (APIENTRY *colorCallBackData) (const GLfloat *color, void* data);
-void     (APIENTRY *texcoordCallBackData) (const GLfloat *texcoord, void* data);
+      void* userData; // the opaque pointer for Data callback functions
+      void beginCallBack(GLenum type, void* data);
+      void endCallBack(void* data);
+      void vertexCallBack(const GLfloat* vert, void *data);
+      void normalCallBack(const GLfloat* normal, void* data);
+      void colorCallBack(const GLfloat* color, void* data);
+      void texcoordCallBack(const GLfloat* texcoord, void* data);
 
-void* userData; //the opaque pointer for Data callback functions
-void  beginCallBack(GLenum type, void* data);
-void endCallBack(void* data);
-void vertexCallBack(const GLfloat *vert, void *data);
-void normalCallBack(const GLfloat *normal, void* data);
-void colorCallBack(const  GLfloat *color, void* data);
-void texcoordCallBack(const GLfloat *texcoord, void* data);
+/*------------------end for curveEvalMachine------------*/
 
-
-/*------------------end   for curveEvalMachine------------*/
-
-private:
-    int output_triangles; //true 1; false 0
+   private:
+      int output_triangles; // true 1; false 0
 };
 
 #endif /* __gluglcurveval_h_ */

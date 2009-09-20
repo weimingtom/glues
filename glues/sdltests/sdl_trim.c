@@ -1,5 +1,7 @@
 /*                                                              */
-/* This test is based on Mark J. Kilgard's molehill example     */
+/* This test is based on SGI's trim.c example                   */
+/* Copyright (c) 1993-1997, Silicon Graphics, Inc.              */
+/* ALL RIGHTS RESERVED                                          */
 /*                                                              */
 /* // Mike Gorchak, 2009. GLU ES test                           */
 /*                                                              */

@@ -214,16 +214,15 @@ void OpenGLCurveEvaluator::endmap1f(void)
  * map1f - pass a desription of a curve map
  *-------------------------------------------------------------------------
  */
-void OpenGLCurveEvaluator::map1f(
-     long  type,        /* map type */
-     REAL  ulo,         /* lower parametric bound */
-     REAL  uhi,         /* upper parametric bound */
-     long  stride,      /* distance to next point in REALS */
-     long  order,       /* parametric order */
-     REAL* pts)         /* control points */
+void OpenGLCurveEvaluator::map1f(long  type,        /* map type */
+                                 REAL  ulo,         /* lower parametric bound */
+                                 REAL  uhi,         /* upper parametric bound */
+                                 long  stride,      /* distance to next point in REALS */
+                                 long  order,       /* parametric order */
+                                 REAL* pts)         /* control points */
 {
    printf("OpenGLCurveEvaluator::map1f\n");
-   if(output_triangles)
+   if (output_triangles)
    {
       int dimension=0;
       int which=0;
@@ -405,23 +404,34 @@ void OpenGLCurveEvaluator::endCallBack(void* data)
    }
 }
 
-void
-OpenGLCurveEvaluator::vertexCallBack(const GLfloat *vert, void* data)
+void OpenGLCurveEvaluator::vertexCallBack(const GLfloat* vert, void* data)
 {
-  if(vertexCallBackData)
-    vertexCallBackData(vert, data);
-  else if(vertexCallBackN)
-    vertexCallBackN(vert);
+   if (vertexCallBackData)
+   {
+      vertexCallBackData(vert, data);
+   }
+   else
+   {
+      if(vertexCallBackN)
+      {
+         vertexCallBackN(vert);
+      }
+   }
 }
 
-
-void
-OpenGLCurveEvaluator::normalCallBack(const GLfloat *normal, void* data)
+void OpenGLCurveEvaluator::normalCallBack(const GLfloat* normal, void* data)
 {
-  if(normalCallBackData)
-    normalCallBackData(normal, data);
-  else if(normalCallBackN)
-    normalCallBackN(normal);
+   if (normalCallBackData)
+   {
+      normalCallBackData(normal, data);
+   }
+   else
+   {
+      if (normalCallBackN)
+      {
+         normalCallBackN(normal);
+      }
+   }
 }
 
 void OpenGLCurveEvaluator::colorCallBack(const GLfloat* color, void* data)
