@@ -53,29 +53,29 @@
  *--------------------------------------------------------------------------
  */
 
-void
-Subdivider::drawCurves(void)
+void Subdivider::drawCurves(void)
 {
-    REAL 	from[1], to[1];
-    Flist	bpts;
-    qlist->getRange( from, to, bpts );
+   REAL  from[1], to[1];
+   Flist bpts;
+   qlist->getRange(from, to, bpts);
 
-    renderhints.init( );
+   renderhints.init();
 
-    printf("Subdivider::drawCurves\n");
+   printf("Subdivider::drawCurves\n");
 
-    backend.bgncurv();
-    for( int i=bpts.start; i<bpts.end-1; i++ ) {
-        REAL pta, ptb;
-	pta = bpts.pts[i];
-	ptb = bpts.pts[i+1];
+   backend.bgncurv();
+   for(int i=bpts.start; i<bpts.end-1; i++)
+   {
+      REAL pta, ptb;
+      pta=bpts.pts[i];
+      ptb=bpts.pts[i+1];
 
-	qlist->downloadAll( &pta, &ptb, backend );
+      qlist->downloadAll(&pta, &ptb, backend);
 
-	Curvelist curvelist( qlist, pta, ptb );
-	samplingSplit( curvelist, renderhints.maxsubdivisions );
-    }
-    backend.endcurv();
+      Curvelist curvelist(qlist, pta, ptb);
+      samplingSplit(curvelist, renderhints.maxsubdivisions);
+   }
+   backend.endcurv();
 }
 
 
