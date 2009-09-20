@@ -64,7 +64,7 @@ void OpenGLCurveEvaluator::inPreEvaluate(int order, REAL vprime, REAL* coeff)
     */
    if (order==1)
    {
-      coeff[0]=1.0;
+      coeff[0]=1.0f;
       return;
    }
 
@@ -149,68 +149,79 @@ void OpenGLCurveEvaluator::inDoDomain1(curveEvalMachine* em, REAL u, REAL* retPo
    REAL the_uprime;
    REAL* data;
 
-  if(em->u2 == em->u1)
-    return;
-  the_uprime = (u-em->u1) / (em->u2-em->u1);
-  /*use already cached values if possible*/
-  if(em->uprime != the_uprime){
-    inPreEvaluate(em->uorder, the_uprime, em->ucoeff);
-    em->uprime = the_uprime;
-  }
+   if (em->u2==em->u1)
+   {
+      return;
+   }
+   the_uprime=(u-em->u1)/(em->u2-em->u1);
 
-  for(j=0; j<em->k; j++){
-    data = em->ctlpoints+j;
-    retPoint[j] = 0.0;
-    for(row=0; row<em->uorder; row++)
+   /* use already cached values if possible */
+   if (em->uprime!=the_uprime)
+   {
+      inPreEvaluate(em->uorder, the_uprime, em->ucoeff);
+      em->uprime = the_uprime;
+   }
+
+   for(j=0; j<em->k; j++)
+   {
+      data=em->ctlpoints+j;
+      retPoint[j]=0.0f;
+      for (row=0; row<em->uorder; row++)
       {
-	retPoint[j] += em->ucoeff[row] * (*data);
-	data += em->k;
+         retPoint[j]+=em->ucoeff[row]*(*data);
+         data+=em->k;
       }
-  }
+   }
 }
 
 void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
 {
-  REAL temp_vertex[4];
-  REAL temp_normal[3];
-  REAL temp_color[4];
-  REAL temp_texcoord[4];
-  printf("OpenGLCurveEvaluator::inDoEvalCoord1\n");
-  if(texcoord_flag) //there is a texture map
-    {
+   REAL temp_vertex[4];
+   REAL temp_normal[3];
+   REAL temp_color[4];
+   REAL temp_texcoord[4];
+   printf("OpenGLCurveEvaluator::inDoEvalCoord1\n");
+
+   if (texcoord_flag) // there is a texture map
+   {
       inDoDomain1(&em_texcoord, u, temp_texcoord);
       texcoordCallBack(temp_texcoord, userData);
-    }
+   }
 
-  if(color_flag) //there is a color map
-    {
+   if (color_flag) // there is a color map
+   {
       inDoDomain1(&em_color, u, temp_color);
       colorCallBack(temp_color, userData);
-    }
-  if(normal_flag) //there is a normal map
-    {
+   }
+   if (normal_flag) // there is a normal map
+   {
       inDoDomain1(&em_normal, u, temp_normal);
       normalCallBack(temp_normal, userData);
-    }
-  if(vertex_flag)
-    {
+   }
+   if(vertex_flag)
+   {
       inDoDomain1(&em_vertex, u, temp_vertex);
       vertexCallBack(temp_vertex, userData);
-    }
+   }
 }
 
 void OpenGLCurveEvaluator::inMapMesh1f(int umin, int umax)
 {
-  REAL du, u;
-  printf("OpenGLCurveEvaluator::inMapMesh1f\n");
-  int i;
-  if(global_grid_nu == 0)
-    return; //no points to output
-  du = (global_grid_u1 - global_grid_u0) / (REAL) global_grid_nu;
-  bgnline();
-  for(i=umin; i<= umax; i++){
-    u = (i==global_grid_nu)? global_grid_u1: global_grid_u0 + i*du;
-    inDoEvalCoord1(u);
-  }
-  endline();
+   REAL du, u;
+   int i;
+
+   printf("OpenGLCurveEvaluator::inMapMesh1f\n");
+
+   if (global_grid_nu==0)
+   {
+      return; // no points to output
+   }
+   du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
+   bgnline();
+   for(i=umin; i<=umax; i++)
+   {
+      u=(i==global_grid_nu)?global_grid_u1:global_grid_u0+i*du;
+      inDoEvalCoord1(u);
+   }
+   endline();
 }

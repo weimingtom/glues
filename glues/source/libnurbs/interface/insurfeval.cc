@@ -425,23 +425,23 @@ void OpenGLSurfaceEvaluator::inMap2f(int k, REAL ulower, REAL uupper, int ustrid
 
 
 /*
- *given a point p with homegeneous coordiante (x,y,z,w), 
- *let pu(x,y,z,w) be its partial derivative vector with
- *respect to u
- *and pv(x,y,z,w) be its partial derivative vector with repect to v.
- *This function returns the partial derivative vectors of the
- *inhomegensous coordinates, i.e., 
- * (x/w, y/w, z/w) with respect to u and v.
+ * given a point p with homegeneous coordiante (x,y,z,w),
+ * let pu(x,y,z,w) be its partial derivative vector with
+ * respect to u
+ * and pv(x,y,z,w) be its partial derivative vector with repect to v.
+ * This function returns the partial derivative vectors of the
+ * inhomegensous coordinates, i.e.,
+ *  (x/w, y/w, z/w) with respect to u and v.
  */
-void OpenGLSurfaceEvaluator::inComputeFirstPartials(REAL *p, REAL *pu, REAL *pv)
+void OpenGLSurfaceEvaluator::inComputeFirstPartials(REAL* p, REAL* pu, REAL* pv)
 {
-    pu[0] = pu[0]*p[3] - pu[3]*p[0];
-    pu[1] = pu[1]*p[3] - pu[3]*p[1];
-    pu[2] = pu[2]*p[3] - pu[3]*p[2];
+   pu[0]=pu[0]*p[3]-pu[3]*p[0];
+   pu[1]=pu[1]*p[3]-pu[3]*p[1];
+   pu[2]=pu[2]*p[3]-pu[3]*p[2];
 
-    pv[0] = pv[0]*p[3] - pv[3]*p[0];
-    pv[1] = pv[1]*p[3] - pv[3]*p[1];
-    pv[2] = pv[2]*p[3] - pv[3]*p[2];
+   pv[0]=pv[0]*p[3]-pv[3]*p[0];
+   pv[1]=pv[1]*p[3]-pv[3]*p[1];
+   pv[2]=pv[2]*p[3]-pv[3]*p[2];
 }
 
 /* compute the cross product of pu and pv and normalize.
@@ -685,19 +685,15 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE_BV(REAL u, REAL v,
  */
 void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
+   REAL du[4];
+   REAL dv[4];
 
-  REAL du[4];
-  REAL dv[4];
-
- 
-  assert(global_ev_k>=3 && global_ev_k <= 4);
-  /*compute homegeneous point and partial derivatives*/
-  inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
-
+   assert(global_ev_k>=3 && global_ev_k<=4);
+   /* compute homegeneous point and partial derivatives */
+   inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
 
 #ifdef AVOID_ZERO_NORMAL
-
-  if(myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
+   if (myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
     {
 
       REAL tempdu[4];
@@ -829,11 +825,11 @@ void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBU(int k, REAL u, REAL v,
       for (col = 0; col < vorder; col++)  {
 	retPoint[j] += global_BU[col][j] * global_vcoeff[col];
 	retdu[j] += global_PBU[col][j] * global_vcoeff[col];
-	retdv[j] += global_BU[col][j] * global_vcoeffDeriv[col];
+         retdv[j] += global_BU[col][j] * global_vcoeffDeriv[col];
       }
-    }
-}    
-   
+   }
+}
+
 void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBV(int k, REAL u, REAL v,
 						      REAL u1, REAL u2, int uorder,
 						      REAL v1, REAL v2, int vorder,
@@ -866,7 +862,6 @@ void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBV(int k, REAL u, REAL v,
       }
     }
 }
-  
 
 /*
  *given a Bezier surface, and parameter (u,v), compute the point in the object space,
@@ -930,15 +925,15 @@ void OpenGLSurfaceEvaluator::inDoDomain2WithDerivs(int k, REAL u, REAL v,
 		p += global_vcoeff[col] * (*data);
 		pdv += global_vcoeffDeriv[col] * (*data);
 		data += k;
-	    }
-	    /* Use p, pdv value to incrementally add up r, du, dv */
-	    retPoint[j] += global_ucoeff[row] * p;
-	    retdu[j] += global_ucoeffDeriv[row] * p;
-	    retdv[j] += global_ucoeff[row] * pdv;
-	}
-    }  
-}
+         }
 
+         /* Use p, pdv value to incrementally add up r, du, dv */
+         retPoint[j]+=global_ucoeff[row]*p;
+         retdu[j]+=global_ucoeffDeriv[row]*p;
+         retdv[j]+=global_ucoeff[row]*pdv;
+      }
+   }
+}
 
 /*
  *compute the Bezier polynomials C[n,j](v) for all j at v with 
@@ -953,141 +948,164 @@ void OpenGLSurfaceEvaluator::inDoDomain2WithDerivs(int k, REAL u, REAL v,
  *   C[n,j](v) = (1-v)*C[n-1,j](v) + v*C[n-1,j-1](v), n>=1
  *This code is copied from opengl/soft/so_eval.c:PreEvaluate
  */
-void OpenGLSurfaceEvaluator::inPreEvaluate(int order, REAL vprime, REAL *coeff)
+void OpenGLSurfaceEvaluator::inPreEvaluate(int order, REAL vprime, REAL* coeff)
 {
-  int i, j;
-  REAL oldval, temp;
-  REAL oneMinusvprime;
-  
-  /*
-   * Minor optimization
-   * Compute orders 1 and 2 outright, and set coeff[0], coeff[1] to
-     * their i==1 loop values to avoid the initialization and the i==1 loop.
-     */
-  if (order == 1) {
-    coeff[0] = 1.0;
-    return;
-  }
-  
-  oneMinusvprime = 1-vprime;
-  coeff[0] = oneMinusvprime;
-  coeff[1] = vprime;
-  if (order == 2) return;
-  
-  for (i = 2; i < order; i++) {
-    oldval = coeff[0] * vprime;
-    coeff[0] = oneMinusvprime * coeff[0];
-    for (j = 1; j < i; j++) {
-      temp = oldval;
-      oldval = coeff[j] * vprime;
-	    coeff[j] = temp + oneMinusvprime * coeff[j];
-    }
-    coeff[j] = oldval;
-  }
+   int i, j;
+   REAL oldval, temp;
+   REAL oneMinusvprime;
+
+   /*
+    * Minor optimization
+    * Compute orders 1 and 2 outright, and set coeff[0], coeff[1] to
+    * their i==1 loop values to avoid the initialization and the i==1 loop.
+    */
+   if (order==1)
+   {
+      coeff[0]=1.0f;
+      return;
+   }
+
+   oneMinusvprime=1-vprime;
+   coeff[0]=oneMinusvprime;
+   coeff[1]=vprime;
+
+   if (order==2)
+   {
+      return;
+   }
+
+   for (i=2; i<order; i++)
+   {
+      oldval=coeff[0]*vprime;
+      coeff[0]=oneMinusvprime*coeff[0];
+      for (j=1; j<i; j++)
+      {
+         temp=oldval;
+         oldval=coeff[j]*vprime;
+         coeff[j]=temp+oneMinusvprime*coeff[j];
+      }
+      coeff[j]=oldval;
+   }
 }
 
 /*
- *compute the Bezier polynomials C[n,j](v) and derivatives for all j at v with 
- *return values stored in coeff[] and coeffDeriv[].
- *see the head of function inPreEvaluate for the definition of C[n,j](v)
- *and how to compute the values. 
- *The algorithm to compute the derivative is:
+ * compute the Bezier polynomials C[n,j](v) and derivatives for all j at v with 
+ * return values stored in coeff[] and coeffDeriv[].
+ * see the head of function inPreEvaluate for the definition of C[n,j](v)
+ * and how to compute the values. 
+ * The algorithm to compute the derivative is:
  *   dC[0,0](v) = 0.
  *   dC[n,j](v) = n*(dC[n-1,j-1](v) - dC[n-1,j](v)).
  *
- *This code is copied from opengl/soft/so_eval.c:PreEvaluateWidthDeriv
+ * This code is copied from opengl/soft/so_eval.c:PreEvaluateWidthDeriv
  */
-void OpenGLSurfaceEvaluator::inPreEvaluateWithDeriv(int order, REAL vprime, 
-    REAL *coeff, REAL *coeffDeriv)
+void OpenGLSurfaceEvaluator::inPreEvaluateWithDeriv(int order, REAL vprime,
+                                                    REAL* coeff, REAL* coeffDeriv)
 {
-  int i, j;
-  REAL oldval, temp;
-  REAL oneMinusvprime;
-  
-  oneMinusvprime = 1-vprime;
-  /*
-   * Minor optimization
-   * Compute orders 1 and 2 outright, and set coeff[0], coeff[1] to 
-   * their i==1 loop values to avoid the initialization and the i==1 loop.
-   */
-  if (order == 1) {
-    coeff[0] = 1.0;
-    coeffDeriv[0] = 0.0;
-    return;
-  } else if (order == 2) {
-    coeffDeriv[0] = -1.0;
-    coeffDeriv[1] = 1.0;
-    coeff[0] = oneMinusvprime;
-    coeff[1] = vprime;
-    return;
-  }
-  coeff[0] = oneMinusvprime;
-  coeff[1] = vprime;
-  for (i = 2; i < order - 1; i++) {
-    oldval = coeff[0] * vprime;
-    coeff[0] = oneMinusvprime * coeff[0];
-    for (j = 1; j < i; j++) {
-      temp = oldval;
-      oldval = coeff[j] * vprime;
-      coeff[j] = temp + oneMinusvprime * coeff[j];
-    }
-    coeff[j] = oldval;
-  }
-  coeffDeriv[0] = -coeff[0];
-  /*
-   ** Minor optimization:
-   ** Would make this a "for (j=1; j<order-1; j++)" loop, but it is always
-   ** executed at least once, so this is more efficient.
-   */
-  j=1;
-  do {
-    coeffDeriv[j] = coeff[j-1] - coeff[j];
-    j++;
-  } while (j < order - 1);
-  coeffDeriv[j] = coeff[j-1];
-  
-  oldval = coeff[0] * vprime;
-  coeff[0] = oneMinusvprime * coeff[0];
-  for (j = 1; j < i; j++) {
-    temp = oldval;
-    oldval = coeff[j] * vprime;
-    coeff[j] = temp + oneMinusvprime * coeff[j];
-  }
-  coeff[j] = oldval;
+   int i, j;
+   REAL oldval, temp;
+   REAL oneMinusvprime;
+
+   oneMinusvprime=1-vprime;
+
+   /*
+    * Minor optimization
+    * Compute orders 1 and 2 outright, and set coeff[0], coeff[1] to 
+    * their i==1 loop values to avoid the initialization and the i==1 loop.
+    */
+   if (order==1)
+   {
+      coeff[0]=1.0f;
+      coeffDeriv[0]=0.0f;
+      return;
+   }
+   else
+   {
+      if (order==2)
+      {
+         coeffDeriv[0]=-1.0f;
+         coeffDeriv[1]=1.0f;
+         coeff[0]=oneMinusvprime;
+         coeff[1]=vprime;
+         return;
+      }
+   }
+
+   coeff[0]=oneMinusvprime;
+   coeff[1]=vprime;
+
+   for (i=2; i<order-1; i++)
+   {
+      oldval=coeff[0]*vprime;
+      coeff[0]=oneMinusvprime*coeff[0];
+      for (j=1; j<i; j++)
+      {
+         temp=oldval;
+         oldval=coeff[j]*vprime;
+         coeff[j]=temp+oneMinusvprime*coeff[j];
+      }
+      coeff[j]=oldval;
+   }
+   coeffDeriv[0]=-coeff[0];
+
+   /*
+    ** Minor optimization:
+    ** Would make this a "for (j=1; j<order-1; j++)" loop, but it is always
+    ** executed at least once, so this is more efficient.
+    */
+   j=1;
+
+   do {
+      coeffDeriv[j]=coeff[j-1]-coeff[j];
+      j++;
+   } while (j<order-1);
+
+   coeffDeriv[j]=coeff[j-1];
+   oldval=coeff[0]*vprime;
+   coeff[0]=oneMinusvprime*coeff[0];
+
+   for (j=1; j<i; j++)
+   {
+      temp=oldval;
+      oldval=coeff[j]*vprime;
+      coeff[j]=temp+oneMinusvprime*coeff[j];
+   }
+   coeff[j]=oldval;
 }
 
-void OpenGLSurfaceEvaluator::inEvalULine(int n_points, REAL v, REAL* u_vals, 
-	int stride, REAL ret_points[][3], REAL ret_normals[][3])
+void OpenGLSurfaceEvaluator::inEvalULine(int n_points, REAL v, REAL* u_vals, int stride,
+                                         REAL ret_points[][3], REAL ret_normals[][3])
 {
-  int i,k;
-  REAL temp[4];
-inPreEvaluateBV_intfac(v);
+   int i, k;
+   REAL temp[4];
 
-  for(i=0,k=0; i<n_points; i++, k += stride)
-    {
-      inDoEvalCoord2NOGE_BV(u_vals[k],v,temp, ret_normals[i]);
+   inPreEvaluateBV_intfac(v);
 
-      ret_points[i][0] = temp[0];
-      ret_points[i][1] = temp[1];
-      ret_points[i][2] = temp[2];
+   for(i=0, k=0; i<n_points; i++, k+=stride)
+   {
+      inDoEvalCoord2NOGE_BV(u_vals[k], v, temp, ret_normals[i]);
 
-    }
-
+      ret_points[i][0]=temp[0];
+      ret_points[i][1]=temp[1];
+      ret_points[i][2]=temp[2];
+   }
 }
 
-void OpenGLSurfaceEvaluator::inEvalVLine(int n_points, REAL u, REAL* v_vals, 
-	int stride, REAL ret_points[][3], REAL ret_normals[][3])
+void OpenGLSurfaceEvaluator::inEvalVLine(int n_points, REAL u, REAL* v_vals, int stride,
+                                         REAL ret_points[][3], REAL ret_normals[][3])
 {
-  int i,k;
-  REAL temp[4];
-inPreEvaluateBU_intfac(u);
-  for(i=0,k=0; i<n_points; i++, k += stride)
-    {
+   int i, k;
+   REAL temp[4];
+
+   inPreEvaluateBU_intfac(u);
+
+   for(i=0, k=0; i<n_points; i++, k+=stride)
+   {
       inDoEvalCoord2NOGE_BU(u, v_vals[k], temp, ret_normals[i]);
-      ret_points[i][0] = temp[0];
-      ret_points[i][1] = temp[1];
-      ret_points[i][2] = temp[2];
-    }
+      ret_points[i][0]=temp[0];
+      ret_points[i][1]=temp[1];
+      ret_points[i][2]=temp[2];
+   }
 }
 
 
@@ -2147,455 +2165,440 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
 }
 
 /*-----------------------begin evalMachine-------------------*/
-void OpenGLSurfaceEvaluator::inMap2fEM(int which, int k,
-	     REAL ulower,
-	     REAL uupper,
-	     int ustride,
-	     int uorder,
-	     REAL vlower,
-	     REAL vupper,
-	     int vstride,
-	     int vorder,
-	     REAL *ctlPoints)
+void OpenGLSurfaceEvaluator::inMap2fEM(int which, int k, REAL ulower, REAL uupper, int ustride,
+                                       int uorder, REAL vlower, REAL vupper, int vstride,
+                                       int vorder, REAL* ctlPoints)
 {
-  int i,j,x;
-  surfEvalMachine *temp_em;
-  switch(which){
-  case 0: //vertex
-    vertex_flag = 1;
-    temp_em = &em_vertex;
-    break;
-  case 1: //normal
-    normal_flag = 1;
-    temp_em = &em_normal;
-    break;
-  case 2: //color
-    color_flag = 1;
-    temp_em = &em_color;
-    break;
-  default:
-    texcoord_flag = 1;
-    temp_em = &em_texcoord;
-    break;
-  }
+   int i, j, x;
 
-  REAL *data = temp_em->ctlPoints;
-  
-  temp_em->uprime = -1;//initilized
-  temp_em->vprime = -1;
+   surfEvalMachine* temp_em;
 
-  temp_em->k = k;
-  temp_em->u1 = ulower;
-  temp_em->u2 = uupper;
-  temp_em->ustride = ustride;
-  temp_em->uorder = uorder;
-  temp_em->v1 = vlower;
-  temp_em->v2 = vupper;
-  temp_em->vstride = vstride;
-  temp_em->vorder = vorder;
+   switch (which)
+   {
+      case 0: // vertex
+           vertex_flag=1;
+           temp_em=&em_vertex;
+           break;
+      case 1: // normal
+           normal_flag=1;
+           temp_em=&em_normal;
+           break;
+      case 2: // color
+           color_flag=1;
+           temp_em=&em_color;
+           break;
+      default:
+           texcoord_flag=1;
+           temp_em=&em_texcoord;
+           break;
+   }
 
-  /*copy the contrl points from ctlPoints to global_ev_ctlPoints*/
-  for (i=0; i<uorder; i++) {
-    for (j=0; j<vorder; j++) {
-      for (x=0; x<k; x++) {
-	data[x] = ctlPoints[x];
+   REAL* data=temp_em->ctlPoints;
+
+   temp_em->uprime=-1; // initilized
+   temp_em->vprime=-1;
+
+   temp_em->k=k;
+   temp_em->u1=ulower;
+   temp_em->u2=uupper;
+   temp_em->ustride=ustride;
+   temp_em->uorder=uorder;
+   temp_em->v1=vlower;
+   temp_em->v2=vupper;
+   temp_em->vstride=vstride;
+   temp_em->vorder=vorder;
+
+   /* copy the contrl points from ctlPoints to global_ev_ctlPoints */
+   for (i=0; i<uorder; i++)
+   {
+      for (j=0; j<vorder; j++)
+      {
+         for (x=0; x<k; x++)
+         {
+            data[x]=ctlPoints[x];
+         }
+         ctlPoints+=vstride;
+         data+=k;
       }
-      ctlPoints += vstride;
-      data += k;
-    }
-    ctlPoints += ustride - vstride * vorder;
-  }
+      ctlPoints+=ustride-vstride*vorder;
+   }
 }
 
-void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsEM(surfEvalMachine *em, REAL u, REAL v, 
-				REAL *retPoint, REAL *retdu, REAL *retdv)
+void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsEM(surfEvalMachine* em, REAL u, REAL v,
+                                                     REAL* retPoint, REAL* retdu, REAL* retdv)
 {
-    int j, row, col;
-    REAL the_uprime;
-    REAL the_vprime;
-    REAL p;
-    REAL pdv;
-    REAL *data;
+   int j, row, col;
+   REAL  the_uprime;
+   REAL  the_vprime;
+   REAL  p;
+   REAL  pdv;
+   REAL* data;
 
-    if((em->u2 == em->u1) || (em->v2 == em->v1))
-	return;
-    the_uprime = (u - em->u1) / (em->u2 - em->u1);
-    the_vprime = (v - em->v1) / (em->v2 - em->v1);
-    
-    /* Compute coefficients for values and derivs */
+   if ((em->u2==em->u1)||(em->v2==em->v1))
+   {
+      return;
+   }
 
-    /* Use already cached values if possible */
-    if(em->uprime != the_uprime) {
-        inPreEvaluateWithDeriv(em->uorder, the_uprime, em->ucoeff, em->ucoeffDeriv);
-	em->uprime = the_uprime;
-    }
-    if (em->vprime != the_vprime) {
-	inPreEvaluateWithDeriv(em->vorder, the_vprime, em->vcoeff, em->vcoeffDeriv);
-	em->vprime = the_vprime;
-    }
+   the_uprime=(u-em->u1)/(em->u2-em->u1);
+   the_vprime=(v-em->v1)/(em->v2-em->v1);
 
-    for (j = 0; j < em->k; j++) {
-	data=em->ctlPoints+j;
-	retPoint[j] = retdu[j] = retdv[j] = 0.0;
-	for (row = 0; row < em->uorder; row++)  {
-	    /* 
-	    ** Minor optimization.
-	    ** The col == 0 part of the loop is extracted so we don't
-	    ** have to initialize p and pdv to 0.
-	    */
-	    p = em->vcoeff[0] * (*data);
-	    pdv = em->vcoeffDeriv[0] * (*data);
-	    data += em->k;
-	    for (col = 1; col < em->vorder; col++) {
-		/* Incrementally build up p, pdv value */
-		p += em->vcoeff[col] * (*data);
-		pdv += em->vcoeffDeriv[col] * (*data);
-		data += em->k;
-	    }
-	    /* Use p, pdv value to incrementally add up r, du, dv */
-	    retPoint[j] += em->ucoeff[row] * p;
-	    retdu[j] += em->ucoeffDeriv[row] * p;
-	    retdv[j] += em->ucoeff[row] * pdv;
-	}
-    }
+   /* Compute coefficients for values and derivs */
+
+   /* Use already cached values if possible */
+   if (em->uprime!=the_uprime)
+   {
+      inPreEvaluateWithDeriv(em->uorder, the_uprime, em->ucoeff, em->ucoeffDeriv);
+      em->uprime=the_uprime;
+   }
+
+   if (em->vprime!=the_vprime)
+   {
+      inPreEvaluateWithDeriv(em->vorder, the_vprime, em->vcoeff, em->vcoeffDeriv);
+      em->vprime=the_vprime;
+   }
+
+   for (j=0; j<em->k; j++)
+   {
+      data=em->ctlPoints+j;
+      retPoint[j]=retdu[j]=retdv[j]=0.0f;
+      for (row=0; row<em->uorder; row++)
+      {
+         /*
+          ** Minor optimization.
+          ** The col == 0 part of the loop is extracted so we don't
+          ** have to initialize p and pdv to 0.
+          */
+         p=em->vcoeff[0]*(*data);
+         pdv=em->vcoeffDeriv[0]*(*data);
+         data+=em->k;
+         for (col=1; col<em->vorder; col++)
+         {
+            /* Incrementally build up p, pdv value */
+            p+=em->vcoeff[col]*(*data);
+            pdv+=em->vcoeffDeriv[col]*(*data);
+            data+=em->k;
+         }
+
+         /* Use p, pdv value to incrementally add up r, du, dv */
+         retPoint[j]+=em->ucoeff[row]*p;
+         retdu[j]+=em->ucoeffDeriv[row]*p;
+         retdv[j]+=em->ucoeff[row]*pdv;
+      }
+   }
 }
 
-void OpenGLSurfaceEvaluator::inDoDomain2EM(surfEvalMachine *em, REAL u, REAL v, 
-				REAL *retPoint)
+void OpenGLSurfaceEvaluator::inDoDomain2EM(surfEvalMachine* em, REAL u, REAL v, REAL* retPoint)
 {
-    int j, row, col;
-    REAL the_uprime;
-    REAL the_vprime;
-    REAL p;
-    REAL *data;
+   int j, row, col;
+   REAL  the_uprime;
+   REAL  the_vprime;
+   REAL  p;
+   REAL* data;
 
-    if((em->u2 == em->u1) || (em->v2 == em->v1))
-	return;
-    the_uprime = (u - em->u1) / (em->u2 - em->u1);
-    the_vprime = (v - em->v1) / (em->v2 - em->v1);
+   if ((em->u2==em->u1) || (em->v2==em->v1))
+   {
+      return;
+   }
 
-    /* Compute coefficients for values and derivs */
+   the_uprime=(u-em->u1)/(em->u2-em->u1);
+   the_vprime=(v-em->v1)/(em->v2-em->v1);
 
-    /* Use already cached values if possible */
-    if(em->uprime != the_uprime) {
-        inPreEvaluate(em->uorder, the_uprime, em->ucoeff);
-	em->uprime = the_uprime;
-    }
-    if (em->vprime != the_vprime) {
-	inPreEvaluate(em->vorder, the_vprime, em->vcoeff);
-	em->vprime = the_vprime;
-    }
+   /* Compute coefficients for values and derivs */
 
-    for (j = 0; j < em->k; j++) {
-	data=em->ctlPoints+j;
-	retPoint[j] = 0.0;
-	for (row = 0; row < em->uorder; row++)  {
-	    /* 
-	    ** Minor optimization.
-	    ** The col == 0 part of the loop is extracted so we don't
-	    ** have to initialize p and pdv to 0.
-	    */
-	    p = em->vcoeff[0] * (*data);
-	    data += em->k;
-	    for (col = 1; col < em->vorder; col++) {
-		/* Incrementally build up p, pdv value */
-		p += em->vcoeff[col] * (*data);
-		data += em->k;
-	    }
-	    /* Use p, pdv value to incrementally add up r, du, dv */
-	    retPoint[j] += em->ucoeff[row] * p;
-	}
-    }
+   /* Use already cached values if possible */
+   if (em->uprime!=the_uprime)
+   {
+      inPreEvaluate(em->uorder, the_uprime, em->ucoeff);
+      em->uprime=the_uprime;
+   }
+
+   if (em->vprime!=the_vprime)
+   {
+      inPreEvaluate(em->vorder, the_vprime, em->vcoeff);
+      em->vprime=the_vprime;
+   }
+
+   for (j=0; j<em->k; j++)
+   {
+      data=em->ctlPoints+j;
+      retPoint[j]=0.0f;
+
+      for (row=0; row<em->uorder; row++)
+      {
+            /*
+            ** Minor optimization.
+            ** The col == 0 part of the loop is extracted so we don't
+            ** have to initialize p and pdv to 0.
+            */
+         p=em->vcoeff[0]*(*data);
+         data+=em->k;
+
+         for (col=1; col<em->vorder; col++)
+         {
+            /* Incrementally build up p, pdv value */
+            p+=em->vcoeff[col]*(*data);
+            data+=em->k;
+         }
+         /* Use p, pdv value to incrementally add up r, du, dv */
+         retPoint[j]+=em->ucoeff[row]*p;
+      }
+   }
 }
 
 void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
 {
-  REAL temp_vertex[5];
-  REAL temp_normal[3];
-  REAL temp_color[4];
-  REAL temp_texcoord[4];
+   REAL temp_vertex[5];
+   REAL temp_normal[3];
+   REAL temp_color[4];
+   REAL temp_texcoord[4];
 
-  if(texcoord_flag)
-    {
+   if (texcoord_flag)
+   {
       inDoDomain2EM(&em_texcoord, u,v, temp_texcoord);
       texcoordCallBack(temp_texcoord, userData);
-    }
-  if(color_flag)
-    {
+   }
+   if (color_flag)
+   {
       inDoDomain2EM(&em_color, u,v, temp_color);
       colorCallBack(temp_color, userData);
-    }
+   }
 
-  if(normal_flag) //there is a normla map
-    {
+   if (normal_flag) // there is a normal map
+   {
       inDoDomain2EM(&em_normal, u,v, temp_normal);
       normalCallBack(temp_normal, userData);
 
       if(vertex_flag)
-	{
-	  inDoDomain2EM(&em_vertex, u,v,temp_vertex);
-	  if(em_vertex.k == 4)
-	    {
-	      temp_vertex[0] /= temp_vertex[3];
-	      temp_vertex[1] /= temp_vertex[3];
-	      temp_vertex[2] /= temp_vertex[3];
-	    }
-          temp_vertex[3]=u;
-          temp_vertex[4]=v;
-	  vertexCallBack(temp_vertex, userData);
-	}
-    }
-  else if(auto_normal_flag) //no normal map but there is a normal callbackfunctin
-    {
-      REAL du[4];
-      REAL dv[4];
+      {
+         inDoDomain2EM(&em_vertex, u, v, temp_vertex);
+         if (em_vertex.k==4)
+         {
+            temp_vertex[0]/=temp_vertex[3];
+            temp_vertex[1]/=temp_vertex[3];
+            temp_vertex[2]/=temp_vertex[3];
+         }
+         temp_vertex[3]=u;
+         temp_vertex[4]=v;
+         vertexCallBack(temp_vertex, userData);
+      }
+   }
+   else
+   {
+      if (auto_normal_flag) // no normal map but there is a normal callbackfunctin
+      {
+         REAL du[4];
+         REAL dv[4];
 
-      /*compute homegeneous point and partial derivatives*/
-      inDoDomain2WithDerivsEM(&em_vertex, u,v,temp_vertex,du,dv);
+         /* compute homegeneous point and partial derivatives */
+         inDoDomain2WithDerivsEM(&em_vertex, u, v, temp_vertex, du, dv);
 
-      if(em_vertex.k ==4)
-	inComputeFirstPartials(temp_vertex, du, dv);
+         if (em_vertex.k==4)
+         {
+            inComputeFirstPartials(temp_vertex, du, dv);
 
 #ifdef AVOID_ZERO_NORMAL
-      if(myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
-	{
-	  
-	  REAL tempdu[4];
-	  REAL tempdata[4];
-	  REAL u1 = em_vertex.u1;
-	  REAL u2 = em_vertex.u2;
-	  if(u-MYDELTA*(u2-u1) < u1)
-	    u = u+ MYDELTA*(u2-u1);
-	  else
-	    u = u-MYDELTA*(u2-u1);
-	  inDoDomain2WithDerivsEM(&em_vertex,u,v, tempdata, tempdu, dv);
+            if (myabs(dv[0])<=MYZERO && myabs(dv[1])<=MYZERO && myabs(dv[2])<=MYZERO)
+            {
+               REAL tempdu[4];
+               REAL tempdata[4];
+               REAL u1=em_vertex.u1;
+               REAL u2=em_vertex.u2;
 
-	  if(em_vertex.k ==4)
-	    inComputeFirstPartials(temp_vertex, du, dv);
-	}
-      else if(myabs(du[0]) <= MYZERO && myabs(du[1]) <= MYZERO && myabs(du[2]) <= MYZERO)
-	{
-	  REAL tempdv[4];
-	  REAL tempdata[4];
-	  REAL v1 = em_vertex.v1;
-	  REAL v2 = em_vertex.v2;
-	  if(v-MYDELTA*(v2-v1) < v1)
-	    v = v+ MYDELTA*(v2-v1);
-	  else
-	    v = v-MYDELTA*(v2-v1);
-	  inDoDomain2WithDerivsEM(&em_vertex,u,v, tempdata, du, tempdv);
+               if (u-MYDELTA*(u2-u1)<u1)
+               {
+                  u=u+MYDELTA*(u2-u1);
+               }
+               else
+               {
+                  u=u-MYDELTA*(u2-u1);
+               }
+               inDoDomain2WithDerivsEM(&em_vertex, u, v, tempdata, tempdu, dv);
 
-	  if(em_vertex.k ==4)
-	    inComputeFirstPartials(temp_vertex, du, dv);
-	}
+               if (em_vertex.k==4)
+               {
+                  inComputeFirstPartials(temp_vertex, du, dv);
+               }
+            }
+            else
+            {
+               if (myabs(du[0])<=MYZERO && myabs(du[1])<=MYZERO && myabs(du[2])<=MYZERO)
+               {
+                  REAL tempdv[4];
+                  REAL tempdata[4];
+                  REAL v1=em_vertex.v1;
+                  REAL v2=em_vertex.v2;
+
+                  if (v-MYDELTA*(v2-v1)<v1)
+                  {
+                     v=v+MYDELTA*(v2-v1);
+                  }
+                  else
+                  {
+                     v=v-MYDELTA*(v2-v1);
+                  }
+                  inDoDomain2WithDerivsEM(&em_vertex,u,v, tempdata, du, tempdv);
+
+                  if (em_vertex.k==4)
+                  {
+                     inComputeFirstPartials(temp_vertex, du, dv);
+                  }
+               }
+            }
+         }
 #endif
 
-      /*compute normal*/
-      switch(em_vertex.k){
-      case 3:
-
-	inComputeNormal2(du, dv, temp_normal);
-	break;
-      case 4:
-
-//	inComputeFirstPartials(temp_vertex, du, dv);
-	inComputeNormal2(du, dv, temp_normal);
-
-	/*transform the homegeneous coordinate of retPoint into inhomogenous one*/
-	temp_vertex[0] /= temp_vertex[3];
-	temp_vertex[1] /= temp_vertex[3];
-	temp_vertex[2] /= temp_vertex[3];
-	break;
+         /* compute normal */
+         switch (em_vertex.k)
+         {
+            case 3:
+                 inComputeNormal2(du, dv, temp_normal);
+                 break;
+            case 4:
+                 inComputeNormal2(du, dv, temp_normal);
+                 /* transform the homegeneous coordinate of retPoint into inhomogenous one */
+                 temp_vertex[0]/=temp_vertex[3];
+                 temp_vertex[1]/=temp_vertex[3];
+                 temp_vertex[2]/=temp_vertex[3];
+                 break;
+         }
+         normalCallBack(temp_normal, userData);
+         temp_vertex[3]=u;
+         temp_vertex[4]=v;
+         vertexCallBack(temp_vertex, userData);
+      } /* end if auto_normal */
+      else // no normal map, and no normal callback function
+      {
+         if(vertex_flag)
+         {
+            inDoDomain2EM(&em_vertex, u, v, temp_vertex);
+            if (em_vertex.k==4)
+            {
+               temp_vertex[0]/=temp_vertex[3];
+               temp_vertex[1]/=temp_vertex[3];
+               temp_vertex[2]/=temp_vertex[3];
+            }
+            temp_vertex[3]=u;
+            temp_vertex[4]=v;
+            vertexCallBack(temp_vertex, userData);
+         }
       }
-      normalCallBack(temp_normal, userData);
-      temp_vertex[3] = u;
-      temp_vertex[4] = v;
-      vertexCallBack(temp_vertex, userData);
-
-    }/*end if auto_normal*/
-  else //no normal map, and no normal callback function
-    {
-      if(vertex_flag)
-	{
-	  inDoDomain2EM(&em_vertex, u,v,temp_vertex);
-	  if(em_vertex.k == 4)
-	    {
-	      temp_vertex[0] /= temp_vertex[3];
-	      temp_vertex[1] /= temp_vertex[3];
-	      temp_vertex[2] /= temp_vertex[3];	      
-	    }
-          temp_vertex[3] = u;
-          temp_vertex[4] = v;
-	  vertexCallBack(temp_vertex, userData);
-	}
-    }
+   }
 }
-
 
 void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
 {
-  int i,j,k;
-  float u,v;
+   int i, j, k;
+   float u, v;
 
-  int ustride;
-  int vstride;
+   int ustride;
+   int vstride;
 
 #ifdef USE_LOD
-  if(bpm->bpatch != NULL)
-    {
+   if (bpm->bpatch!=NULL)
+   {
       bezierPatch* p=bpm->bpatch;
-      ustride = p->dimension * p->vorder;
-      vstride = p->dimension;
+      ustride=p->dimension*p->vorder;
+      vstride=p->dimension;
 
-      glMap2f( (p->dimension == 3)? GLU_MAP2_VERTEX_3 : GLU_MAP2_VERTEX_4,
-	      p->umin,
-	      p->umax,
-	      ustride,
-	      p->uorder,
-	      p->vmin,
-	      p->vmax,
-	      vstride,
-	      p->vorder,
-	      p->ctlpoints);
-
-
-/*
-    inMap2fEM(0, p->dimension,
-	  p->umin,
-	  p->umax,
-	  ustride,
-	  p->uorder,
-	  p->vmin,
-	  p->vmax,
-	  vstride,
-	  p->vorder,
-	  p->ctlpoints);
-*/
+      glMap2f((p->dimension==3)?GLU_MAP2_VERTEX_3:GLU_MAP2_VERTEX_4,
+               p->umin, p->umax, ustride, p->uorder, p->vmin, p->vmax,
+               vstride, p->vorder, p->ctlpoints);
     }
-#else
+#else /* USE_LOD */
+   if (bpm->bpatch!=NULL)
+   {
+      bezierPatch* p=bpm->bpatch;
+      ustride=p->dimension*p->vorder;
+      vstride=p->dimension;
+      inMap2fEM(0, p->dimension, p->umin, p->umax, ustride, p->uorder, p->vmin,
+                p->vmax, vstride, p->vorder, p->ctlpoints);
+   }
 
-  if(bpm->bpatch != NULL){
-    bezierPatch* p = bpm->bpatch;
-    ustride = p->dimension * p->vorder;
-    vstride = p->dimension;
-    inMap2fEM(0, p->dimension,
-	  p->umin,
-	  p->umax,
-	  ustride,
-	  p->uorder,
-	  p->vmin,
-	  p->vmax,
-	  vstride,
-	  p->vorder,
-	  p->ctlpoints);
-  }
-  if(bpm->bpatch_normal != NULL){
-    bezierPatch* p = bpm->bpatch_normal;
-    ustride = p->dimension * p->vorder;
-    vstride = p->dimension;
-    inMap2fEM(1, p->dimension,
-	  p->umin,
-	  p->umax,
-	  ustride,
-	  p->uorder,
-	  p->vmin,
-	  p->vmax,
-	  vstride,
-	  p->vorder,
-	  p->ctlpoints);
-  }
-  if(bpm->bpatch_color != NULL){
-    bezierPatch* p = bpm->bpatch_color;
-    ustride = p->dimension * p->vorder;
-    vstride = p->dimension;
-    inMap2fEM(2, p->dimension,
-	  p->umin,
-	  p->umax,
-	  ustride,
-	  p->uorder,
-	  p->vmin,
-	  p->vmax,
-	  vstride,
-	  p->vorder,
-	  p->ctlpoints);
-  }
-  if(bpm->bpatch_texcoord != NULL){
-    bezierPatch* p = bpm->bpatch_texcoord;
-    ustride = p->dimension * p->vorder;
-    vstride = p->dimension;
-    inMap2fEM(3, p->dimension,
-	  p->umin,
-	  p->umax,
-	  ustride,
-	  p->uorder,
-	  p->vmin,
-	  p->vmax,
-	  vstride,
-	  p->vorder,
-	  p->ctlpoints);
-  }
-#endif
+   if (bpm->bpatch_normal!=NULL)
+   {
+      bezierPatch* p = bpm->bpatch_normal;
+      ustride=p->dimension*p->vorder;
+      vstride=p->dimension;
+      inMap2fEM(1, p->dimension, p->umin, p->umax, ustride, p->uorder, p->vmin,
+                p->vmax, vstride, p->vorder, p->ctlpoints);
+   }
 
+   if (bpm->bpatch_color!=NULL)
+   {
+      bezierPatch* p=bpm->bpatch_color;
+      ustride=p->dimension*p->vorder;
+      vstride=p->dimension;
+      inMap2fEM(2, p->dimension, p->umin, p->umax, ustride, p->uorder, p->vmin,
+                p->vmax, vstride, p->vorder, p->ctlpoints);
+   }
 
-  k=0;
-  for(i=0; i<bpm->index_length_array; i++)
-    {
+   if (bpm->bpatch_texcoord!=NULL)
+   {
+      bezierPatch* p=bpm->bpatch_texcoord;
+      ustride=p->dimension * p->vorder;
+      vstride=p->dimension;
+      inMap2fEM(3, p->dimension, p->umin, p->umax, ustride, p->uorder, p->vmin,
+                p->vmax, vstride, p->vorder, p->ctlpoints);
+   }
+#endif /* USE_LOD */
+
+   k=0;
+
+   for(i=0; i<bpm->index_length_array; i++)
+   {
 #ifdef USE_LOD
-      if(bpm->type_array[i] == GL_POLYGON) //a mesh
-	{
-	  GLfloat *temp = bpm->UVarray+k;
-	  GLfloat u0 = temp[0];
-	  GLfloat v0 = temp[1];
-	  GLfloat u1 = temp[2];
-	  GLfloat v1 = temp[3];
-	  GLint nu = (GLint) ( temp[4]);
-	  GLint nv = (GLint) ( temp[5]);
-	  GLint umin = (GLint) ( temp[6]);
-	  GLint vmin = (GLint) ( temp[7]);
-	  GLint umax = (GLint) ( temp[8]);
-	  GLint vmax = (GLint) ( temp[9]);
+      if (bpm->type_array[i]==GL_POLYGON) // a mesh
+      {
+         GLfloat* temp=bpm->UVarray+k;
+         GLfloat u0=temp[0];
+         GLfloat v0=temp[1];
+         GLfloat u1=temp[2];
+         GLfloat v1=temp[3];
+         GLint nu=(GLint)(temp[4]);
+         GLint nv=(GLint)(temp[5]);
+         GLint umin=(GLint)(temp[6]);
+         GLint vmin=(GLint)(temp[7]);
+         GLint umax=(GLint)(temp[8]);
+         GLint vmax=(GLint)(temp[9]);
 
-	  glMapGrid2f(LOD_eval_level*nu, u0, u1, LOD_eval_level*nv, v0, v1);
-	  glEvalMesh2(GL_FILL, LOD_eval_level*umin, LOD_eval_level*umax, LOD_eval_level*vmin, LOD_eval_level*vmax);
-	}
+         glMapGrid2f(LOD_eval_level*nu, u0, u1, LOD_eval_level*nv, v0, v1);
+         glEvalMesh2(GL_FILL, LOD_eval_level*umin, LOD_eval_level*umax, LOD_eval_level*vmin, LOD_eval_level*vmax);
+      }
       else
-	{
-	  LOD_eval(bpm->length_array[i], bpm->UVarray+k, bpm->type_array[i],
-		   0
-		   );
-	}
-	  k+= 2*bpm->length_array[i];
+      {
+         LOD_eval(bpm->length_array[i], bpm->UVarray+k, bpm->type_array[i], 0);
+      }
 
-#else //undef  USE_LOD
+      k+=2*bpm->length_array[i];
+
+#else /* USE_LOD */
 
       beginCallBack(bpm->type_array[i], userData);
 
       for(j=0; j<bpm->length_array[i]; j++)
-	{
-	  u = bpm->UVarray[k];
-	  v = bpm->UVarray[k+1];
+      {
+         u=bpm->UVarray[k];
+         v=bpm->UVarray[k+1];
 #ifdef USE_LOD
-          LOD_EVAL_COORD(u,v);
-//	  glEvalCoord2f(u,v);
-#else
-          inDoEvalCoord2EM(u,v);
-     
-#endif //USE_LOD
+         LOD_EVAL_COORD(u, v);
+#else /* USE_LOD */
+         inDoEvalCoord2EM(u, v);
+#endif /* USE_LOD */
 
-	  k += 2;
-	}
+         k+=2;
+      }
       endCallBack(userData);
-
 #endif // USE_LOD
    }
 }
 
 void OpenGLSurfaceEvaluator::inBPMListEvalEM(bezierPatchMesh* list)
 {
-  bezierPatchMesh* temp;
-  for(temp = list; temp != NULL; temp = temp->next)
-    {
+   bezierPatchMesh* temp;
+
+   for(temp=list; temp!=NULL; temp=temp->next)
+   {
       inBPMEvalEM(temp);
-    }
+   }
 }
 

@@ -37,16 +37,16 @@
 #define __glumystdio_h_
 
 #ifdef LIBRARYBUILD
-#ifndef NDEBUG
-#include <stdio.h>
-#define _glu_dprintf printf
-#else
-inline void _glu_dprintf(const char *, ...) { }
-#endif
+   #ifndef NDEBUG
+      #include <stdio.h>
+      #define _glu_dprintf printf
+   #else
+      inline void _glu_dprintf(const char *, ...) { }
+   #endif
 #endif
 
 #ifdef GLBUILD
-inline void _glu_dprintf(const char *, ...) { }
+   inline void _glu_dprintf(const char *, ...) { }
 #endif
 
 #ifndef NULL
