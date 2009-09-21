@@ -32,115 +32,525 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
-/*
-*/
 
 #include "monoTriangulation.h"
 #include "polyUtil.h"
 #include "backend.h"
 #include "arc.h"
+#include "displaymode.h"
+
+#include "gles_evaluator.h"
+#include "glues.h"
 
 #include <stdio.h>
 
 void reflexChain::outputFan(Real v[2], Backend* backend)
 {
-  Int i;
+   Int i;
+   REAL retPoint[4];
+   REAL retNormal[3];
+   int it=0;
 
-  printf("reflexChain::outputFan\n");
-  backend->bgntfan();
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
 
-  backend->tmeshvert(v[0], v[1]);
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
 
-  if(isIncreasing) {
-    for(i=0; i<index_queue; i++)
+   backend->bgntfan();
+
+   if (backend->get_output_style()==N_MESHLINE)
+   {
+      REAL* vertices=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1)*3);
+      assert(vertices);
+      REAL* normals=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1)*3);
+      assert(normals);
+
+      /* Enable needed and disable unneeded arrays */
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glVertexPointer(3, GL_FLOAT, 0, vertices);
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glNormalPointer(GL_FLOAT, 0, normals);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisableClientState(GL_COLOR_ARRAY);
+
+      backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+      /* Store triangle fan center vertex */
+      vertices[it*3+0]=retPoint[0];
+      vertices[it*3+1]=retPoint[1];
+      vertices[it*3+2]=retPoint[2];
+      normals[it*3+0]=retNormal[0];
+      normals[it*3+1]=retNormal[1];
+      normals[it*3+2]=retNormal[2];
+      it++;
+
+      if (isIncreasing)
       {
-	backend->tmeshvert(queue[i][0], queue[i][1]);
+         for(i=0; i<index_queue; i++)
+         {
+            if (it%3==0)
+            {
+               /* Store triangle fan center vertex */
+               backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+               /* Store previous vertex */
+               backend->tmeshvert(queue[i-1][0], queue[i-1][1], retPoint, retNormal);
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+            }
+            /* Store new vertex */
+            backend->tmeshvert(queue[i][0], queue[i][1], retPoint, retNormal);
+            vertices[it*3+0]=retPoint[0];
+            vertices[it*3+1]=retPoint[1];
+            vertices[it*3+2]=retPoint[2];
+            normals[it*3+0]=retNormal[0];
+            normals[it*3+1]=retNormal[1];
+            normals[it*3+2]=retNormal[2];
+            it++;
+         }
       }
-  }
-  else {
-    for(i=index_queue-1; i>=0; i--)
+      else
       {
-	backend->tmeshvert(queue[i][0], queue[i][1]);
+         for(i=index_queue-1; i>=0; i--)
+         {
+            if (it%3==0)
+            {
+               /* Store triangle fan center vertex */
+               backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+               /* Store previous vertex */
+               backend->tmeshvert(queue[i+1][0], queue[i+1][1], retPoint, retNormal);
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+            }
+            backend->tmeshvert(queue[i][0], queue[i][1], retPoint, retNormal);
+            vertices[it*3+0]=retPoint[0];
+            vertices[it*3+1]=retPoint[1];
+            vertices[it*3+2]=retPoint[2];
+            normals[it*3+0]=retNormal[0];
+            normals[it*3+1]=retNormal[1];
+            normals[it*3+2]=retNormal[2];
+            it++;
+         }
       }
-  }
-  backend->endtfan();
+
+      int jt;
+
+      for (jt=0; jt<it; jt+=3)
+      {
+         glDrawArrays(GL_LINE_LOOP, jt, 3);
+      }
+
+      free(normals);
+      free(vertices);
+   }
+   else
+   {
+      REAL* vertices=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1));
+      assert(vertices);
+      REAL* normals=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1));
+      assert(normals);
+
+      /* Enable needed and disable unneeded arrays */
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glVertexPointer(3, GL_FLOAT, 0, vertices);
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glNormalPointer(GL_FLOAT, 0, normals);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisableClientState(GL_COLOR_ARRAY);
+
+      backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+      /* Store triangle fan center vertex */
+      vertices[it*3+0]=retPoint[0];
+      vertices[it*3+1]=retPoint[1];
+      vertices[it*3+2]=retPoint[2];
+      normals[it*3+0]=retNormal[0];
+      normals[it*3+1]=retNormal[1];
+      normals[it*3+2]=retNormal[2];
+      it++;
+
+      if (isIncreasing)
+      {
+         for(i=0; i<index_queue; i++)
+         {
+            backend->tmeshvert(queue[i][0], queue[i][1], retPoint, retNormal);
+            /* Store calculated vertex */
+            vertices[it*3+0]=retPoint[0];
+            vertices[it*3+1]=retPoint[1];
+            vertices[it*3+2]=retPoint[2];
+            normals[it*3+0]=retNormal[0];
+            normals[it*3+1]=retNormal[1];
+            normals[it*3+2]=retNormal[2];
+            it++;
+         }
+      }
+      else
+      {
+         for(i=index_queue-1; i>=0; i--)
+         {
+            backend->tmeshvert(queue[i][0], queue[i][1], retPoint, retNormal);
+            /* Store calculated vertex */
+            vertices[it*3+0]=retPoint[0];
+            vertices[it*3+1]=retPoint[1];
+            vertices[it*3+2]=retPoint[2];
+            normals[it*3+0]=retNormal[0];
+            normals[it*3+1]=retNormal[1];
+            normals[it*3+2]=retNormal[2];
+            it++;
+         }
+      }
+
+      glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+
+      free(normals);
+      free(vertices);
+   }
+
+   backend->endtfan();
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
 }
 
 void reflexChain::processNewVertex(Real v[2], Backend* backend)
 {
-  Int i,j,k;
-  Int isReflex;
+   Int  i, j, k;
+   Int  isReflex;
+   REAL retPoint[4];
+   REAL retNormal[3];
+   int it=0;
 
-   printf("reflexChain::processNewVertex\n");
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
 
-  /*TrimVertex trimVert;*/
-  /*if there are at most one vertex in the queue, then simply insert
-   */
-  if(index_queue <=1){
-    insert(v);
-    return;
-  }
-  
-  /*there are at least two vertices in the queue*/
-  j=index_queue-1;
-  
-  for(i=j; i>=1; i--) {
-    if(isIncreasing) {
-      isReflex = (area(queue[i-1], queue[i], v) <= 0.0);
-    }
-    else /*decreasing*/{
-      isReflex = (area(v, queue[i], queue[i-1]) <= 0.0);	  
-    }
-    if(isReflex) {
-      break;
-    }
-  }
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
 
-  /*
-   *if i<j then vertices: i+1--j are convex
-   * output triangle fan: 
-   *  v, and queue[i], i+1, ..., j
-   */
-  if(i<j) 
-    {
+   /* TrimVertex trimVert; */
+   /* if there are at most one vertex in the queue, then simply insert */
+   if (index_queue<=1)
+   {
+      insert(v);
+      return;
+   }
+
+   /* there are at least two vertices in the queue */
+   j=index_queue-1;
+
+   for(i=j; i>=1; i--)
+   {
+      if (isIncreasing)
+      {
+         isReflex=(area(queue[i-1], queue[i], v)<=0.0f);
+      }
+      else /* decreasing */
+      {
+         isReflex=(area(v, queue[i], queue[i-1])<=0.0f);
+      }
+
+      if (isReflex)
+      {
+         break;
+      }
+   }
+
+   /*
+    * if i<j then vertices: i+1--j are convex
+    * output triangle fan:
+    *  v, and queue[i], i+1, ..., j
+    */
+   if (i<j)
+   {
       backend->bgntfan();
-      /*
-      trimVert.param[0]=v[0];
-      trimVert.param[1]=v[1];
-      backend->tmeshvert(& trimVert);
-      */
-      backend->tmeshvert(v[0], v[1]);
 
-      if(isIncreasing) {
-	for(k=i; k<=j; k++)
-	  {
-	    /*
-	    trimVert.param[0]=queue[k][0];
-	    trimVert.param[1]=queue[k][1];
-	    backend->tmeshvert(& trimVert);
-	    */
-	    backend->tmeshvert(queue[k][0], queue[k][1]);
-	  }
+      if (backend->get_output_style()==N_MESHLINE)
+      {
+         REAL* vertices=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1)*3);
+         assert(vertices);
+         REAL* normals=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1)*3);
+         assert(normals);
+
+         /* Enable needed and disable unneeded arrays */
+         glEnableClientState(GL_VERTEX_ARRAY);
+         glVertexPointer(3, GL_FLOAT, 0, vertices);
+         glEnableClientState(GL_NORMAL_ARRAY);
+         glNormalPointer(GL_FLOAT, 0, normals);
+         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+         glDisableClientState(GL_COLOR_ARRAY);
+
+         backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+         /* Store triangle fan center vertex */
+         vertices[it*3+0]=retPoint[0];
+         vertices[it*3+1]=retPoint[1];
+         vertices[it*3+2]=retPoint[2];
+         normals[it*3+0]=retNormal[0];
+         normals[it*3+1]=retNormal[1];
+         normals[it*3+2]=retNormal[2];
+         it++;
+
+         if (isIncreasing)
+         {
+            for(k=i; k<=j; k++)
+            {
+               if (it%3==0)
+               {
+                  /* Store triangle fan center vertex */
+                  backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+                  vertices[it*3+0]=retPoint[0];
+                  vertices[it*3+1]=retPoint[1];
+                  vertices[it*3+2]=retPoint[2];
+                  normals[it*3+0]=retNormal[0];
+                  normals[it*3+1]=retNormal[1];
+                  normals[it*3+2]=retNormal[2];
+                  it++;
+                  /* Store previous vertex */
+                  backend->tmeshvert(queue[k-1][0], queue[k-1][1], retPoint, retNormal);
+                  vertices[it*3+0]=retPoint[0];
+                  vertices[it*3+1]=retPoint[1];
+                  vertices[it*3+2]=retPoint[2];
+                  normals[it*3+0]=retNormal[0];
+                  normals[it*3+1]=retNormal[1];
+                  normals[it*3+2]=retNormal[2];
+                  it++;
+               }
+               backend->tmeshvert(queue[k][0], queue[k][1], retPoint, retNormal);
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+            }
+         }
+         else
+         {
+            for(k=j; k>=i; k--)
+            {
+               if (it%3==0)
+               {
+                  /* Store triangle fan center vertex */
+                  backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+                  vertices[it*3+0]=retPoint[0];
+                  vertices[it*3+1]=retPoint[1];
+                  vertices[it*3+2]=retPoint[2];
+                  normals[it*3+0]=retNormal[0];
+                  normals[it*3+1]=retNormal[1];
+                  normals[it*3+2]=retNormal[2];
+                  it++;
+                  /* Store previous vertex */
+                  backend->tmeshvert(queue[k+1][0], queue[k+1][1], retPoint, retNormal);
+                  vertices[it*3+0]=retPoint[0];
+                  vertices[it*3+1]=retPoint[1];
+                  vertices[it*3+2]=retPoint[2];
+                  normals[it*3+0]=retNormal[0];
+                  normals[it*3+1]=retNormal[1];
+                  normals[it*3+2]=retNormal[2];
+                  it++;
+               }
+               backend->tmeshvert(queue[k][0], queue[k][1], retPoint, retNormal);
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+            }
+         }
+
+         free(normals);
+         free(vertices);
       }
-      else {
-	for(k=j; k>=i; k--)
-	  {
-	    backend->tmeshvert(queue[k][0], queue[k][1]);
-	  }
+      else
+      {
+         REAL* vertices=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1));
+         assert(vertices);
+         REAL* normals=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1));
+         assert(normals);
+
+         /* Enable needed and disable unneeded arrays */
+         glEnableClientState(GL_VERTEX_ARRAY);
+         glVertexPointer(3, GL_FLOAT, 0, vertices);
+         glEnableClientState(GL_NORMAL_ARRAY);
+         glNormalPointer(GL_FLOAT, 0, normals);
+         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+         glDisableClientState(GL_COLOR_ARRAY);
+
+         backend->tmeshvert(v[0], v[1], retPoint, retNormal);
+         /* Store triangle fan center vertex */
+         vertices[it*3+0]=retPoint[0];
+         vertices[it*3+1]=retPoint[1];
+         vertices[it*3+2]=retPoint[2];
+         normals[it*3+0]=retNormal[0];
+         normals[it*3+1]=retNormal[1];
+         normals[it*3+2]=retNormal[2];
+         it++;
+
+         if (isIncreasing)
+         {
+            for(k=i; k<=j; k++)
+            {
+               backend->tmeshvert(queue[k][0], queue[k][1], retPoint, retNormal);
+               /* Store triangle fan center vertex */
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+            }
+         }
+         else
+         {
+            for(k=j; k>=i; k--)
+            {
+               backend->tmeshvert(queue[k][0], queue[k][1], retPoint, retNormal);
+               /* Store triangle fan center vertex */
+               vertices[it*3+0]=retPoint[0];
+               vertices[it*3+1]=retPoint[1];
+               vertices[it*3+2]=retPoint[2];
+               normals[it*3+0]=retNormal[0];
+               normals[it*3+1]=retNormal[1];
+               normals[it*3+2]=retNormal[2];
+               it++;
+            }
+         }
+
+         free(normals);
+         free(vertices);
       }
-      
+
       backend->endtfan();
-    }
 
-  /*delete vertices i+1--j from the queue*/
-  index_queue = i+1;
-  /*finally insert v at the end of the queue*/
-  insert(v);
+      if (backend->get_output_style()==N_MESHLINE)
+      {
+         int jt;
 
+         for (jt=0; jt<it; jt+=3)
+         {
+            glDrawArrays(GL_LINE_LOOP, jt, 3);
+         }
+      }
+      else
+      {
+         glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+      }
+
+      /* Disable or re-enable arrays */
+      if (vertex_enabled)
+      {
+         /* Re-enable vertex array */
+         glEnableClientState(GL_VERTEX_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_VERTEX_ARRAY);
+      }
+
+      if (texcoord_enabled)
+      {
+         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+
+      if (normal_enabled)
+      {
+         glEnableClientState(GL_NORMAL_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_NORMAL_ARRAY);
+      }
+
+      if (color_enabled)
+      {
+         glEnableClientState(GL_COLOR_ARRAY);
+      }
+      else
+      {
+         glDisableClientState(GL_COLOR_ARRAY);
+      }
+   }
+
+   /* delete vertices i+1--j from the queue */
+   index_queue=i+1;
+   /* finally insert v at the end of the queue */
+   insert(v);
 }
 
-
-void monoTriangulationRec(Real* topVertex, Real* botVertex, 
+void monoTriangulationRec(Real* topVertex, Real* botVertex,
 			  vertexArray* inc_chain, Int inc_current,
 			  vertexArray* dec_chain, Int dec_current,
 			  Backend* backend)
@@ -365,13 +775,13 @@ void monoTriangulationRecFunBackend(Real* topVertex, Real* botVertex,
 	  rChain.processNewVertex(topVertex, backend);
 	  for(i=inc_current; i<inc_nVertices; i++)
 	    {
-	      if(compFun(inc_array[i], dec_array[dec_current]) >0)		
-		rChain.processNewVertex(inc_array[i], backend);	      
+	      if(compFun(inc_array[i], dec_array[dec_current]) >0)
+		rChain.processNewVertex(inc_array[i], backend);
 	      else
 		break;
 	    }
 	  rChain.outputFan(dec_array[dec_current], backend);
-	  monoTriangulationRecFunBackend(inc_array[i-1], botVertex, 
+	  monoTriangulationRecFunBackend(inc_array[i-1], botVertex,
 			       inc_chain, i,
 			       dec_chain, dec_current,
 			       compFun,

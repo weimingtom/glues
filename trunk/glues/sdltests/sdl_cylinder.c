@@ -18,6 +18,9 @@
 #define WINDOW_WIDTH  640
 #define WINDOW_HEIGHT 480
 
+int window_width=WINDOW_WIDTH;
+int window_height=WINDOW_HEIGHT;
+
 GLUquadricObj* cone_fill_smooth;
 GLUquadricObj* cone_fill_flat;
 GLUquadricObj* cone_fill_texture;
@@ -28,6 +31,8 @@ GLUquadricObj* cone_line_smooth;
 GLUquadricObj* cone_line_flat;
 GLUquadricObj* cone_line_texture;
 GLfloat rotate=0;
+
+GLuint textureid;
 
 /* Create a single component texture map */
 GLubyte* make_texture(int maxs, int maxt)
@@ -71,13 +76,23 @@ void init_scene(int width, int height)
    /* place light 0 in the right place */
    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-   /* enable filtering */
-   glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   /* Enable texturing */
+   glEnable(GL_TEXTURE_2D);
+
+   /* Create the texture */
+   glGenTextures(1, &textureid);
+   glBindTexture(GL_TEXTURE_2D, textureid);
 
    tex=make_texture(256, 256);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 256, 256, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, tex);
    free(tex);
+
+   /* enable filtering */
+   glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+   /* Disable texturing */
+   glDisable(GL_TEXTURE_2D);
 
    cone_fill_smooth=gluNewQuadric();
    gluQuadricDrawStyle(cone_fill_smooth, GLU_FILL);
@@ -122,6 +137,12 @@ void init_scene(int width, int height)
    {
       printf("Oops! I screwed up my OpenGL ES calls somewhere\n");
    }
+}
+
+void resize(int width, int height)
+{
+   /* Setup our new viewport */
+   glViewport(0, 0, (GLint)width, (GLint)height);
 }
 
 void render_scene()
@@ -360,7 +381,7 @@ int main(int argc, char** argv)
    window=SDL_CreateWindow("SDL GLU ES Cylinder test",
       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
-      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
    if (window==0)
    {
       fprintf(stderr, "Can't create window: %s\n", SDL_GetError());
@@ -381,7 +402,7 @@ int main(int argc, char** argv)
       exit(-1);
    }
 
-   init_scene(WINDOW_WIDTH, WINDOW_HEIGHT);
+   init_scene(window_width, window_height);
 
    do {
       /* handle the events in the queue */
@@ -394,6 +415,9 @@ int main(int argc, char** argv)
                  {
                     case SDL_WINDOWEVENT_CLOSE:
                          done=SDL_TRUE;
+                         break;
+                    case SDL_WINDOWEVENT_RESIZED:
+                         resize(event.window.data1, event.window.data2);
                          break;
                  }
                  break;
@@ -419,6 +443,20 @@ int main(int argc, char** argv)
       render_scene();
       SDL_GL_SwapWindow(window);
    } while(1);
+
+   /* Destroy texture */
+   glDeleteTextures(1, &textureid);
+
+   /* Destroy quadric objects */
+   gluDeleteQuadric(cone_fill_smooth);
+   gluDeleteQuadric(cone_fill_flat);
+   gluDeleteQuadric(cone_fill_texture);
+   gluDeleteQuadric(cone_point_smooth);
+   gluDeleteQuadric(cone_point_flat);
+   gluDeleteQuadric(cone_point_texture);
+   gluDeleteQuadric(cone_line_smooth);
+   gluDeleteQuadric(cone_line_flat);
+   gluDeleteQuadric(cone_line_texture);
 
    SDL_GL_DeleteContext(glcontext);
    SDL_DestroyWindow(window);

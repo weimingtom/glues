@@ -107,11 +107,6 @@ void OpenGLCurveEvaluator::bgnline(void)
    {
       beginCallBack(GL_LINE_STRIP, userData);
    }
-   else
-   {
-// MIKE: TODO
-//      glBegin((GLenum)GL_LINE_STRIP);
-   }
 }
 
 void OpenGLCurveEvaluator::endline(void)
@@ -120,11 +115,6 @@ void OpenGLCurveEvaluator::endline(void)
    if (output_triangles)
    {
       endCallBack(userData);
-   }
-   else
-   {
-// MIKE: TODO
-//      glEnd();
    }
 }
 
@@ -135,8 +125,7 @@ void OpenGLCurveEvaluator::endline(void)
 void OpenGLCurveEvaluator::disable(long type)
 {
    printf("OpenGLCurveEvaluator::disable\n");
-// MIKE: TODO
-//    glDisable((GLenum) type);
+   gluDisable((GLenum) type);
 }
 
 /*---------------------------------------------------------------------------
@@ -146,8 +135,7 @@ void OpenGLCurveEvaluator::disable(long type)
 void OpenGLCurveEvaluator::enable(long type)
 {
    printf("OpenGLCurveEvaluator::enable\n");
-// MIKE: TODO
-//    glEnable((GLenum) type);
+   gluEnable((GLenum) type);
 }
 
 /*-------------------------------------------------------------------------

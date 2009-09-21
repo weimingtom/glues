@@ -91,10 +91,9 @@ void Backend::patch(REAL ulo, REAL uhi, REAL vlo, REAL vhi)
    surfaceEvaluator.domain2f(ulo, uhi, vlo, vhi);
 }
 
-void
-Backend::surfbbox( long type, REAL *from, REAL *to )
+void Backend::surfbbox(long type, REAL* from, REAL* to)
 {
-    surfaceEvaluator.range2f( type, from, to );
+   surfaceEvaluator.range2f(type, from, to);
 }
 
 /*-------------------------------------------------------------------------
@@ -253,13 +252,8 @@ void Backend::tmeshvert(TrimVertex* t, REAL* retPoint, REAL* retNormal)
 }
 
 // the same as tmeshvert(trimvertex), for efficiency purpose
-void Backend::tmeshvert(REAL u, REAL v)
+void Backend::tmeshvert(REAL u, REAL v, REAL* retPoint, REAL* retNormal)
 {
-   REAL retPoint[4];
-   REAL retNormal[3];
-
-   printf("Backend::tmeshvert REAL, REAL\n");
-
    surfaceEvaluator.evalcoord2f(0, u, v, retPoint, retNormal);
 }
 

@@ -20,6 +20,9 @@
 #define WINDOW_WIDTH  640
 #define WINDOW_HEIGHT 480
 
+int window_width=WINDOW_WIDTH;
+int window_height=WINDOW_HEIGHT;
+
 GLfloat mat_ambient[4]={0.2f, 0.2f, 0.2f, 0.2f};
 GLfloat mat_diffuse[]={0.7f, 0.7f, 0.7f, 1.0f};
 GLfloat mat_specular[]={1.0f, 1.0f, 1.0f, 1.0f};
@@ -89,13 +92,33 @@ void init_scene(int width, int height)
 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(45.0f, (GLfloat)WINDOW_WIDTH/(GLfloat)WINDOW_HEIGHT, 3.0f, 8.0f);
+   gluPerspective(45.0f, (GLfloat)window_width/(GLfloat)window_height, 3.0f, 8.0f);
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
    glTranslatef(0.0f, 0.5f, -5.5f);
    glRotatef(330.0f, 1.0f, 0.0f, 0.0f);
    glScalef(0.5f, 0.5f, 0.5f);
+}
+
+void resize(int width, int height)
+{
+   /* Avoid division by zero */
+   if (height==0)
+   {
+      height=1;
+   }
+
+   /* Setup our new viewport for OpenGL ES */
+   glViewport(0, 0, (GLint)width, (GLint)height);
+   /* Setup our new viewport for GLU ES (required when using OpenGL ES 1.0 only) */
+   gluViewport(0, 0, (GLint)width, (GLint)height);
+
+   /* Setup new aspect ration */
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   gluPerspective(45.0f, (GLfloat)width/(GLfloat)height, 3.0f, 8.0f);
+   glMatrixMode(GL_MODELVIEW);
 }
 
 void render_scene()
@@ -146,7 +169,7 @@ int main(int argc, char** argv)
    window=SDL_CreateWindow("SDL GLU ES Nurbs Trim test",
       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
-      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+      SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
    if (window==0)
    {
       fprintf(stderr, "Can't create window: %s\n", SDL_GetError());
@@ -167,7 +190,7 @@ int main(int argc, char** argv)
       exit(-1);
    }
 
-   init_scene(WINDOW_WIDTH, WINDOW_HEIGHT);
+   init_scene(window_width, window_height);
 
    do {
       /* handle the events in the queue */
@@ -180,6 +203,9 @@ int main(int argc, char** argv)
                  {
                     case SDL_WINDOWEVENT_CLOSE:
                          done=SDL_TRUE;
+                         break;
+                    case SDL_WINDOWEVENT_RESIZED:
+                         resize(event.window.data1, event.window.data2);
                          break;
                  }
                  break;
@@ -205,6 +231,9 @@ int main(int argc, char** argv)
       render_scene();
       SDL_GL_SwapWindow(window);
    } while(1);
+
+   /* Destroy NURBS renderer */
+   gluDeleteNurbsRenderer(nurb);
 
    SDL_GL_DeleteContext(glcontext);
    SDL_DestroyWindow(window);

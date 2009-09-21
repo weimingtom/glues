@@ -58,16 +58,6 @@
 #include "gles_evaluator.h"
 #include "glues.h"
 
-//#define USE_READ_FLAG  // whether to use new or old tesselator
-                         // if defined, it reads "flagFile",
-                         // if the number is 1, then use new tess
-                         // otherwise, use the old tess.
-                         // if not defined, then use new tess.
-#ifdef USE_READ_FLAG
-   static Int read_flag(char* name);
-   Int newtess_flag=read_flag("flagFile");
-#endif
-
 #define max(a,b) ((a>b)? a:b)
 #define ZERO 0.00001 /*determing whether a loop is a rectngle or not*/
 #define equalRect(a,b) ((glu_abs(a-b) <= ZERO)? 1:0) //only used in tessellating a rectangle
@@ -170,23 +160,10 @@ static Int is_rect(Arc_ptr loop)
     {
       nlines++;
       if(nlines == 5)
-	break;
+        break;
     }
   if(nlines != 4)
     return 0;
-
-
-/*
-printf("here1\n");
-printf("loop->tail=(%f,%f)\n", loop->tail()[0], loop->tail()[1]);
-printf("loop->head=(%f,%f)\n", loop->head()[0], loop->head()[1]);
-printf("loop->next->tail=(%f,%f)\n", loop->next->tail()[0], loop->next->tail()[1]);
-printf("loop->next->head=(%f,%f)\n", loop->next->head()[0], loop->next->head()[1]);
-if(fglu_abs(loop->tail()[0] - loop->head()[0])<0.000001)
-	printf("equal 1\n");
-if(loop->next->tail()[1] == loop->next->head()[1])
-	printf("equal 2\n");
-*/
 
   if( (glu_abs(loop->tail()[0] - loop->head()[0])<=ZERO) && 
       (glu_abs(loop->next->tail()[1] - loop->next->head()[1])<=ZERO) &&
@@ -205,20 +182,262 @@ if(loop->next->tail()[1] == loop->next->head()[1])
     return 0;
 }
 
+int primitive_type;
+int primitive_count;
+int max_primitives;
+REAL* enormals;
+REAL* evertices;
+REAL startvtx[3];
+REAL startnrm[3];
+REAL prevvtx[3];
+REAL prevnrm[3];
 
-inline void OPT_OUTVERT(TrimVertex& vv, Backend& backend) 
+#define PRIMITIVES_INCREMENT 256
+
+void OPT_START(GLuint type)
 {
-   REAL retPoint[4];
-   REAL retNormal[3];
+   primitive_type=type;
+   primitive_count=0;
+   max_primitives=PRIMITIVES_INCREMENT;
+
+   enormals=(REAL*)malloc(sizeof(REAL)*3*max_primitives);
+   assert(enormals);
+   evertices=(REAL*)malloc(sizeof(REAL)*3*max_primitives);
+   assert(evertices);
+}
+
+void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNormal)
+{
+   /* increase vertex and normal buffers size */
+   if (primitive_count+3>=max_primitives)
+   {
+      max_primitives+=PRIMITIVES_INCREMENT;
+      enormals=(REAL*)realloc(enormals, sizeof(REAL)*3*max_primitives);
+      assert(enormals);
+      evertices=(REAL*)realloc(evertices, sizeof(REAL)*3*max_primitives);
+      assert(evertices);
+   }
 
    backend.tmeshvert(&vv, retPoint, retNormal);
+   switch (primitive_type)
+   {
+      case GL_TRIANGLE_FAN:
+           switch (backend.get_output_style())
+           {
+              case N_MESHFILL:
+                   evertices[primitive_count*3+0]=retPoint[0];
+                   evertices[primitive_count*3+1]=retPoint[1];
+                   evertices[primitive_count*3+2]=retPoint[2];
+                   enormals[primitive_count*3+0]=retNormal[0];
+                   enormals[primitive_count*3+1]=retNormal[1];
+                   enormals[primitive_count*3+2]=retNormal[2];
+                   break;
+              case N_MESHLINE:
+                   if (primitive_count==0)
+                   {
+                      /* Store start vertex, centre of triangle fan */
+                      startvtx[0]=retPoint[0];
+                      startvtx[1]=retPoint[1];
+                      startvtx[2]=retPoint[2];
+                      startnrm[0]=retNormal[0];
+                      startnrm[1]=retNormal[1];
+                      startnrm[2]=retNormal[2];
+                   }
+
+                   if (primitive_count%3==0)
+                   {
+                      /* Insert new triangle vertices */
+                      evertices[primitive_count*3+0]=startvtx[0];
+                      evertices[primitive_count*3+1]=startvtx[1];
+                      evertices[primitive_count*3+2]=startvtx[2];
+                      enormals[primitive_count*3+0]=startnrm[0];
+                      enormals[primitive_count*3+1]=startnrm[1];
+                      enormals[primitive_count*3+2]=startnrm[2];
+                      primitive_count++;
+
+                      evertices[primitive_count*3+0]=prevvtx[0];
+                      evertices[primitive_count*3+1]=prevvtx[1];
+                      evertices[primitive_count*3+2]=prevvtx[2];
+                      enormals[primitive_count*3+0]=prevnrm[0];
+                      enormals[primitive_count*3+1]=prevnrm[1];
+                      enormals[primitive_count*3+2]=prevnrm[2];
+                      primitive_count++;
+                   }
+
+                   /* Store current vertex */
+                   evertices[primitive_count*3+0]=retPoint[0];
+                   evertices[primitive_count*3+1]=retPoint[1];
+                   evertices[primitive_count*3+2]=retPoint[2];
+                   enormals[primitive_count*3+0]=retNormal[0];
+                   enormals[primitive_count*3+1]=retNormal[1];
+                   enormals[primitive_count*3+2]=retNormal[2];
+
+                   /* Store current vertex as previous */
+                   prevvtx[0]=retPoint[0];
+                   prevvtx[1]=retPoint[1];
+                   prevvtx[2]=retPoint[2];
+                   prevnrm[0]=retNormal[0];
+                   prevnrm[1]=retNormal[1];
+                   prevnrm[2]=retNormal[2];
+                   break;
+           }
+           break;
+      case GL_QUAD_STRIP:
+           switch (backend.get_output_style())
+           {
+              case N_MESHFILL:
+                   evertices[primitive_count*3+0]=retPoint[0];
+                   evertices[primitive_count*3+1]=retPoint[1];
+                   evertices[primitive_count*3+2]=retPoint[2];
+                   enormals[primitive_count*3+0]=retNormal[0];
+                   enormals[primitive_count*3+1]=retNormal[1];
+                   enormals[primitive_count*3+2]=retNormal[2];
+                   break;
+              case N_MESHLINE:
+                   switch (primitive_count%4)
+                   {
+                      case 0:
+                      case 1:
+                           evertices[primitive_count*3+0]=retPoint[0];
+                           evertices[primitive_count*3+1]=retPoint[1];
+                           evertices[primitive_count*3+2]=retPoint[2];
+                           enormals[primitive_count*3+0]=retNormal[0];
+                           enormals[primitive_count*3+1]=retNormal[1];
+                           enormals[primitive_count*3+2]=retNormal[2];
+                           break;
+                      case 2:
+                           evertices[(primitive_count+1)*3+0]=retPoint[0];
+                           evertices[(primitive_count+1)*3+1]=retPoint[1];
+                           evertices[(primitive_count+1)*3+2]=retPoint[2];
+                           enormals[(primitive_count+1)*3+0]=retNormal[0];
+                           enormals[(primitive_count+1)*3+1]=retNormal[1];
+                           enormals[(primitive_count+1)*3+2]=retNormal[2];
+                           break;
+                      case 3:
+                           evertices[(primitive_count-1)*3+0]=retPoint[0];
+                           evertices[(primitive_count-1)*3+1]=retPoint[1];
+                           evertices[(primitive_count-1)*3+2]=retPoint[2];
+                           enormals[(primitive_count-1)*3+0]=retNormal[0];
+                           enormals[(primitive_count-1)*3+1]=retNormal[1];
+                           enormals[(primitive_count-1)*3+2]=retNormal[2];
+                           break;
+                   }
+                   break;
+           }
+           break;
+   }
+
+   primitive_count++;
+}
+
+void OPT_END(Backend& backend)
+{
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
+
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
+
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, evertices);
+   glEnableClientState(GL_NORMAL_ARRAY);
+   glNormalPointer(GL_FLOAT, 0, enormals);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+
+   switch (primitive_type)
+   {
+      case GL_TRIANGLE_FAN:
+           switch (backend.get_output_style())
+           {
+              case N_MESHFILL:
+                   glDrawArrays(GL_TRIANGLE_FAN, 0, primitive_count);
+                   break;
+              case N_MESHLINE:
+                   {
+                      int jt;
+
+                      for (jt=0; jt<primitive_count; jt+=3)
+                      {
+                         glDrawArrays(GL_LINE_LOOP, jt, 3);
+                      }
+                   }
+                   break;
+           }
+           break;
+      case GL_QUAD_STRIP:
+           switch (backend.get_output_style())
+           {
+              case N_MESHFILL:
+                   glDrawArrays(GL_TRIANGLE_STRIP, 0, primitive_count);
+                   break;
+              case N_MESHLINE:
+                   {
+                      int jt;
+
+                      for (jt=0; jt<=primitive_count-4; jt+=2)
+                      {
+                         glDrawArrays(GL_LINE_LOOP, jt, 4);
+                      }
+                   }
+                   break;
+           }
+           break;
+   }
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
+
+   free(evertices);
+   free(enormals);
 }
 
 static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* right, Backend& backend);
 
 static void triangulateRect(Arc_ptr loop, Backend& backend, int TB_or_LR, int ulinear, int vlinear)
 {
-  //we know the loop is a rectangle, but not sure which is top
+   // we know the loop is a rectangle, but not sure which is top
   Arc_ptr top, bot, left, right;
   if(loop->tail()[1] == loop->head()[1])
     {
@@ -273,216 +492,214 @@ static void triangulateRect(Arc_ptr loop, Backend& backend, int TB_or_LR, int ul
   if(TB_or_LR == 1)
     triangulateRectAux(top->pwlArc, bot->pwlArc, left->pwlArc, right->pwlArc, backend);
   else if(TB_or_LR == -1)
-    triangulateRectAux(left->pwlArc, right->pwlArc, bot->pwlArc, top->pwlArc, backend);    
+    triangulateRectAux(left->pwlArc, right->pwlArc, bot->pwlArc, top->pwlArc, backend);
   else
     {
       Int maxPointsTB = top->pwlArc->npts + bot->pwlArc->npts;
       Int maxPointsLR = left->pwlArc->npts + right->pwlArc->npts;
-      
+
       if(maxPointsTB < maxPointsLR)
-	triangulateRectAux(left->pwlArc, right->pwlArc, bot->pwlArc, top->pwlArc, backend);    
+	triangulateRectAux(left->pwlArc, right->pwlArc, bot->pwlArc, top->pwlArc, backend);
       else
 	triangulateRectAux(top->pwlArc, bot->pwlArc, left->pwlArc, right->pwlArc, backend);
     }
 }
 
 static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* right, Backend& backend)
-{ //if(maxPointsTB >= maxPointsLR)
-    {
+{
+   Int d, topd_left, topd_right, botd_left, botd_right, i, j;
+   d=left->npts/2;
+   REAL retPoint[4];
+   REAL retNormal[3];
 
-      Int d, topd_left, topd_right, botd_left, botd_right, i,j;
-      d = left->npts /2;
-
-printf("triangulateRectAux\n");
-
-      if(top->npts == 2) {
-	backend.bgntfan();
-	OPT_OUTVERT(top->pts[0], backend);//the root
-	for(i=0; i<left->npts; i++){
-	  OPT_OUTVERT(left->pts[i], backend);
-	}
-	for(i=1; i<= bot->npts-2; i++){
-	  OPT_OUTVERT(bot->pts[i], backend);
-	}
-	backend.endtfan();
-	
-	backend.bgntfan();
-	OPT_OUTVERT(bot->pts[bot->npts-2], backend);
-	for(i=0; i<right->npts; i++){
-	  OPT_OUTVERT(right->pts[i], backend);
-	}
-	backend.endtfan();
+   if (top->npts==2)
+   {
+      backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+      OPT_OUTVERT(top->pts[0], backend, retPoint, retNormal); // the root
+      for(i=0; i<left->npts; i++)
+      {
+         OPT_OUTVERT(left->pts[i], backend, retPoint, retNormal);
       }
-      else if(bot->npts == 2) {
-	backend.bgntfan();
-	OPT_OUTVERT(bot->pts[0], backend);//the root
-	for(i=0; i<right->npts; i++){
-	  OPT_OUTVERT(right->pts[i], backend);
-	}
-	for(i=1; i<= top->npts-2; i++){
-	  OPT_OUTVERT(top->pts[i], backend);
-	}
-	backend.endtfan();
-	
-	backend.bgntfan();
-	OPT_OUTVERT(top->pts[top->npts-2], backend);
-	for(i=0; i<left->npts; i++){
-	  OPT_OUTVERT(left->pts[i], backend);
-	}
-	backend.endtfan();
+      for(i=1; i<= bot->npts-2; i++)
+      {
+         OPT_OUTVERT(bot->pts[i], backend, retPoint, retNormal);
       }
-      else { //both top and bot have >=3 points
-	
-	backend.bgntfan();
-	
-	OPT_OUTVERT(top->pts[top->npts-2], backend);
-	
-	for(i=0; i<=d; i++)
-	  {
-	    OPT_OUTVERT(left->pts[i], backend);
-	  }
-	backend.endtfan();
-	
-	backend.bgntfan();
-	
-	OPT_OUTVERT(bot->pts[1], backend);
-	
-	OPT_OUTVERT(top->pts[top->npts-2], backend);
-	
-	for(i=d; i< left->npts; i++)
-	  {
-	    OPT_OUTVERT(left->pts[i], backend);
-	  }
-	backend.endtfan();
+      backend.endtfan(); OPT_END(backend);
 
-	d = right->npts/2;
-	//output only when d<right->npts-1 and
-	//
-	if(d<right->npts-1)
-	  {	
-	    backend.bgntfan();
-	    //      backend.tmeshvert(& top->pts[1]);
-	    OPT_OUTVERT(top->pts[1], backend);
-	    for(i=d; i< right->npts; i++)
-	      {
-		//	  backend.tmeshvert(& right->pts[i]);
-		
-		OPT_OUTVERT(right->pts[i], backend);
-		
-	      }
-	    backend.endtfan();
-	  }
-	
-	backend.bgntfan();
-	//      backend.tmeshvert(& bot->pts[bot->npts-2]);
-	OPT_OUTVERT( bot->pts[bot->npts-2], backend);
-	for(i=0; i<=d; i++)
-	  {
-	    //	  backend.tmeshvert(& right->pts[i]);
-	    OPT_OUTVERT(right->pts[i], backend);
-	    
-	  }
-	
-	//      backend.tmeshvert(& top->pts[1]);
-	OPT_OUTVERT(top->pts[1], backend);
-	
-	backend.endtfan();
-
-
-	topd_left = top->npts-2;
-	topd_right = 1; //topd_left>= topd_right
-
-	botd_left = 1;
-	botd_right = bot->npts-2; //botd_left<= bot_dright
-
-	
-	if(top->npts < bot->npts)
-	  {
-	    int delta=bot->npts - top->npts;
-	    int u = delta/2;
-	    botd_left = 1+ u;
-	    botd_right = bot->npts-2-(delta-u);
-	
-	    if(botd_left >1)
-	      {
-		backend.bgntfan();
-		//	  backend.tmeshvert(& top->pts[top->npts-2]);
-		OPT_OUTVERT(top->pts[top->npts-2], backend);
-		for(i=1; i<= botd_left; i++)
-		  {
-		    //	      backend.tmeshvert(& bot->pts[i]);
-		    OPT_OUTVERT(bot->pts[i] , backend);
-		  }
-		backend.endtfan();
-	      }
-	    if(botd_right < bot->npts-2)
-	      {
-		backend.bgntfan();
-		OPT_OUTVERT(top->pts[1], backend);
-		for(i=botd_right; i<= bot->npts-2; i++)
-		  OPT_OUTVERT(bot->pts[i], backend);
-		backend.endtfan();
-	      }
-	  }
-	else if(top->npts> bot->npts)
-	  {
-	    int delta=top->npts-bot->npts;
-	    int u = delta/2;
-	    topd_left = top->npts-2 - u;
-	    topd_right = 1+delta-u;
-	    
-	    if(topd_left < top->npts-2)
-	      {
-		backend.bgntfan();
-		//	  backend.tmeshvert(& bot->pts[1]);
-		OPT_OUTVERT(bot->pts[1], backend);
-		for(i=topd_left; i<= top->npts-2; i++)
-		  {
-		    //	      backend.tmeshvert(& top->pts[i]);
-		    OPT_OUTVERT(top->pts[i], backend);
-		  }
-		backend.endtfan();
-	      }
-	    if(topd_right > 1)
-	      {
-		backend.bgntfan();
-		OPT_OUTVERT(bot->pts[bot->npts-2], backend);
-		for(i=1; i<= topd_right; i++)
-		  OPT_OUTVERT(top->pts[i], backend);
-		backend.endtfan();
-	      }
-	  }
-	
-	if(topd_left <= topd_right) 
-	  return;
-
-	backend.bgnqstrip();
-	for(j=botd_left, i=topd_left; i>=topd_right; i--,j++)
-	  {
-	    OPT_OUTVERT(top->pts[i], backend);
-	    OPT_OUTVERT(bot->pts[j], backend);
-	  }
-	backend.endqstrip();
-	
+      backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+      OPT_OUTVERT(bot->pts[bot->npts-2], backend, retPoint, retNormal);
+      for(i=0; i<right->npts; i++)
+      {
+         OPT_OUTVERT(right->pts[i], backend, retPoint, retNormal);
       }
-    }
+      backend.endtfan(); OPT_END(backend);
+   }
+   else
+   {
+      if(bot->npts==2)
+      {
+         backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+         OPT_OUTVERT(bot->pts[0], backend, retPoint, retNormal); // the root
+         for(i=0; i<right->npts; i++)
+         {
+            OPT_OUTVERT(right->pts[i], backend, retPoint, retNormal);
+         }
+         for(i=1; i<= top->npts-2; i++)
+         {
+            OPT_OUTVERT(top->pts[i], backend, retPoint, retNormal);
+         }
+         backend.endtfan(); OPT_END(backend);
+
+         backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+         OPT_OUTVERT(top->pts[top->npts-2], backend, retPoint, retNormal);
+         for(i=0; i<left->npts; i++)
+         {
+            OPT_OUTVERT(left->pts[i], backend, retPoint, retNormal);
+         }
+         backend.endtfan(); OPT_END(backend);
+      }
+      else // both top and bot have >=3 points
+      {
+         backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+
+         OPT_OUTVERT(top->pts[top->npts-2], backend, retPoint, retNormal);
+
+         for(i=0; i<=d; i++)
+         {
+            OPT_OUTVERT(left->pts[i], backend, retPoint, retNormal);
+         }
+         backend.endtfan(); OPT_END(backend);
+
+         backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+         OPT_OUTVERT(bot->pts[1], backend, retPoint, retNormal);
+         OPT_OUTVERT(top->pts[top->npts-2], backend, retPoint, retNormal);
+         for(i=d; i< left->npts; i++)
+         {
+            OPT_OUTVERT(left->pts[i], backend, retPoint, retNormal);
+         }
+         backend.endtfan(); OPT_END(backend);
+
+         d = right->npts/2;
+         // output only when d<right->npts-1 and
+         if (d<right->npts-1)
+         {
+            backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+            OPT_OUTVERT(top->pts[1], backend, retPoint, retNormal);
+            for(i=d; i< right->npts; i++)
+            {
+               OPT_OUTVERT(right->pts[i], backend, retPoint, retNormal);
+            }
+            backend.endtfan(); OPT_END(backend);
+         }
+
+         backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+         OPT_OUTVERT(bot->pts[bot->npts-2], backend, retPoint, retNormal);
+         for(i=0; i<=d; i++)
+         {
+            OPT_OUTVERT(right->pts[i], backend, retPoint, retNormal);
+         }
+
+         OPT_OUTVERT(top->pts[1], backend, retPoint, retNormal);
+
+         backend.endtfan(); OPT_END(backend);
+
+
+         topd_left=top->npts-2;
+         topd_right=1; // topd_left>= topd_right
+
+         botd_left=1;
+         botd_right=bot->npts-2; // botd_left<=bot_dright
+
+         if (top->npts<bot->npts)
+         {
+            int delta=bot->npts-top->npts;
+            int u=delta/2;
+            botd_left=1+u;
+            botd_right=bot->npts-2-(delta-u);
+
+            if (botd_left>1)
+            {
+               backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+               OPT_OUTVERT(top->pts[top->npts-2], backend, retPoint, retNormal);
+               for(i=1; i<=botd_left; i++)
+               {
+                  OPT_OUTVERT(bot->pts[i] , backend, retPoint, retNormal);
+               }
+               backend.endtfan(); OPT_END(backend);
+            }
+            if(botd_right < bot->npts-2)
+            {
+               backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+               OPT_OUTVERT(top->pts[1], backend, retPoint, retNormal);
+               for(i=botd_right; i<=bot->npts-2; i++)
+               {
+                  OPT_OUTVERT(bot->pts[i], backend, retPoint, retNormal);
+               }
+               backend.endtfan(); OPT_END(backend);
+            }
+         }
+         else
+         {
+            if(top->npts> bot->npts)
+            {
+               int delta=top->npts-bot->npts;
+               int u=delta/2;
+
+               topd_left=top->npts-2 - u;
+               topd_right=1+delta-u;
+
+               if (topd_left<top->npts-2)
+               {
+                  backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+                  OPT_OUTVERT(bot->pts[1], backend, retPoint, retNormal);
+                  for(i=topd_left; i<=top->npts-2; i++)
+                  {
+                     OPT_OUTVERT(top->pts[i], backend, retPoint, retNormal);
+                  }
+                  backend.endtfan(); OPT_END(backend);
+               }
+               if (topd_right>1)
+               {
+                  backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
+                  OPT_OUTVERT(bot->pts[bot->npts-2], backend, retPoint, retNormal);
+                  for(i=1; i<=topd_right; i++)
+                  {
+                     OPT_OUTVERT(top->pts[i], backend, retPoint, retNormal);
+                  }
+                  backend.endtfan(); OPT_END(backend);
+               }
+            }
+         }
+
+         if (topd_left<=topd_right) 
+         {
+            return;
+         }
+
+         backend.bgnqstrip(); OPT_START(GL_QUAD_STRIP);
+         for(j=botd_left, i=topd_left; i>=topd_right; i--, j++)
+         {
+            OPT_OUTVERT(top->pts[i], backend, retPoint, retNormal);
+            OPT_OUTVERT(bot->pts[j], backend, retPoint, retNormal);
+         }
+         backend.endqstrip(); OPT_END(backend);
+      }
+   }
 }
 
-static void triangulateRectCenter(int n_ulines, REAL* u_val, 
-				  int n_vlines, REAL* v_val,
-				  Backend& backend)
+static void triangulateRectCenter(int n_ulines, REAL* u_val, int n_vlines, REAL* v_val,
+                                  Backend& backend)
 {
+   // XXX this code was patched by Diego Santa Cruz <Diego.SantaCruz@epfl.ch>
+   // to fix a problem in which glMapGrid2f() was called with bad parameters.
+   // This has beens submitted to SGI but not integrated as of May 1, 2001.
+   if (n_ulines>1 && n_vlines>1)
+   {
+      backend.surfgrid(u_val[0], u_val[n_ulines-1], n_ulines-1, v_val[n_vlines-1], v_val[0], n_vlines-1);
+      backend.surfmesh(0, 0, n_ulines-1, n_vlines-1);
+   }
 
-  // XXX this code was patched by Diego Santa Cruz <Diego.SantaCruz@epfl.ch>
-  // to fix a problem in which glMapGrid2f() was called with bad parameters.
-  // This has beens submitted to SGI but not integrated as of May 1, 2001.
-  if(n_ulines>1 && n_vlines>1) {
-    backend.surfgrid(u_val[0], u_val[n_ulines-1], n_ulines-1, 
-                     v_val[n_vlines-1], v_val[0], n_vlines-1);
-    backend.surfmesh(0,0,n_ulines-1,n_vlines-1);
-  }
-
-  return;
+   return;
 }
 
 //it works for top, bot, left ad right, you need ot select correct arguments
@@ -499,7 +716,7 @@ static void triangulateRectTopGen(Arc_ptr arc, int n_ulines, REAL* u_val, Real v
 	  for(k=0,i=arc->pwlArc->npts-1; i>=0; i--,k++)
 	    {
 	      upper_val[k] = arc->pwlArc->pts[i].param[0];
-	    }	
+	    }
 	  backend.evalUStrip(arc->pwlArc->npts, arc->pwlArc->pts[0].param[1],
 			     upper_val,
 			     n_ulines, v, u_val);
@@ -510,7 +727,7 @@ static void triangulateRectTopGen(Arc_ptr arc, int n_ulines, REAL* u_val, Real v
 	    {
 	      upper_val[k] = arc->pwlArc->pts[i].param[0];
 
-	    }		  
+	    }
 
 	  backend.evalUStrip(
 			     n_ulines, v, u_val,
@@ -525,7 +742,7 @@ static void triangulateRectTopGen(Arc_ptr arc, int n_ulines, REAL* u_val, Real v
     {
       int i,k;
       REAL* left_val = (REAL*) malloc(sizeof(REAL) * arc->pwlArc->npts);
-      assert(left_val);   
+      assert(left_val);
       if(dir)
 	{
 	  for(k=0,i=arc->pwlArc->npts-1; i>=0; i--,k++)
@@ -574,7 +791,7 @@ static void triangulateRectGen(Arc_ptr loop, int n_ulines, int n_vlines, Backend
 	top = loop->prev->prev;
 	}
     }
-  else 
+  else
     {
       if(loop->tail()[0] > loop->prev->prev->tail()[0])
 	{
@@ -632,28 +849,7 @@ return;
 
   free(u_val);
   free(v_val);
-  
 }
-
-
-  
-
-/**********for reading newtess_flag from a file**********/
-#ifdef USE_READ_FLAG
-static Int read_flag(char* name)
-{
-  Int ret;
-  FILE* fp = fopen(name, "r");
-  if(fp == NULL)
-    {
-      fprintf(stderr, "can't open file %s\n", name);
-      exit(1);
-    }
-  fscanf(fp, "%i", &ret);
-  fclose(fp);
-  return ret;
-}
-#endif  
 
 /***********nextgen tess****************/
 #include "sampleMonoPoly.h"
@@ -735,7 +931,7 @@ directedLine* arcLoopToDLineLoop(Arc_ptr loop)
 void Slicer::evalRBArray(rectBlockArray* rbArray, gridWrap* grid)
 {
   Int i,j,k;
-  
+
   Int n_vlines=grid->get_n_vlines();
   //the reason to switch the position of v_max and v_min is because of the
   //the orientation problem. glEvalMesh generates quad_strip clockwise, but
@@ -1049,16 +1245,7 @@ void Slicer::slice_new(Arc_ptr loop)
 
 void Slicer::slice(Arc_ptr loop)
 {
-#ifdef USE_READ_FLAG
-  if(read_flag("flagFile"))
-    slice_new(loop);
-  else
-    slice_old(loop);
-
-#else
-    slice_new(loop);
-#endif
-
+   slice_new(loop);
 }
 
 Slicer::Slicer(Backend& b): CoveAndTiler(b), Mesher(b), backend(b)
@@ -1076,13 +1263,12 @@ void Slicer::setisolines(int x)
    isolines=x;
 }
 
-void
-Slicer::setstriptessellation( REAL x, REAL y )
+void Slicer::setstriptessellation(REAL x, REAL y)
 {
-    assert(x > 0 && y > 0);
-    du = x;
-    dv = y;
-    setDu( du );
+   assert(x>0 && y>0);
+   du=x;
+   dv=y;
+   setDu(du);
 }
 
 void
