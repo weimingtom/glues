@@ -19,6 +19,9 @@
 #define WINDOW_WIDTH  640
 #define WINDOW_HEIGHT 480
 
+int window_width=WINDOW_WIDTH;
+int window_height=WINDOW_HEIGHT;
+
 #define order    4          /* make a cubic spline                                  */
 #define cvcount  10         /* number of cvs                                        */
 #define stride   3          /* just refers to the number of float values in each cv */
@@ -42,7 +45,7 @@ void init_scene(int width, int height)
    gluViewport(0, 0, (GLint)width, (GLint)height);
 
    /* setup a perspective projection */
-   glMatrixMode (GL_PROJECTION);
+   glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
    glFrustumf(-1.0f, 1.0f, -0.75f, 0.75f, 1.0f, 100.0f);
 
@@ -77,6 +80,14 @@ void init_scene(int width, int height)
    {
       knots[knot]=knot;
    }
+}
+
+void resize(int width, int height)
+{
+   /* Setup our new viewport */
+   glViewport(0, 0, (GLint)width, (GLint)height);
+   /* Setup our viewport for GLU ES (required when using OpenGL ES 1.0 only) */
+   gluViewport(0, 0, (GLint)width, (GLint)height);
 }
 
 void render_scene()
@@ -146,7 +157,7 @@ int main(int argc, char** argv)
    window=SDL_CreateWindow("SDL GLU ES Nurbs Curves test",
       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
-      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+      SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
    if (window==0)
    {
       fprintf(stderr, "Can't create window: %s\n", SDL_GetError());
@@ -167,7 +178,7 @@ int main(int argc, char** argv)
       exit(-1);
    }
 
-   init_scene(WINDOW_WIDTH, WINDOW_HEIGHT);
+   init_scene(window_width, window_height);
 
    do {
       /* handle the events in the queue */
@@ -180,6 +191,9 @@ int main(int argc, char** argv)
                  {
                     case SDL_WINDOWEVENT_CLOSE:
                          done=SDL_TRUE;
+                         break;
+                    case SDL_WINDOWEVENT_RESIZED:
+                         resize(event.window.data1, event.window.data2);
                          break;
                  }
                  break;
