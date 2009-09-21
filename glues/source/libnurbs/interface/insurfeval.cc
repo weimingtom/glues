@@ -693,238 +693,266 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2NOGE(REAL u, REAL v, REAL* retPoint, 
    inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, retPoint, du, dv);
 
 #ifdef AVOID_ZERO_NORMAL
-   if (myabs(dv[0]) <= MYZERO && myabs(dv[1]) <= MYZERO && myabs(dv[2]) <= MYZERO)
-    {
-
+   if (myabs(dv[0])<=MYZERO && myabs(dv[1])<=MYZERO && myabs(dv[2])<=MYZERO)
+   {
       REAL tempdu[4];
       REAL tempdata[4];
-      REAL u1 = global_ev_u1;
-      REAL u2 = global_ev_u2;
-      if(u-MYDELTA*(u2-u1) < u1)
-	u = u+ MYDELTA*(u2-u1);
+      REAL u1=global_ev_u1;
+      REAL u2=global_ev_u2;
+
+      if (u-MYDELTA*(u2-u1)<u1)
+      {
+         u=u+MYDELTA*(u2-u1);
+      }
       else
-	u = u-MYDELTA*(u2-u1);
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
-    }
-  if(myabs(du[0]) <= MYZERO && myabs(du[1]) <= MYZERO && myabs(du[2]) <= MYZERO)
-    {
+      {
+         u=u-MYDELTA*(u2-u1);
+      }
+      inDoDomain2WithDerivs(global_ev_k, u, v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, tempdu, dv);
+   }
+
+   if (myabs(du[0])<=MYZERO && myabs(du[1])<=MYZERO && myabs(du[2])<=MYZERO)
+   {
       REAL tempdv[4];
       REAL tempdata[4];
-      REAL v1 = global_ev_v1;
-      REAL v2 = global_ev_v2;
-      if(v-MYDELTA*(v2-v1) < v1)
-	v = v+ MYDELTA*(v2-v1);
+      REAL v1=global_ev_v1;
+      REAL v2=global_ev_v2;
+
+      if (v-MYDELTA*(v2-v1)<v1)
+      {
+         v=v+MYDELTA*(v2-v1);
+      }
       else
-	v = v-MYDELTA*(v2-v1);
-      inDoDomain2WithDerivs(global_ev_k, u,v,global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
+      {
+         v=v-MYDELTA*(v2-v1);
+      }
+      inDoDomain2WithDerivs(global_ev_k, u, v, global_ev_u1, global_ev_u2, global_ev_uorder, global_ev_v1, global_ev_v2, global_ev_vorder, global_ev_ctlPoints, tempdata, du, tempdv);
     }
 #endif /* AVOID_ZERO_NORMAL */
 
-  /*compute normal*/
-  switch(global_ev_k){
-  case 3:
-    inComputeNormal2(du, dv, retNormal);
-    break;
-  case 4:
-    inComputeFirstPartials(retPoint, du, dv);
-    inComputeNormal2(du, dv, retNormal);
-    /*transform the homegeneous coordinate of retPoint into inhomogenous one*/
-    retPoint[0] /= retPoint[3];
-    retPoint[1] /= retPoint[3];
-    retPoint[2] /= retPoint[3];
-    break;
-  }
-}
- 
-void OpenGLSurfaceEvaluator::inPreEvaluateBV(int k, int uorder, int vorder, REAL vprime, REAL *baseData)
-{
-  int j,row,col;
-  REAL p, pdv;
-  REAL *data;
+   /* compute normal */
+   switch(global_ev_k)
+   {
+      case 3:
+           inComputeNormal2(du, dv, retNormal);
+           break;
+      case 4:
+           inComputeFirstPartials(retPoint, du, dv);
+           inComputeNormal2(du, dv, retNormal);
 
-  if(global_vprime != vprime || global_vorder != vorder) {      
-    inPreEvaluateWithDeriv(vorder, vprime, global_vcoeff, global_vcoeffDeriv);
-    global_vprime = vprime;
-    global_vorder = vorder;
-  }
-
-  for(j=0; j<k; j++){
-    data = baseData+j;
-    for(row=0; row<uorder; row++){
-      p = global_vcoeff[0] * (*data);
-      pdv = global_vcoeffDeriv[0] * (*data);
-      data += k;
-      for(col = 1; col < vorder; col++){
-	p += global_vcoeff[col] *  (*data);
-	pdv += global_vcoeffDeriv[col] * (*data);
-	data += k;
-      }
-      global_BV[row][j]  = p;
-      global_PBV[row][j]  = pdv;
-    }
-  }
+           /* transform the homegeneous coordinate of retPoint into inhomogenous one */
+           retPoint[0]/=retPoint[3];
+           retPoint[1]/=retPoint[3];
+           retPoint[2]/=retPoint[3];
+           break;
+   }
 }
 
-void OpenGLSurfaceEvaluator::inPreEvaluateBU(int k, int uorder, int vorder, REAL uprime, REAL *baseData)
+void OpenGLSurfaceEvaluator::inPreEvaluateBV(int k, int uorder, int vorder, REAL vprime, REAL* baseData)
 {
-  int j,row,col;
-  REAL p, pdu;
-  REAL *data;
+   int j, row, col;
+   REAL  p, pdv;
+   REAL* data;
 
-  if(global_uprime != uprime || global_uorder != uorder) {      
-    inPreEvaluateWithDeriv(uorder, uprime, global_ucoeff, global_ucoeffDeriv);
-    global_uprime = uprime;
-    global_uorder = uorder;
-  }
+   if (global_vprime!=vprime || global_vorder!=vorder)
+   {
+      inPreEvaluateWithDeriv(vorder, vprime, global_vcoeff, global_vcoeffDeriv);
+      global_vprime = vprime;
+      global_vorder = vorder;
+   }
 
-  for(j=0; j<k; j++){
-    data = baseData+j;
-    for(col=0; col<vorder; col++){
-      data = baseData+j + k*col;
-      p = global_ucoeff[0] * (*data);
-      pdu = global_ucoeffDeriv[0] * (*data);
-      data += k*uorder;
-      for(row = 1; row < uorder; row++){
-	p += global_ucoeff[row] *  (*data);
-	pdu += global_ucoeffDeriv[row] * (*data);
-	data += k * uorder;
-      }
-      global_BU[col][j]  = p;
-      global_PBU[col][j]  = pdu;
-    }
-  }
-}
- 
-void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBU(int k, REAL u, REAL v,
-						      REAL u1, REAL u2, int uorder,
-						      REAL v1, REAL v2, int vorder,
-						      REAL *baseData,
-						      REAL *retPoint, REAL* retdu, REAL *retdv)
-{
-  int j, col;
+   for (j=0; j<k; j++)
+   {
+      data=baseData+j;
 
-  REAL vprime;
-
-
-  if((u2 == u1) || (v2 == v1))
-    return;
-
-  vprime = (v - v1) / (v2 - v1);
-
-
-  if(global_vprime != vprime || global_vorder != vorder) {
-    inPreEvaluateWithDeriv(vorder, vprime, global_vcoeff, global_vcoeffDeriv);
-    global_vprime = vprime;
-    global_vorder = vorder;
-  }
-
-
-  for(j=0; j<k; j++)
-    {
-      retPoint[j] = retdu[j] = retdv[j] = 0.0;
-      for (col = 0; col < vorder; col++)  {
-	retPoint[j] += global_BU[col][j] * global_vcoeff[col];
-	retdu[j] += global_PBU[col][j] * global_vcoeff[col];
-         retdv[j] += global_BU[col][j] * global_vcoeffDeriv[col];
+      for (row=0; row<uorder; row++)
+      {
+         p=global_vcoeff[0]*(*data);
+         pdv=global_vcoeffDeriv[0]*(*data);
+         data+=k;
+         for (col=1; col<vorder; col++)
+         {
+            p+=global_vcoeff[col]*(*data);
+            pdv+=global_vcoeffDeriv[col]*(*data);
+            data+=k;
+         }
+         global_BV[row][j]=p;
+         global_PBV[row][j]=pdv;
       }
    }
 }
 
-void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBV(int k, REAL u, REAL v,
-						      REAL u1, REAL u2, int uorder,
-						      REAL v1, REAL v2, int vorder,
-						      REAL *baseData,
-						      REAL *retPoint, REAL* retdu, REAL *retdv)
+void OpenGLSurfaceEvaluator::inPreEvaluateBU(int k, int uorder, int vorder, REAL uprime, REAL* baseData)
 {
-  int j, row;
-  REAL uprime;
+   int j, row, col;
+   REAL p, pdu;
+   REAL* data;
 
+   if (global_uprime!=uprime || global_uorder!=uorder)
+   {
+      inPreEvaluateWithDeriv(uorder, uprime, global_ucoeff, global_ucoeffDeriv);
+      global_uprime = uprime;
+      global_uorder = uorder;
+   }
 
-  if((u2 == u1) || (v2 == v1))
-    return;
-  uprime = (u - u1) / (u2 - u1);
+   for (j=0; j<k; j++)
+   {
+      data=baseData+j;
+      for (col=0; col<vorder; col++)
+      {
+         data=baseData+j+k*col;
+         p=global_ucoeff[0]*(*data);
+         pdu=global_ucoeffDeriv[0]*(*data);
+         data+=k*uorder;
 
-
-  if(global_uprime != uprime || global_uorder != uorder) {
-    inPreEvaluateWithDeriv(uorder, uprime, global_ucoeff, global_ucoeffDeriv);
-    global_uprime = uprime;
-    global_uorder = uorder;
-  }
-
-
-  for(j=0; j<k; j++)
-    {
-      retPoint[j] = retdu[j] = retdv[j] = 0.0;
-      for (row = 0; row < uorder; row++)  {
-	retPoint[j] += global_BV[row][j] * global_ucoeff[row];
-	retdu[j] += global_BV[row][j] * global_ucoeffDeriv[row];
-	retdv[j] += global_PBV[row][j] * global_ucoeff[row];
+         for(row=1; row<uorder; row++)
+         {
+            p+=global_ucoeff[row]*(*data);
+            pdu+=global_ucoeffDeriv[row]*(*data);
+            data+=k*uorder;
+         }
+         global_BU[col][j]=p;
+         global_PBU[col][j]=pdu;
       }
-    }
+   }
+}
+
+void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBU(int k, REAL u, REAL v, REAL u1, REAL u2, int uorder,
+                                                     REAL v1, REAL v2, int vorder, REAL* baseData,
+                                                     REAL* retPoint, REAL* retdu, REAL* retdv)
+{
+   int j, col;
+
+   REAL vprime;
+
+
+   if ((u2==u1) || (v2==v1))
+   {
+      return;
+   }
+
+   vprime=(v-v1)/(v2-v1);
+
+
+   if (global_vprime!=vprime || global_vorder!=vorder)
+   {
+      inPreEvaluateWithDeriv(vorder, vprime, global_vcoeff, global_vcoeffDeriv);
+      global_vprime=vprime;
+      global_vorder=vorder;
+   }
+
+   for(j=0; j<k; j++)
+   {
+      retPoint[j]=retdu[j]=retdv[j]=0.0f;
+      for (col=0; col<vorder; col++)
+      {
+         retPoint[j]+=global_BU[col][j]*global_vcoeff[col];
+         retdu[j]+=global_PBU[col][j]*global_vcoeff[col];
+         retdv[j]+=global_BU[col][j]*global_vcoeffDeriv[col];
+      }
+   }
+}
+
+void OpenGLSurfaceEvaluator::inDoDomain2WithDerivsBV(int k, REAL u, REAL v, REAL u1, REAL u2, int uorder,
+                                                     REAL v1, REAL v2, int vorder, REAL* baseData,
+                                                     REAL* retPoint, REAL* retdu, REAL* retdv)
+{
+   int j, row;
+   REAL uprime;
+
+
+   if ((u2==u1) || (v2==v1))
+   {
+      return;
+   }
+   uprime=(u-u1)/(u2-u1);
+
+   if (global_uprime!=uprime || global_uorder!=uorder)
+   {
+      inPreEvaluateWithDeriv(uorder, uprime, global_ucoeff, global_ucoeffDeriv);
+      global_uprime=uprime;
+      global_uorder=uorder;
+   }
+
+   for(j=0; j<k; j++)
+   {
+      retPoint[j]=retdu[j]=retdv[j]=0.0f;
+      for (row=0; row<uorder; row++)
+      {
+         retPoint[j]+=global_BV[row][j]*global_ucoeff[row];
+         retdu[j]+=global_BV[row][j]*global_ucoeffDeriv[row];
+         retdv[j]+=global_PBV[row][j]*global_ucoeff[row];
+      }
+   }
 }
 
 /*
- *given a Bezier surface, and parameter (u,v), compute the point in the object space,
- *and the normal
- *k: the dimension of the object space: usually 2,3,or 4.
- *u,v: the paramter pair.
- *u1,u2,uorder: the Bezier polynomial of u coord is defined on [u1,u2] with order uorder.
- *v1,v2,vorder: the Bezier polynomial of v coord is defined on [v1,v2] with order vorder.
- *baseData: contrl points. arranged as: (u,v,k).
- *retPoint:  the computed point (one point) with dimension k.
- *retdu: the computed partial derivative with respect to u.
- *retdv: the computed partial derivative with respect to v.
+ * given a Bezier surface, and parameter (u,v), compute the point in the object space,
+ * and the normal
+ * k: the dimension of the object space: usually 2,3,or 4.
+ * u,v: the paramter pair.
+ * u1,u2,uorder: the Bezier polynomial of u coord is defined on [u1,u2] with order uorder.
+ * v1,v2,vorder: the Bezier polynomial of v coord is defined on [v1,v2] with order vorder.
+ * baseData: contrl points. arranged as: (u,v,k).
+ * retPoint:  the computed point (one point) with dimension k.
+ * retdu: the computed partial derivative with respect to u.
+ * retdv: the computed partial derivative with respect to v.
  */
-void OpenGLSurfaceEvaluator::inDoDomain2WithDerivs(int k, REAL u, REAL v, 
-				REAL u1, REAL u2, int uorder, 
-				REAL v1,  REAL v2, int vorder, 
-				REAL *baseData,
-				REAL *retPoint, REAL *retdu, REAL *retdv)
+void OpenGLSurfaceEvaluator::inDoDomain2WithDerivs(int k, REAL u, REAL v, REAL u1, REAL u2, int uorder,
+                                                   REAL v1,  REAL v2, int vorder, REAL* baseData,
+                                                   REAL* retPoint, REAL* retdu, REAL* retdv)
 {
-    int j, row, col;
-    REAL uprime;
-    REAL vprime;
-    REAL p;
-    REAL pdv;
-    REAL *data;
+   int j, row, col;
+   REAL  uprime;
+   REAL  vprime;
+   REAL  p;
+   REAL  pdv;
+   REAL* data;
 
-    if((u2 == u1) || (v2 == v1))
-	return;
-    uprime = (u - u1) / (u2 - u1);
-    vprime = (v - v1) / (v2 - v1);
-    
-    /* Compute coefficients for values and derivs */
+   if ((u2==u1) || (v2==v1))
+   {
+      return;
+   }
+   uprime=(u-u1)/(u2-u1);
+   vprime=(v-v1)/(v2-v1);
 
-    /* Use already cached values if possible */
-    if(global_uprime != uprime || global_uorder != uorder) {
-        inPreEvaluateWithDeriv(uorder, uprime, global_ucoeff, global_ucoeffDeriv);
-	global_uorder = uorder;
-	global_uprime = uprime;
-    }
-    if (global_vprime != vprime || 
-	  global_vorder != vorder) {
-	inPreEvaluateWithDeriv(vorder, vprime, global_vcoeff, global_vcoeffDeriv);
-	global_vorder = vorder;
-	global_vprime = vprime;
-    }
+   /* Compute coefficients for values and derivs */
 
-    for (j = 0; j < k; j++) {
-	data=baseData+j;
-	retPoint[j] = retdu[j] = retdv[j] = 0.0;
-	for (row = 0; row < uorder; row++)  {
-	    /* 
-	    ** Minor optimization.
-	    ** The col == 0 part of the loop is extracted so we don't
-	    ** have to initialize p and pdv to 0.
-	    */
-	    p = global_vcoeff[0] * (*data);
-	    pdv = global_vcoeffDeriv[0] * (*data);
-	    data += k;
-	    for (col = 1; col < vorder; col++) {
-		/* Incrementally build up p, pdv value */
-		p += global_vcoeff[col] * (*data);
-		pdv += global_vcoeffDeriv[col] * (*data);
-		data += k;
+   /* Use already cached values if possible */
+   if(global_uprime!=uprime || global_uorder!=uorder)
+   {
+      inPreEvaluateWithDeriv(uorder, uprime, global_ucoeff, global_ucoeffDeriv);
+      global_uorder=uorder;
+      global_uprime=uprime;
+   }
+   if (global_vprime!=vprime || global_vorder!=vorder)
+   {
+      inPreEvaluateWithDeriv(vorder, vprime, global_vcoeff, global_vcoeffDeriv);
+      global_vorder=vorder;
+      global_vprime=vprime;
+   }
+
+   for (j=0; j<k; j++)
+   {
+      data=baseData+j;
+      retPoint[j]=retdu[j]=retdv[j]=0.0f;
+
+      for (row=0; row<uorder; row++)
+      {
+         /*
+          ** Minor optimization.
+          ** The col == 0 part of the loop is extracted so we don't
+          ** have to initialize p and pdv to 0.
+          */
+         p=global_vcoeff[0]*(*data);
+         pdv=global_vcoeffDeriv[0]*(*data);
+         data+=k;
+         for (col=1; col<vorder; col++)
+         {
+            /* Incrementally build up p, pdv value */
+            p+=global_vcoeff[col]*(*data);
+            pdv+=global_vcoeffDeriv[col]*(*data);
+            data+=k;
          }
 
          /* Use p, pdv value to incrementally add up r, du, dv */
@@ -1109,11 +1137,11 @@ void OpenGLSurfaceEvaluator::inEvalVLine(int n_points, REAL u, REAL* v_vals, int
 }
 
 
-/*triangulate a strip bounded by two lines which are parallel  to U-axis
- *upperVerts: the verteces on the upper line
- *lowerVertx: the verteces on the lower line
- *n_upper >=1
- *n_lower >=1
+/* triangulate a strip bounded by two lines which are parallel  to U-axis
+ * upperVerts: the verteces on the upper line
+ * lowerVertx: the verteces on the lower line
+ * n_upper >=1
+ * n_lower >=1
  */
 void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val)
 {
@@ -1657,22 +1685,23 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
  */
 void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_val, int n_right, REAL u_right, REAL* right_val)
 {
-   int i,j,k,l;
+   int i, j, k, l;
    REAL botMostV[2];
    typedef REAL REAL3[3];
+   int it;
 
    GLboolean texcoord_enabled;
    GLboolean normal_enabled;
    GLboolean vertex_enabled;
    GLboolean color_enabled;
 
-   REAL3* leftXYZ = (REAL3*) malloc(sizeof(REAL3)*n_left);
+   REAL3* leftXYZ=(REAL3*)malloc(sizeof(REAL3)*n_left);
    assert(leftXYZ);
-   REAL3* leftNormal = (REAL3*) malloc(sizeof(REAL3) * n_left);
+   REAL3* leftNormal=(REAL3*)malloc(sizeof(REAL3)*n_left);
    assert(leftNormal);
-   REAL3* rightXYZ = (REAL3*) malloc(sizeof(REAL3)*n_right);
+   REAL3* rightXYZ=(REAL3*) malloc(sizeof(REAL3)*n_right);
    assert(rightXYZ);
-   REAL3* rightNormal = (REAL3*) malloc(sizeof(REAL3) * n_right);
+   REAL3* rightNormal=(REAL3*)malloc(sizeof(REAL3)*n_right);
    assert(rightNormal);
    REAL3* normals=(REAL3*)malloc(sizeof(REAL3)*((n_left>n_right?n_left:n_right)*3));
    assert(normals);
@@ -1740,7 +1769,7 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
       {
          if (j<n_right-1) /* at least two vertices in right */
          {
-            int it=0;
+            it=0;
 
             bgntfan();
 
@@ -1819,7 +1848,7 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
          {
             if (i<n_left-1) /* at least two vertices in left */
             {
-               int it=0;
+               it=0;
 
                bgntfan();
 
@@ -1891,9 +1920,9 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
          }
          else /* case3: neither is empty, plus the botMostV, there is at least one triangle to output */
          {
-            if(left_val[i]<=right_val[j])
+            if (left_val[i]<=right_val[j])
             {
-               int it=0;
+               it=0;
 
                bgntfan();
 
@@ -2015,7 +2044,7 @@ void OpenGLSurfaceEvaluator::inEvalVStrip(int n_left, REAL u_left, REAL* left_va
             }
             else /* left_val[i] > right_val[j]) */
             {
-               int it=0;
+               it=0;
 
                bgntfan();
 

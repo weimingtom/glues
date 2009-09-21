@@ -86,49 +86,49 @@ class GLUnurbs: public NurbsTessellator
 #else
       void putSurfCallBack(GLenum which, _GLUfuncptr fn)
 #endif
-           {
-              curveEvaluator.putCallBack(which, fn);
-              surfaceEvaluator.putCallBack(which, fn);
-           }
+      {
+         curveEvaluator.putCallBack(which, fn);
+         surfaceEvaluator.putCallBack(which, fn);
+      }
       int get_vertices_call_back()
-          {
-             return surfaceEvaluator.get_vertices_call_back();
-          }
+      {
+         return surfaceEvaluator.get_vertices_call_back();
+      }
       void put_vertices_call_back(int flag)
-           {
-              surfaceEvaluator.put_vertices_call_back(flag);
-           }
+      {
+         surfaceEvaluator.put_vertices_call_back(flag);
+      }
       int get_callback_auto_normal()
-          {
-             return surfaceEvaluator.get_callback_auto_normal();
-          }
+      {
+         return surfaceEvaluator.get_callback_auto_normal();
+      }
       void put_callback_auto_normal(int flag)
-          {
-             surfaceEvaluator.put_callback_auto_normal(flag);
-          }
+      {
+         surfaceEvaluator.put_callback_auto_normal(flag);
+      }
       void setNurbsCallbackData(void* userData)
-           {
-              curveEvaluator.set_callback_userData(userData);
-              surfaceEvaluator.set_callback_userData(userData);
-           }
+      {
+         curveEvaluator.set_callback_userData(userData);
+         surfaceEvaluator.set_callback_userData(userData);
+      }
 
-    // for LOD
-    void LOD_eval_list(int level)
-         {
-            surfaceEvaluator.LOD_eval_list(level);
-         }
+      // for LOD
+      void LOD_eval_list(int level)
+      {
+         surfaceEvaluator.LOD_eval_list(level);
+      }
 
-    // NEWCALLBACK
-    int is_callback()
-        {
-           return callbackFlag;
-        }
-    void put_callbackFlag(int flag)
-         {
-            callbackFlag = flag;
-            surfaceEvaluator.put_vertices_call_back(flag);
-            curveEvaluator.put_vertices_call_back(flag);
-         }
+      // NEWCALLBACK
+      int is_callback()
+      {
+         return callbackFlag;
+      }
+      void put_callbackFlag(int flag)
+      {
+         callbackFlag=flag;
+         surfaceEvaluator.put_vertices_call_back(flag);
+         curveEvaluator.put_vertices_call_back(flag);
+      }
 
    private:
       GLboolean              autoloadmode;

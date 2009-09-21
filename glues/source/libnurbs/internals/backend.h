@@ -66,7 +66,7 @@ class Backend
       void tmeshvert(GridTrimVertex*);
       void tmeshvert(TrimVertex*, REAL*, REAL*);
       void tmeshvert(GridVertex*);
-      void tmeshvert(REAL u, REAL v);
+      void tmeshvert(REAL u, REAL v, REAL*, REAL*);
       void linevert(TrimVertex*, REAL*, REAL*);
       void linevert(GridVertex*);
       void bgnoutline(void);

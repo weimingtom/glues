@@ -126,7 +126,7 @@ class OpenGLCurveEvaluator: public BasicCurveEvaluator
       void (APIENTRY* colorCallBackN)(const GLfloat* color);
       void (APIENTRY* texcoordCallBackN)(const GLfloat* texcoord);
 
-      void (APIENTRY* beginCallBackData)GLenum type, void* data);
+      void (APIENTRY* beginCallBackData)(GLenum type, void* data);
       void (APIENTRY* endCallBackData)(void* data);
       void (APIENTRY* vertexCallBackData)(const GLfloat* vert, void* data);
       void (APIENTRY* normalCallBackData)(const GLfloat* normal, void* data);

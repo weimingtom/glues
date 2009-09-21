@@ -39,7 +39,7 @@
 class CachingEvaluator
 {
    public:
-      virtual      ~CachingEvaluator() { /* silence warning*/ }
+      virtual ~CachingEvaluator() { /* silence warning*/ }
       enum ServiceMode { play, record, playAndRecord };
       virtual int  canRecord(void);
       virtual int  canPlayAndRecord(void);

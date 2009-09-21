@@ -46,32 +46,31 @@
 #include "trimvertex.h"
 #include "simplemath.h"
 
-inline int 
-Subdivider::bbox( TrimVertex *a, TrimVertex *b, TrimVertex *c, int p )
+inline int Subdivider::bbox(TrimVertex* a, TrimVertex* b, TrimVertex* c, int p)
 {
-    return bbox( a->param[p], b->param[p], c->param[p], 
-	         a->param[1-p], b->param[1-p], c->param[1-p] ); 
+   return bbox(a->param[p], b->param[p], c->param[p], a->param[1-p], b->param[1-p], c->param[1-p]);
 }
 
-int
-Subdivider::ccwTurn_sr( Arc_ptr j1, Arc_ptr j2 ) // dir = 1
+int Subdivider::ccwTurn_sr(Arc_ptr j1, Arc_ptr j2) // dir = 1
 {
-    register TrimVertex *v1	= &j1->pwlArc->pts[j1->pwlArc->npts-1];
-    register TrimVertex *v1last	= &j1->pwlArc->pts[0];
-    register TrimVertex *v2	= &j2->pwlArc->pts[0];
-    register TrimVertex *v2last	= &j2->pwlArc->pts[j2->pwlArc->npts-1];
-    register TrimVertex *v1next	= v1-1;
-    register TrimVertex *v2next	= v2+1;
-    int sgn;
+   register TrimVertex* v1=&j1->pwlArc->pts[j1->pwlArc->npts-1];
+   register TrimVertex* v1last=&j1->pwlArc->pts[0];
+   register TrimVertex* v2=&j2->pwlArc->pts[0];
+   register TrimVertex* v2last=&j2->pwlArc->pts[j2->pwlArc->npts-1];
+   register TrimVertex* v1next=v1-1;
+   register TrimVertex* v2next=v2+1;
+   int sgn;
 
-    assert( v1 != v1last );
-    assert( v2 != v2last );
+   assert(v1!=v1last);
+   assert(v2!=v2last);
 
-    // the arcs lie on the line (0 == v1->param[0])
-    if( v1->param[0] == v1next->param[0] && v2->param[0] == v2next->param[0] )
-	return 0;
+   // the arcs lie on the line (0 == v1->param[0])
+   if (v1->param[0]==v1next->param[0] && v2->param[0]==v2next->param[0])
+   {
+      return 0;
+   }
 
-    if( v2next->param[0] < v2->param[0] || v1next->param[0] < v1->param[0] )
+   if( v2next->param[0] < v2->param[0] || v1next->param[0] < v1->param[0] )
 	::mylongjmp( jumpbuffer, 28 );
 
     if( v1->param[1] < v2->param[1] )
