@@ -282,7 +282,7 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                    break;
            }
            break;
-      case GL_QUAD_STRIP:
+      case GL_TRIANGLE_STRIP:
            switch (backend.get_output_style())
            {
               case N_MESHFILL:
@@ -371,7 +371,7 @@ void OPT_END(Backend& backend)
                    break;
            }
            break;
-      case GL_QUAD_STRIP:
+      case GL_TRIANGLE_STRIP:
            switch (backend.get_output_style())
            {
               case N_MESHFILL:
@@ -676,7 +676,7 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
             return;
          }
 
-         backend.bgnqstrip(); OPT_START(GL_QUAD_STRIP);
+         backend.bgnqstrip(); OPT_START(GL_TRIANGLE_STRIP);
          for(j=botd_left, i=topd_left; i>=topd_right; i--, j++)
          {
             OPT_OUTVERT(top->pts[i], backend, retPoint, retNormal);

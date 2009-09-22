@@ -229,7 +229,6 @@ long OpenGLSurfaceEvaluator::get_output_style()
 
 void OpenGLSurfaceEvaluator::bgnline(void)
 {
-printf("OpenGLSurfaceEvaluator::bgnline\n");
    if (output_triangles)
    {
       bezierPatchMeshBeginStrip(global_bpm, GL_LINE_STRIP);
@@ -238,7 +237,6 @@ printf("OpenGLSurfaceEvaluator::bgnline\n");
 
 void OpenGLSurfaceEvaluator::endline(void)
 {
-printf("OpenGLSurfaceEvaluator::endline\n");
    if (output_triangles)
    {
       bezierPatchMeshEndStrip(global_bpm);
@@ -605,7 +603,7 @@ void OpenGLSurfaceEvaluator::bgnqstrip(void)
 {
    if (output_triangles)
    {
-      bezierPatchMeshBeginStrip(global_bpm, GL_QUAD_STRIP);
+      bezierPatchMeshBeginStrip(global_bpm, GL_TRIANGLE_STRIP);
    }
 }
 

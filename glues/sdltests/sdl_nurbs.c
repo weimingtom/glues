@@ -55,7 +55,7 @@ void init_scene(int width, int height)
    gluEnable(GLU_AUTO_NORMAL);
 
    nurb=gluNewNurbsRenderer();
-   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 150.0f);
+   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 25.0f);
    gluNurbsProperty(nurb, GLU_DISPLAY_MODE, GLU_FILL);
 
    /* Build control points for NURBS mole hills. */
@@ -152,8 +152,10 @@ void init_scene(int width, int height)
    pts4[0][3][2]=1;
 
    glMatrixMode(GL_PROJECTION);
-   gluPerspective(55.0f, (GLfloat)window_width/(GLfloat)window_height, 2.0f, 24.0f);
+   glLoadIdentity();
+   gluPerspective(55.0f, (GLfloat)width/(GLfloat)height, 2.0f, 24.0f);
    glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
    glTranslatef(0.0f, 0.0f, -15.0f);
    glRotatef(330.0f, 1.0f, 0.0f, 0.0f);
 }
@@ -171,8 +173,9 @@ void resize(int width, int height)
    /* Setup our new viewport for GLU ES (required when using OpenGL ES 1.0 only) */
    gluViewport(0, 0, (GLint)width, (GLint)height);
 
-   /* Setup new aspect ration */
+   /* Setup new aspect ratio */
    glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
    gluPerspective(55.0f, (GLfloat)width/(GLfloat)height, 2.0f, 24.0f);
    glMatrixMode(GL_MODELVIEW);
 }

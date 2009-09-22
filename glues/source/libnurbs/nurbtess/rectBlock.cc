@@ -94,7 +94,7 @@ void rectBlock::draw(Real* u_values, Real* v_values)
   for(k=0, i=upGridLineIndex; i > lowGridLineIndex; i--, k++)
     {
 // MIKE: TODO
-//      glBegin(GL_QUAD_STRIP);
+//      glBegin(GL_TRIANGLE_STRIP);
 
       for(j=leftIndices[k+1]; j<= rightIndices[k+1]; j++)
 	{

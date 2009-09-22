@@ -529,18 +529,11 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2(REAL u, REAL v, REAL* retPoint, REAL
            inComputeFirstPartials(retPoint, du, dv);
            inComputeNormal2(du, dv, retNormal);
            /* transform the homegeneous coordinate of retPoint into inhomogenous one */
-           retPoint[0] /= retPoint[3];
-           retPoint[1] /= retPoint[3];
-           retPoint[2] /= retPoint[3];
+           retPoint[0]/=retPoint[3];
+           retPoint[1]/=retPoint[3];
+           retPoint[2]/=retPoint[3];
            break;
    }
-
-   /* output this vertex */
-
-// MIKE: TODO
-//  glNormal3fv(retNormal);
-// MIKE: TODO
-//  glVertex3fv(retPoint);
 }
 
 /* Compute point and normal
@@ -1145,7 +1138,7 @@ void OpenGLSurfaceEvaluator::inEvalVLine(int n_points, REAL u, REAL* v_vals, int
  */
 void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper_val, int n_lower, REAL v_lower, REAL* lower_val)
 {
-   int i,j,k,l;
+   int i, j, k, l;
    REAL leftMostV[2];
    typedef REAL REAL3[3];
 
@@ -2474,7 +2467,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
                }
             }
          }
-#endif
+#endif /* AVOID_ZERO_NORMAL */
 
          /* compute normal */
          switch (em_vertex.k)
@@ -2497,7 +2490,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
       } /* end if auto_normal */
       else // no normal map, and no normal callback function
       {
-         if(vertex_flag)
+         if (vertex_flag)
          {
             inDoDomain2EM(&em_vertex, u, v, temp_vertex);
             if (em_vertex.k==4)
@@ -2625,7 +2618,7 @@ void OpenGLSurfaceEvaluator::inBPMListEvalEM(bezierPatchMesh* list)
 {
    bezierPatchMesh* temp;
 
-   for(temp=list; temp!=NULL; temp=temp->next)
+   for (temp=list; temp!=NULL; temp=temp->next)
    {
       inBPMEvalEM(temp);
    }
