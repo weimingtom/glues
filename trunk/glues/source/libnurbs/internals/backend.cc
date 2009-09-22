@@ -295,7 +295,6 @@ void Backend::endtmesh(void)
  */
 void Backend::bgnoutline(void)
 {
-   printf("Backend::bgnoutline\n");
    surfaceEvaluator.bgnline();
 }
 
@@ -305,7 +304,6 @@ void Backend::bgnoutline(void)
  */
 void Backend::linevert(TrimVertex* t, REAL* retPoint, REAL* retNormal)
 {
-printf("Backend::linevert TrimVertex\n");
    surfaceEvaluator.evalcoord2f(t->nuid, t->param[0], t->param[1], retPoint, retNormal);
 }
 
@@ -325,7 +323,6 @@ printf("Backend::linevert GridVertex\n");
  */
 void Backend::endoutline(void)
 {
-   printf("Backend::endoutline\n");
    surfaceEvaluator.endline();
 }
 

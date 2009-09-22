@@ -1,5 +1,5 @@
 /*                                                              */
-/* This test is based on SGI's trim.c example                   */
+/* This test is based on SGI's trim.c example from redbook      */
 /* Copyright (c) 1993-1997, Silicon Graphics, Inc.              */
 /* ALL RIGHTS RESERVED                                          */
 /*                                                              */
@@ -39,8 +39,6 @@ GLfloat curveKnots[8]={0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 /* clockwise */
 GLfloat pwlPt[4][2]={{0.75f, 0.5f}, {0.5f, 0.25f}, {0.25f, 0.5f}};
 
-GLfloat zrot=3.0f;
-
 GLUnurbsObj* nurb;
 
 void init_scene(int width, int height)
@@ -69,7 +67,7 @@ void init_scene(int width, int height)
    gluEnable(GLU_AUTO_NORMAL);
 
    nurb=gluNewNurbsRenderer();
-   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 150.0f);
+   gluNurbsProperty(nurb, GLU_SAMPLING_TOLERANCE, 25.0f);
    gluNurbsProperty(nurb, GLU_DISPLAY_MODE, GLU_FILL);
 
    for (u=0; u<4; u++)
@@ -81,24 +79,23 @@ void init_scene(int width, int height)
 
          if ((u==1 || u==2) && (v==1 || v==2))
          {
-            ctlpoints[u][v][2]=3.0;
+            ctlpoints[u][v][2]=3.0f;
          }
          else
          {
-            ctlpoints[u][v][2]=-3.0;
+            ctlpoints[u][v][2]=-3.0f;
          }
       }
    }
 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(45.0f, (GLfloat)window_width/(GLfloat)window_height, 3.0f, 8.0f);
+   gluPerspective(45.0f, (GLfloat)window_width/(GLfloat)window_height, 3.0f, 24.0f);
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
-   glTranslatef(0.0f, 0.5f, -5.5f);
+   glTranslatef(0.0f, 0.5f, -9.0f);
    glRotatef(330.0f, 1.0f, 0.0f, 0.0f);
-   glScalef(0.5f, 0.5f, 0.5f);
 }
 
 void resize(int width, int height)
@@ -114,18 +111,16 @@ void resize(int width, int height)
    /* Setup our new viewport for GLU ES (required when using OpenGL ES 1.0 only) */
    gluViewport(0, 0, (GLint)width, (GLint)height);
 
-   /* Setup new aspect ration */
+   /* Setup new aspect ratio */
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(45.0f, (GLfloat)width/(GLfloat)height, 3.0f, 8.0f);
+   gluPerspective(45.0f, (GLfloat)width/(GLfloat)height, 3.0f, 24.0f);
    glMatrixMode(GL_MODELVIEW);
 }
 
 void render_scene()
 {
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-   glRotatef(zrot, 0.0f, 0.0f, 1.0f);
 
    /* Render trimmed surface */
    gluBeginSurface(nurb);

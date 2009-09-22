@@ -40,15 +40,4 @@
 /* Fixed point to float point conversion */
 #define FX2F(fx) (GLfloat(fx)/65536.0f)
 
-/* Primitives */
-#define GL_QUAD_STRIP                           0x0008
-
-/* Polygons */
-#define GL_POINT                                0x1B00
-#define GL_LINE                                 0x1B01
-#define GL_FILL                                 0x1B02
-#define GL_FRONT                                0x0404
-#define GL_BACK                                 0x0405
-#define GL_POLYGON_MODE                         0x0B40
-
 #endif /* __gles_evaluator_h_ */

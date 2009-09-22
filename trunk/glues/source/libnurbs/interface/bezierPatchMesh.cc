@@ -474,13 +474,6 @@ int bezierPatchMeshNumTriangles(bezierPatchMesh* bpm)
                   sum+=bpm->length_array[i]-2;
                }
                break;
-// MIKE: TODO
-          case GL_QUAD_STRIP:
-               if (bpm->length_array[i]>2)
-               {
-                  sum+=(bpm->length_array[i]-2);
-               }
-               break;
           default:
                fprintf(stderr, "error in bezierPatchMeshListNumTriangles, type invalid\n");
                break;

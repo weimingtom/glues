@@ -169,6 +169,7 @@ GLAPI void APIENTRY gluGetFloatv(GLenum pname, GLfloat* params)
                     {
                        case GL_MODELVIEW_MATRIX:
                             glMatrixMode(GL_MODELVIEW);
+                            break;
                        case GL_PROJECTION_MATRIX:
                             glMatrixMode(GL_PROJECTION);
                             break;
