@@ -58,8 +58,6 @@ private:
     inline void		append( TrimVertex * );
     static long		interpvert( TrimVertex *, TrimVertex *, TrimVertex *, REAL );
 
-
-
 public:
 			Trimline();
 			~Trimline();

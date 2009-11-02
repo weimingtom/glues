@@ -871,7 +871,7 @@ void findLeftGridIndices(directedLine* topEdge, Int firstGridIndex, Int lastGrid
 
   /*initialization to make vtail bigger than grid->...*/
   directedLine* dLine = topEdge;
-  Real vtail = grid->get_v_value(firstGridIndex) + 1.0; 
+  Real vtail = grid->get_v_value(firstGridIndex) + 1.0f; 
   Real tempMaxU = grid->get_u_min();
 
 

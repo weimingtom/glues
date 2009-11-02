@@ -815,18 +815,6 @@ void sweepY(Int nVertices, directedLine** sortedVertices, sweepRange** ret_range
 	  searchTree = TreeNodeDeleteSingleNode(searchTree, thisNode);
 	  searchTree = TreeNodeDeleteSingleNode(searchTree, prevNode);
 	}
-      else
-	{
-	  fprintf(stderr,"error in partitionY.C, invalid case\n");
-	  printf("vert is\n");
-	  vert->printSingle();
-	  printf("thisEdge is\n");
-	  thisEdge->printSingle();
-	  printf("prevEdge is\n");
-	  prevEdge->printSingle();
-	  
-	  exit(1);
-	}
     }
 
   /*finaly clean up space: delete the search tree*/

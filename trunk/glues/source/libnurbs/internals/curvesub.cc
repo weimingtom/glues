@@ -92,7 +92,7 @@ Subdivider::samplingSplit( Curvelist& curvelist, int subdivisions )
     curvelist.getstepsize();
 
     if( curvelist.needsSamplingSubdivision() && (subdivisions > 0) ) {
-	REAL mid = ( curvelist.range[0] + curvelist.range[1] ) * 0.5;
+	REAL mid = ( curvelist.range[0] + curvelist.range[1] ) * 0.5f;
 	Curvelist lowerlist( curvelist, mid );
 	samplingSplit( lowerlist, subdivisions-1 ); // lower
 	samplingSplit( curvelist, subdivisions-1 ); // upper

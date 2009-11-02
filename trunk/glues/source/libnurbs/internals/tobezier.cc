@@ -231,8 +231,8 @@ Splinespec::layout( long ncoords )
     long stride = ncoords;
     for( Knotspec *knotspec = kspec; knotspec; knotspec=knotspec->next ) {
 	knotspec->poststride = (int) stride;
-	stride *= ((knotspec->bend-knotspec->bbegin)*knotspec->order + knotspec->postoffset);
-        knotspec->preoffset  *= knotspec->prestride;
+	stride *= ((long)(knotspec->bend-knotspec->bbegin)*knotspec->order + knotspec->postoffset);
+    knotspec->preoffset  *= knotspec->prestride;
 	knotspec->prewidth  *= knotspec->poststride;
 	knotspec->postwidth *= knotspec->poststride;
 	knotspec->postoffset *= knotspec->poststride;
@@ -269,8 +269,8 @@ Splinespec::setupquilt( Quilt_ptr quilt )
     quilt->eqspec = qspec + dim;
     for( Knotspec *knotspec = kspec; knotspec; knotspec=knotspec->next, qspec++ ) {
 	qspec->stride	= knotspec->poststride;
-	qspec->width	= knotspec->bend - knotspec->bbegin;
-	qspec->order	= (int) knotspec->order;
+	qspec->width	= (int)(knotspec->bend - knotspec->bbegin);
+	qspec->order	= (int)knotspec->order;
 	qspec->offset	= knotspec->postoffset;
 	qspec->index	= 0;
 	qspec->bdry[0]	= (knotspec->kleft == knotspec->kfirst) ? 1 : 0;
@@ -410,7 +410,7 @@ Knotspec::insert( REAL *p )
    for( REAL *pend = srcpt - poststride*bpt->def; srcpt != pend; pend +=poststride ) {
 	REAL *p1 = srcpt;
 	for( REAL *p2 = srcpt-poststride; p2 != pend; p1 = p2, p2 -= poststride ) {
-	    pt_oo_sum( p1, p1, p2, *fptr, 1.0-*fptr );
+	    pt_oo_sum( p1, p1, p2, *fptr, 1.0f-*fptr );
 	    fptr++;
 	}
     }
@@ -428,7 +428,7 @@ Knotspec::insert( REAL *p )
 	    REAL *p1 = srcpt;
 
 	    for( REAL *p2 = srcpt-poststride; p2 != pend; p1=p2, p2 -= poststride ) {
-		pt_oo_sum( p1, p1, p2, *fptr, 1.0-*fptr );
+		pt_oo_sum( p1, p1, p2, *fptr, 1.0f-*fptr );
 		fptr++;
 	    }
 	}
@@ -466,7 +466,7 @@ Knotspec::preselect( void )
 
     bbegin = new Breakpt[(klast - kfirst)+1];
     /* record multiplicity and value of first breakpoint */
-    bbegin->multi = kfirst - k;
+    bbegin->multi = (int)(kfirst - k);
     bbegin->value = kval;
     bend = bbegin;
 
@@ -488,7 +488,7 @@ Knotspec::select( void )
     knots();
     factors();
     
-    preoffset	= kleft - (inkbegin + order);
+    preoffset	= (int)(kleft - (inkbegin + order));
     postwidth	= (int)((bend - bbegin) * order);
     prewidth 	= (int)((outkend - outkbegin) - order);
     postoffset  = (bbegin->def > 1) ? (bbegin->def-1) : 0;

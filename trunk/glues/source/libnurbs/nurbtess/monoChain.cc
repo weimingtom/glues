@@ -65,7 +65,7 @@ extern Int deleteRepeatDiagonals(Int num_diagonals, directedLine** diagonal_vert
  */
 inline Real intersectHoriz(Real x1, Real y1, Real x2, Real y2, Real y)
 {
-  return ((y2==y1)? (x1+x2)*0.5 : x1 + ((y-y1)/(y2-y1)) * (x2-x1));
+  return ((y2==y1) ? (x1+x2)*0.5f : x1 + ((y-y1)/(y2-y1)) * (x2-x1));
 }
 
 //compare the heads of the two chains
@@ -331,24 +331,11 @@ static Int compEdges(directedLine *e1, directedLine *e2)
     e2_Ymin = head2[1];
   }
 
-  
-  /*Real e1_Ymax = max(head1[1], tail1[1]);*/ /*max(e1->head()[1], e1->tail()[1]);*/
-  /*Real e1_Ymin = min(head1[1], tail1[1]);*/ /*min(e1->head()[1], e1->tail()[1]);*/
-  /*Real e2_Ymax = max(head2[1], tail2[1]);*/ /*max(e2->head()[1], e2->tail()[1]);*/
-  /*Real e2_Ymin = min(head2[1], tail2[1]);*/ /*min(e2->head()[1], e2->tail()[1]);*/
-
   Real Ymax = min(e1_Ymax, e2_Ymax);
   Real Ymin = max(e1_Ymin, e2_Ymin);
     
-  Real y = 0.5*(Ymax + Ymin);
+  Real y = 0.5f*(Ymax + Ymin);
 
-/*  Real x1 = intersectHoriz(e1->head()[0], e1->head()[1], e1->tail()[0], e1->tail()[1], y);
-  Real x2 = intersectHoriz(e2->head()[0], e2->head()[1], e2->tail()[0], e2->tail()[1], y);
-*/
-/*
-  Real x1 = intersectHoriz(h10, h11, t10, t11, y);
-  Real x2 = intersectHoriz(h20, h21, t20, t21, y);
-*/
   Real x1 = intersectHoriz(head1[0], head1[1], tail1[0], tail1[1], y);
   Real x2 = intersectHoriz(head2[0], head2[1], tail2[0], tail2[1], y);
 

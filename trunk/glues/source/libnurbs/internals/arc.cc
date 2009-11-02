@@ -197,8 +197,8 @@ int Arc::isDisconnected(void)
    else
    {
       /* average two points together */
-      p0[0]=p1[0]=(p1[0]+p0[0])*0.5;
-      p0[1]=p1[1]=(p1[1]+p0[1])*0.5;
+      p0[0]=p1[0]=(p1[0]+p0[0])*0.5f;
+      p0[1]=p1[1]=(p1[1]+p0[1])*0.5f;
       return 0;
    }
 }

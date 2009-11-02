@@ -36,12 +36,6 @@
 #ifndef __glumyassert_h_
 #define __glumyassert_h_
 
-#ifdef LIBRARYBUILD
-   #include <assert.h>
-#endif
-
-#ifdef GLBUILD
-   #define assert(EX) ((void)0)
-#endif
+#define assert(EX) ((void)0)
 
 #endif /* __glumyassert_h_ */

@@ -52,8 +52,8 @@
 
 #ifdef AVOID_ZERO_NORMAL
 #define myabs(x)  ((x>0)? x: (-x))
-#define MYZERO 0.000001
-#define MYDELTA 0.001
+#define MYZERO 0.000001f
+#define MYDELTA 0.001f
 #endif
 
 void OpenGLSurfaceEvaluator::inBPMListEval(bezierPatchMesh* list)

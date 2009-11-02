@@ -70,9 +70,9 @@ Mapdesc::Mapdesc( long _type, int _israt, int _ncoords, Backend& b )
     minsavings 		= N_NOSAVINGSSUBDIVISION;
     s_steps  		= 0.0;
     t_steps 		= 0.0;
-    maxrate 		= ( s_steps < 0.0 ) ? 0.0 : s_steps;
-    maxsrate 		= ( s_steps < 0.0 ) ? 0.0 : s_steps;
-    maxtrate 		= ( t_steps < 0.0 ) ? 0.0 : t_steps;
+    maxrate 		= ( s_steps < 0.0f ) ? 0.0f : s_steps;
+    maxsrate 		= ( s_steps < 0.0f ) ? 0.0f : s_steps;
+    maxtrate 		= ( t_steps < 0.0f ) ? 0.0f : t_steps;
     identify( bmat );
     identify( cmat );
     identify( smat );
@@ -576,7 +576,7 @@ Mapdesc::xformMat( Maxmatrix mat, REAL *pts,
 void
 Mapdesc::subdivide( REAL *src, REAL *dst, REAL v, int stride, int order )
 {
-    REAL mv = 1.0 - v;
+    REAL mv = 1.0f - v;
 
     for( REAL *send=src+stride*order; src!=send; send-=stride, dst+=stride ) {
 	copyPt( dst, src );
@@ -595,7 +595,7 @@ void
 Mapdesc::subdivide( REAL *src, REAL *dst, REAL v, 
     int so, int ss, int to, int ts  )
 {
-    REAL mv = 1.0 - v;
+    REAL mv = 1.0f - v;
 
     for( REAL *slast = src+ss*so; src != slast; src += ss, dst += ss ) {
 	REAL *sp = src;
@@ -812,15 +812,15 @@ Mapdesc::setProperty( long property, REAL value )
 	    bbox_subdividing = value;
 	    break;
 	case N_S_STEPS:
-	    if( value < 0.0 ) value = 0.0;
+	    if( value < 0.0f ) value = 0.0f;
 	    s_steps = value;
-	    maxrate = ( value < 0.0 ) ? 0.0 : value;
-	    maxsrate = ( value < 0.0 ) ? 0.0 : value;
+	    maxrate = ( value < 0.0f ) ? 0.0f : value;
+	    maxsrate = ( value < 0.0f ) ? 0.0f : value;
 	    break;
 	case N_T_STEPS:
-	    if( value < 0.0 ) value = 0.0;
+	    if( value < 0.0f ) value = 0.0f;
 	    t_steps = value;
-	    maxtrate = ( value < 0.0 ) ? 0.0 : value;
+	    maxtrate = ( value < 0.0f ) ? 0.0f : value;
 	    break;
 	case N_SAMPLINGMETHOD:
 	    sampling_method = value;

@@ -125,11 +125,6 @@ class directedLine
 
       Real polyArea();
 
-      void printSingle();
-      void printList();
-      void printAllPolygons();
-      void writeAllPolygons(char* filename);
-
       /* insert a polygon: using nextPolygon */
       directedLine* insertPolygon(directedLine* newpolygon);
       directedLine* cutoffPolygon(directedLine* p);
@@ -161,8 +156,6 @@ class directedLine
       // notice that "this" is arbitrary
       directedLine* deleteChain(directedLine* begin, directedLine* end);
 };
-
-directedLine* readAllPolygons(char* filename);
 
 extern Int compV2InY(Real A[2], Real B[2]);
 extern Int compV2InX(Real A[2], Real B[2]);

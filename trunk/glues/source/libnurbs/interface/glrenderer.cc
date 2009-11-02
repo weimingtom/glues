@@ -184,8 +184,8 @@ void GLUnurbs::setSamplingMatrixIdentity(void)
 void GLUnurbs::loadSamplingMatrix(const GLfloat vmat[4][4], const GLint viewport[4])
 {
    /* rescale the mapping to correspond to pixels in x/y */
-   REAL xsize = 0.5 * (REAL) (viewport[2]);
-   REAL ysize = 0.5 * (REAL) (viewport[3]);
+   REAL xsize = 0.5f * (REAL) (viewport[2]);
+   REAL ysize = 0.5f * (REAL) (viewport[3]);
 
    INREAL smat[4][4];
    smat[0][0] = vmat[0][0] * xsize;

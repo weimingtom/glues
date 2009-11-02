@@ -81,7 +81,7 @@ Subdivider::tessellate( Arc_ptr jarc, REAL geo_stepsize )
 
     if( mapdesc->isRational() ) {
 	REAL max = mapdesc->calcVelocityRational( b->cpts, b->stride, b->order );
-	REAL arc_stepsize = (max > 1.0) ? (1.0/max) : 1.0; 
+	REAL arc_stepsize = (max > 1.0f) ? (1.0f/max) : 1.0f; 
 	if( jarc->bezierArc->order != 2 )
 	    arctessellator.tessellateNonlinear( jarc, geo_stepsize, arc_stepsize, 1 );
 	else {
@@ -89,7 +89,7 @@ Subdivider::tessellate( Arc_ptr jarc, REAL geo_stepsize )
 	}
     } else { 
 	REAL max = mapdesc->calcVelocityNonrational( b->cpts, b->stride, b->order );
-	REAL arc_stepsize = (max > 1.0) ? (1.0/max) : 1.0; 
+	REAL arc_stepsize = (max > 1.0f) ? (1.0f/max) : 1.0f;
 	if( jarc->bezierArc->order != 2 )
 	    arctessellator.tessellateNonlinear( jarc, geo_stepsize, arc_stepsize, 0 );
 	else {
@@ -169,7 +169,7 @@ Subdivider::monotonize( Arc_ptr jarc, Bin& bin )
 	if( change ) {
 	    if( ! degenerate ) {
 	        /* make last segment into separate pwl curve */
-	        jarc->pwlArc->npts = vert - firstvert + 1;
+	        jarc->pwlArc->npts = (int)(vert - firstvert + 1);
 	        jarc = (new(arcpool) Arc( side, uid ))->append( jarc );
 	        jarc->pwlArc = new(pwlarcpool) PwlArc();
 		bin.addarc( jarc );
@@ -178,7 +178,7 @@ Subdivider::monotonize( Arc_ptr jarc, Bin& bin )
 	    degenerate = nudegenerate;
 	} 
     }
-    jarc->pwlArc->npts = vert - firstvert + 1;
+    jarc->pwlArc->npts = (int)(vert - firstvert + 1);
 
     if( degenerate ) {
 	/* remove jarc from circularly linked list */

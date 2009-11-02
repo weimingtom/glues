@@ -82,8 +82,8 @@ Mapdesc::calcPartialVelocity (
     }
 
     // compute scale factor
-    REAL fac = 1;
-    REAL invt = 1.0 / range;
+    REAL fac = 1.0f;
+    REAL invt = 1.0f / range;
     for( t = ncols-1; t != ncols-1-partial; t-- ) 
 	fac *= t * invt;
 
@@ -198,10 +198,10 @@ Mapdesc::calcPartialVelocity (
     int i, j;
 
     // compute scale factor
-    REAL fac = 1.0;
+    REAL fac = 1.0f;
     {
-	REAL invs = 1.0 / srange;
-	REAL invt = 1.0 / trange;
+	REAL invs = 1.0f / srange;
+	REAL invt = 1.0f / trange;
 	for( int s = nrows-1, slast = s-spartial; s != slast; s-- ) 
 	    fac *= s * invs;
 	for( int t = ncols-1, tlast = t-tpartial; t != tlast; t-- ) 

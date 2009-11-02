@@ -1296,11 +1296,10 @@ Slicer::slice_old( Arc_ptr loop )
 		       varray.vval[quad+1],
 		       varray.voffset[quad+1] - varray.voffset[quad] );
 
-	for( long i=varray.voffset[quad]+1; i <= varray.voffset[quad+1]; i++ ) {
+	for( long i=varray.voffset[quad]+1; i <= varray.voffset[quad+1]; i++ )
+	{
     	    topv = botv++;
-    	    advance( topv - varray.voffset[quad], 
-		     botv - varray.voffset[quad], 
-		     varray.varray[botv] );
+    	    advance( (REAL)(topv - varray.voffset[quad]), (REAL)(botv - varray.voffset[quad]),  varray.varray[botv] );
 	    if( i == vlines )
 		getPts( extrema[2] );
 	    else
@@ -1313,8 +1312,8 @@ Slicer::slice_old( Arc_ptr loop )
 		    coveAndTile();
 		else
 		    mesh();
-	    }
-        }
+ 	     }
+      }
    }
 }
 

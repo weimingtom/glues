@@ -304,7 +304,7 @@ void OpenGLCurveEvaluator::evalcoord1f(long, REAL u)
 
 void
 #ifdef _WIN32
-OpenGLCurveEvaluator::putCallBack(GLenum which, void (GLAPIENTRY *fn)())
+OpenGLCurveEvaluator::putCallBack(GLenum which, void (APIENTRY *fn)())
 #else
 OpenGLCurveEvaluator::putCallBack(GLenum which, _GLUfuncptr fn)
 #endif

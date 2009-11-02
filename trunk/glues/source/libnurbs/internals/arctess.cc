@@ -356,7 +356,7 @@ void ArcTessellator::tessellateNonlinear(Arc* arc, REAL geo_stepsize, REAL arc_s
    }
 
    TrimVertex* vert=trimvertexpool.get(nsteps+1);
-   REAL dp=1.0/nsteps;
+   REAL dp=1.0f/nsteps;
 
    arc->pwlArc=new(pwlarcpool) PwlArc();
    arc->pwlArc->pts=vert;
@@ -509,7 +509,7 @@ void ArcTessellator::tessellateNonlinear(Arc* arc, REAL geo_stepsize, REAL arc_s
       vert->param[0]=b[0];
       vert->param[1]=b[1];
    }
-   arc->pwlArc->npts=vert-arc->pwlArc->pts+1;
+   arc->pwlArc->npts=(int)(vert-arc->pwlArc->pts+1);
 }
 
 const REAL ArcTessellator::gl_Bernstein[][MAXORDER][MAXORDER]=
