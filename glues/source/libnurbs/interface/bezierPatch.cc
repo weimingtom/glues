@@ -6,21 +6,21 @@
 ** this file except in compliance with the License. You may obtain a copy
 ** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
 ** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
+**
 ** http://oss.sgi.com/projects/FreeB
-** 
+**
 ** Note that, as provided in the License, the Software is distributed on an
 ** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
 ** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
 ** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
 ** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
+**
 ** Original Code. The Original Code is: OpenGL Sample Implementation,
 ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
 ** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
 ** Copyright in any portions created by third parties is as indicated
 ** elsewhere herein. All Rights Reserved.
-** 
+**
 ** Additional Notice Provisions: The application programming interfaces
 ** established by SGI in conjunction with the Original Code are The
 ** OpenGL(R) Graphics System: A Specification (Version 1.2.1), released
@@ -32,10 +32,14 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
+/*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #include "glues.h"
+
 #include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
 
 #include "bezierPatch.h"
@@ -129,26 +133,6 @@ bezierPatch* bezierPatchInsert(bezierPatch* list, bezierPatch* b)
    return b;
 }
 
-/* print the data stored in this patch */
-void bezierPatchPrint(bezierPatch* b)
-{
-   printf("bezierPatch:\n");
-   printf("umin,umax=(%f,%f), (vmin, vmax)=(%f,%f)\n", b->umin, b->umax, b->vmin, b->vmax);
-   printf("uorder=%i, vorder=%i\n", b->uorder, b->vorder);
-   printf("idmension = %i\n", b->dimension);
-}
-
-/* print the whole list */
-void bezierPatchPrintList(bezierPatch* list)
-{
-   bezierPatch* temp;
-
-   for(temp=list; temp!=NULL; temp=temp->next)
-   {
-      bezierPatchPrint(temp);
-   }
-}
-
 void bezierPatchEval(bezierPatch* b, float u, float v, float ret[])
 {
    if (u>=b->umin && u<=b->umax && v>=b->vmin && v<=b->vmax)
@@ -188,44 +172,5 @@ void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float ret[])
       {
          bezierSurfEvalNormal(b->umin, b->umax, b->uorder, b->vmin, b->vmax, b->vorder, b->dimension, b->ctlpoints, b->dimension * b->vorder, b->dimension, u, v, ret);
       }
-   }
-}
-
-void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso)
-{
-printf("patch draw\n");
-   if (bpatch->dimension==3)
-   {
-// MIKE: TODO
-//      glMap2f(GLU_MAP2_VERTEX_3, bpatch->umin, bpatch->umax, 3*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*)bpatch->ctlpoints);
-   }
-   else
-   {
-// MIKE: TODO
-//      glMap2f(GLU_MAP2_VERTEX_4, bpatch->umin, bpatch->umax, 4*bpatch->vorder, bpatch->uorder, bpatch->vmin, bpatch->vmax,3, bpatch->vorder, (GLfloat*)bpatch->ctlpoints);
-   }
-
-// MIKE: TODO
-//   glMapGrid2f(u_reso, bpatch->umin, bpatch->umax, v_reso, bpatch->vmin, bpatch->vmax);
-// MIKE: TODO
-//   glEvalMesh2(GL_LINE, 0, u_reso, 0, v_reso);
-}
-
-void bezierPatchListDraw(bezierPatch *list, int u_reso, int v_reso)
-{
-   bezierPatch* temp;
-
-printf("patch list draw\n");
-
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   gluEnable(GLU_MAP2_VERTEX_3);
-   gluEnable(GLU_AUTO_NORMAL);
-   glEnable(GL_NORMALIZE);
-   glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-
-   for(temp=list; temp!=NULL; temp=temp->next)
-   {
-      bezierPatchDraw(temp, u_reso, v_reso);
    }
 }

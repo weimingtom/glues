@@ -121,27 +121,6 @@ void primStream::end(Int type)
   index_lengths++;
 }
 
-void primStream::print()
-{
-  Int i,j,k;
-  printf("index_lengths=%i,size_lengths=%i\n", index_lengths, size_lengths);
-  printf("index_vertices=%i,size_vertices=%i\n", index_vertices, size_vertices);
-  k=0;
-  for(i=0; i<index_lengths; i++)
-    {
-      if(types[i] == PRIMITIVE_STREAM_FAN)
-	printf("primitive-FAN:\n");
-      else 
-	printf("primitive-STRIP:\n");
-      for(j=0; j<lengths[i]; j++)
-	{
-	  printf("(%f,%f) ", vertices[k], vertices[k+1]);
-	  k += 2;	  
-	}
-      printf("\n");
-    }
-}
-
 primStream::primStream(Int sizeLengths, Int sizeVertices)
 {
   lengths = (Int*)malloc (sizeof(Int) * sizeLengths);
@@ -164,32 +143,3 @@ primStream::~primStream()
   free(types);
   free(vertices);
 }
-
-void primStream::draw()
-{
-  Int i,j,k;
-  k=0;
-  printf("primStream::draw()\n");
-  for(i=0; i<index_lengths; i++)
-    {
-      switch(types[i]){
-      case PRIMITIVE_STREAM_FAN:
-// MIKE: TODO
-//	glBegin(GL_TRIANGLE_FAN);
-	break;
-      case PRIMITIVE_STREAM_STRIP:
-// MIKE: TODO
-//	glBegin(GL_TRIANGLE_STRIP);
-	break;
-      }
-
-      for(j=0; j<lengths[i]; j++){
-// MIKE: TODO
-//	glVertex2fv(vertices+k);
-	k += 2;
-      }
-// MIKE: TODO
-//      glEnd();
-    }
-}
-

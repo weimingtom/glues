@@ -54,9 +54,6 @@ class rectBlock
       Int* get_rightIndices() {return rightIndices;}
 
       Int num_quads();
-
-      void print();
-      void draw(Real* u_values, Real* v_values);
 };
 
 class rectBlockArray
@@ -74,9 +71,6 @@ class rectBlockArray
       void insert(rectBlock* newBlock); // only take the pointer, not ther cotent
 
       Int num_quads();
-
-      void print();
-      void draw(Real* u_values, Real* v_values);
 };
 
 #endif /* _RECTBLOCK_H */

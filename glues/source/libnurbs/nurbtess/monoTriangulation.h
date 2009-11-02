@@ -56,10 +56,10 @@ class reflexChain{
 public:
   reflexChain(Int size, Int isIncreasing);
   ~reflexChain();
-  
+
   void insert(Real u, Real v);
   void insert(Real v[2]);
-  
+
   void processNewVertex(Real v[2], primStream* pStream);
   void outputFan(Real v[2], primStream* pStream);
 

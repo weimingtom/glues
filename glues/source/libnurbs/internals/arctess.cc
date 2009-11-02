@@ -47,6 +47,8 @@
 #include "trimvertex.h"
 #include "trimvertpool.h"
 
+#include <stdio.h>
+
 #define NOELIMINATION
 
 #define steps_function(large, small, rate) (max(1, 1+(int)((large-small)/rate)));
@@ -128,6 +130,10 @@ void ArcTessellator::pwl_right(Arc* arc, REAL s, REAL t1, REAL t2, REAL rate)
    assert(t1<t2);
 
    int nsteps=steps_function(t2, t1, rate);
+   if (nsteps>256)
+   {
+      nsteps=256;
+   }
    REAL stepsize=(t2-t1)/(REAL)nsteps;
 
    TrimVertex* newvert=trimvertexpool.get(nsteps+1);

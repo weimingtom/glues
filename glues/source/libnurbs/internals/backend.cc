@@ -186,7 +186,7 @@ void Backend::evalVStrip(int n_left, REAL u_left, REAL* left_val,
  * bgntmesh - preamble to a triangle mesh
  *-------------------------------------------------------------------------
  */
-void Backend::bgntmesh(const char*)
+void Backend::bgntmesh(const char* name)
 {
    if (wireframetris)
    {
@@ -266,8 +266,6 @@ void Backend::tmeshvert(GridVertex* g)
    const long u=g->gparam[0];
    const long v=g->gparam[1];
 
-   printf("Backend::tmeshvert gVertex\n");
-
    surfaceEvaluator.evalpoint2i(u, v);
 }
 
@@ -313,7 +311,6 @@ void Backend::linevert(TrimVertex* t, REAL* retPoint, REAL* retNormal)
  */
 void Backend::linevert(GridVertex* g)
 {
-printf("Backend::linevert GridVertex\n");
    surfaceEvaluator.evalpoint2i(g->gparam[0], g->gparam[1]);
 }
 
@@ -435,7 +432,6 @@ long Backend::get_output_style(void)
 
 void Backend::bgncurv(void)
 {
-   printf("Backend::bgncurv\n");
    curveEvaluator.bgnmap1f(0);
 }
 
@@ -458,37 +454,30 @@ void Backend::curvpts(long type,        /* geometry, color, texture, normal */
 
 void Backend::curvgrid(REAL u0, REAL u1, long nu)
 {
-   printf("Backend::curvgrid\n");
    curveEvaluator.mapgrid1f(nu, u0, u1);
 }
 
 void Backend::curvmesh(long from, long n)
 {
-   printf("Backend::curvmesh\n");
    curveEvaluator.mapmesh1f(N_MESHFILL, from, from+n);
 }
 
 void Backend::curvpt(REAL u)
 {
-   printf("Backend::curvpt\n");
    curveEvaluator.evalcoord1f(0, u);
 }
 
 void Backend::bgnline(void)
 {
-   printf("Backend::bgnline\n");
-
    curveEvaluator.bgnline();
 }
 
 void Backend::endline(void)
 {
-   printf("Backend::endline\n");
    curveEvaluator.endline();
 }
 
 void Backend::endcurv(void)
 {
-   printf("Backend::endcurv\n");
    curveEvaluator.endmap1f();
 }

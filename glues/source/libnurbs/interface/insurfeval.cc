@@ -32,6 +32,10 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
+/*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #include "glues.h"
 
@@ -1238,7 +1242,7 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
                it++;
             }
 
-            while(j<n_lower)
+            while (j<n_lower)
             {
                if ((output_style==N_MESHLINE) && (it%3==0))
                {
@@ -1301,7 +1305,7 @@ void OpenGLSurfaceEvaluator::inEvalUStrip(int n_upper, REAL v_upper, REAL* upper
       }
       else
       {
-         if (j>= n_lower) /* case2: no more in lower */
+         if (j>=n_lower) /* case2: no more in lower */
          {
             if (i<n_upper-1) /*at least two vertices in upper*/
             {

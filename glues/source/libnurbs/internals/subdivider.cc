@@ -384,7 +384,7 @@ void Subdivider::splitInT(Bin& source, int start, int end)
 }
 
 /*--------------------------------------------------------------------------
-* samplingSplit - recursively subdivide patch, cull check each subpatch  
+* samplingSplit - recursively subdivide patch, cull check each subpatch
 *--------------------------------------------------------------------------
 */
 

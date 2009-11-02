@@ -317,8 +317,6 @@ Patch::getstepsize( void )
                 if(tt <0) tt = -tt;
 
 		if( ss != 0.0 && tt != 0.0 ) {
-		    /* printf( "ssv[0] %g ssv[1] %g ttv[0] %g ttv[1] %g\n", 
-			ssv[0], ssv[1], ttv[0], ttv[1] ); */
 		    REAL ttq = sqrtf( (float) ss );
 		    REAL ssq = sqrtf( (float) tt );
 		    REAL ds = sqrtf( 4 * t2 * ttq / ( ss * ttq + st * ssq ) );

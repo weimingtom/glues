@@ -231,6 +231,7 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                    enormals[primitive_count*3+0]=retNormal[0];
                    enormals[primitive_count*3+1]=retNormal[1];
                    enormals[primitive_count*3+2]=retNormal[2];
+                   primitive_count++;
                    break;
               case N_MESHLINE:
                    if (primitive_count==0)
@@ -271,6 +272,7 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                    enormals[primitive_count*3+0]=retNormal[0];
                    enormals[primitive_count*3+1]=retNormal[1];
                    enormals[primitive_count*3+2]=retNormal[2];
+                   primitive_count++;
 
                    /* Store current vertex as previous */
                    prevvtx[0]=retPoint[0];
@@ -292,6 +294,7 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                    enormals[primitive_count*3+0]=retNormal[0];
                    enormals[primitive_count*3+1]=retNormal[1];
                    enormals[primitive_count*3+2]=retNormal[2];
+                   primitive_count++;
                    break;
               case N_MESHLINE:
                    switch (primitive_count%4)
@@ -304,6 +307,7 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                            enormals[primitive_count*3+0]=retNormal[0];
                            enormals[primitive_count*3+1]=retNormal[1];
                            enormals[primitive_count*3+2]=retNormal[2];
+                           primitive_count++;
                            break;
                       case 2:
                            evertices[(primitive_count+1)*3+0]=retPoint[0];
@@ -312,6 +316,7 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                            enormals[(primitive_count+1)*3+0]=retNormal[0];
                            enormals[(primitive_count+1)*3+1]=retNormal[1];
                            enormals[(primitive_count+1)*3+2]=retNormal[2];
+                           primitive_count++;
                            break;
                       case 3:
                            evertices[(primitive_count-1)*3+0]=retPoint[0];
@@ -320,14 +325,13 @@ void OPT_OUTVERT(TrimVertex& vv, Backend& backend, REAL* retPoint, REAL* retNorm
                            enormals[(primitive_count-1)*3+0]=retNormal[0];
                            enormals[(primitive_count-1)*3+1]=retNormal[1];
                            enormals[(primitive_count-1)*3+2]=retNormal[2];
+                           primitive_count++;
                            break;
                    }
                    break;
            }
            break;
    }
-
-   primitive_count++;
 }
 
 void OPT_END(Backend& backend)
@@ -438,55 +442,45 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
 static void triangulateRect(Arc_ptr loop, Backend& backend, int TB_or_LR, int ulinear, int vlinear)
 {
    // we know the loop is a rectangle, but not sure which is top
-  Arc_ptr top, bot, left, right;
-  if(loop->tail()[1] == loop->head()[1])
-    {
+   Arc_ptr top, bot, left, right;
+   if(loop->tail()[1] == loop->head()[1])
+   {
       if(loop->tail()[1] > loop->prev->prev->tail()[1])
-	{
-
-	top = loop;
-	}
-      else{
-
-	top = loop->prev->prev;
-	}
-    }
-  else 
-    {
-      if(loop->tail()[0] > loop->prev->prev->tail()[0])
-	{
-	  //loop is the right arc
-
-	  top = loop->next;
-	}
+      {
+         top = loop;
+      }
       else
-	{
+      {
+         top = loop->prev->prev;
+      }
+   }
+   else
+   {
+      if(loop->tail()[0] > loop->prev->prev->tail()[0])
+      {
+         //loop is the right arc
+         top = loop->next;
+      }
+      else
+      {
+         top = loop->prev;
+      }
+   }
+   left=top->next;
+   bot=left->next;
+   right=bot->next;
 
-	  top = loop->prev;
-	}
-    }
-  left = top->next;
-  bot  = left->next;
-  right= bot->next;
-
-  //if u, v are both nonlinear, then if the
-  //boundary is tessellated dense, we also
-  //sample the inside to get a better tesslletant.
-  if( (!ulinear) && (!vlinear))
-    {
+   // if u, v are both nonlinear, then if the
+   // boundary is tessellated dense, we also
+   // sample the inside to get a better tesslletant.
+   if ((!ulinear) && (!vlinear))
+   {
       int nu = top->pwlArc->npts;
       if(nu < bot->pwlArc->npts)
 	nu = bot->pwlArc->npts;
       int nv = left->pwlArc->npts;
       if(nv < right->pwlArc->npts)
 	nv = right->pwlArc->npts;
-/*
-      if(nu > 2 && nv > 2)
-	{
-	  triangulateRectGen(top, nu-2,  nv-2, backend);
-	  return;
-	}
-*/
     }
 
   if(TB_or_LR == 1)
@@ -627,7 +621,7 @@ static void triangulateRectAux(PwlArc* top, PwlArc* bot, PwlArc* left, PwlArc* r
                }
                backend.endtfan(); OPT_END(backend);
             }
-            if(botd_right < bot->npts-2)
+            if (botd_right < bot->npts-2)
             {
                backend.bgntfan(); OPT_START(GL_TRIANGLE_FAN);
                OPT_OUTVERT(top->pts[1], backend, retPoint, retNormal);
@@ -841,9 +835,6 @@ return;
   triangulateRectTopGen(left, n_vlines, v_val, u_val[0], 1, 0, backend);
   triangulateRectTopGen(right, n_vlines, v_val, u_val[n_ulines-1], 0,0, backend);
 
-
-
-
   //triangulate the center
   triangulateRectCenter(n_ulines, u_val, n_vlines, v_val, backend);
 
@@ -868,7 +859,7 @@ directedLine* arcToDLine(Arc_ptr arc)
   ret = new directedLine(INCREASING, sline);
   return ret;
 }
- 
+
 /*an pwlArc may not be a straight line*/
 directedLine* arcToMultDLines(directedLine* original, Arc_ptr arc)
 {
@@ -1005,13 +996,16 @@ void Slicer::evalStream(primStream* pStream)
                  int it=0;
                  int jt;
 
-                 if (pStream->get_length(i)>(alloc_size/3))
+                 if (pStream->get_length(i)>(alloc_size/(3)))
                  {
-                    normals=(REAL*)realloc(normals, pStream->get_length(i)*3);
+                    normals=(REAL*)realloc(normals, sizeof(REAL)*pStream->get_length(i)*3*(3));
                     assert(normals);
-                    vertices=(REAL*)realloc(vertices, pStream->get_length(i)*3);
+                    vertices=(REAL*)realloc(vertices, sizeof(REAL)*pStream->get_length(i)*3*(3));
                     assert(vertices);
-                    alloc_size=pStream->get_length(i)*3;
+                    alloc_size=pStream->get_length(i)*(3);
+
+                    glVertexPointer(3, GL_FLOAT, 0, vertices);
+                    glNormalPointer(GL_FLOAT, 0, normals);
                  }
 
                  /* Fill up the first vertex */
@@ -1081,11 +1075,14 @@ void Slicer::evalStream(primStream* pStream)
 
                  if (pStream->get_length(i)>(alloc_size))
                  {
-                    normals=(REAL*)realloc(normals, pStream->get_length(i));
+                    normals=(REAL*)realloc(normals, sizeof(REAL)*3*pStream->get_length(i));
                     assert(normals);
-                    vertices=(REAL*)realloc(vertices, pStream->get_length(i));
+                    vertices=(REAL*)realloc(vertices, sizeof(REAL)*3*pStream->get_length(i));
                     assert(vertices);
                     alloc_size=pStream->get_length(i);
+
+                    glVertexPointer(3, GL_FLOAT, 0, vertices);
+                    glNormalPointer(GL_FLOAT, 0, normals);
                  }
 
                  for(j=0; j<pStream->get_length(i); j++)
@@ -1104,7 +1101,6 @@ void Slicer::evalStream(primStream* pStream)
                  }
 
                  glDrawArrays(GL_TRIANGLE_FAN, 0, it);
-
               }
 
               backend.endtfan();
@@ -1208,9 +1204,9 @@ void Slicer::slice_new(Arc_ptr loop)
       if(vlinear)
 	triangulateRect(loop, backend, 1, ulinear, vlinear);
       else if(ulinear)
-	triangulateRect(loop, backend, -1, ulinear, vlinear);	
+	triangulateRect(loop, backend, -1, ulinear, vlinear);
       else
-	triangulateRect(loop, backend, 0, ulinear, vlinear);		
+	triangulateRect(loop, backend, 0, ulinear, vlinear);
     }
 
    else if(isRect)
@@ -1221,12 +1217,12 @@ void Slicer::slice_new(Arc_ptr loop)
     {
       monoTriangulationFunBackend(loop, compV2InY, &backend);
     }
-  else if( (!ulinear) && (!vlinear) && (num_ulines == 2) && (num_vlines > 2))
-    {
+   else if( (!ulinear) && (!vlinear) && (num_ulines == 2) && (num_vlines > 2))
+   {
       monoTriangulationFunBackend(loop, compV2InY, &backend);
-    }
-  else 
-    {
+   }
+   else
+   {
       directedLine* poly = arcLoopToDLineLoop(loop);
 
       gridWrap grid(num_ulines, num_vlines, uMin, uMax, vMin, vMax);
@@ -1240,7 +1236,7 @@ void Slicer::slice_new(Arc_ptr loop)
       evalRBArray(&rbArray, &grid);
 
       poly->deleteSinglePolygonWithSline();
-    }
+   }
 }
 
 void Slicer::slice(Arc_ptr loop)
@@ -1293,11 +1289,11 @@ Slicer::slice_old( Arc_ptr loop )
     getGridExtent( &extrema[0]->pwlArc->pts[0], &extrema[0]->pwlArc->pts[0] );
 
     for( long quad=0; quad<varray.numquads; quad++ ) {
-	backend.surfgrid( uarray.uarray[0], 
-		       uarray.uarray[ulines-1], 
-	 	       ulines-1, 
-		       varray.vval[quad], 
-		       varray.vval[quad+1], 
+	backend.surfgrid( uarray.uarray[0],
+		       uarray.uarray[ulines-1],
+	 	       ulines-1,
+		       varray.vval[quad],
+		       varray.vval[quad+1],
 		       varray.voffset[quad+1] - varray.voffset[quad] );
 
 	for( long i=varray.voffset[quad]+1; i <= varray.voffset[quad+1]; i++ ) {
@@ -1322,7 +1318,6 @@ Slicer::slice_old( Arc_ptr loop )
    }
 }
 
-
 void Slicer::outline(void)
 {
    REAL retPoint[4];
@@ -1330,7 +1325,6 @@ void Slicer::outline(void)
 
    GridTrimVertex upper, lower;
    Hull::init();
-printf("Slicer::outline\n");
    backend.bgnoutline();
    while((nextupper(&upper)))
    {
