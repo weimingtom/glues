@@ -79,7 +79,7 @@ class Quilt: public PooledObj
       void toBezier(Knotvector&, INREAL*, long);
       void toBezier(Knotvector&, Knotvector&, INREAL*, long);
       void select(REAL*, REAL*);
-      int  getDimension(void){ return eqspec-qspec; }
+      int  getDimension(void){ return (int)(eqspec-qspec); }
       void download(Backend&);
       void downloadAll(REAL*, REAL*, Backend&);
       int  isCulled(void);

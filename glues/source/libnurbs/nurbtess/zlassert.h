@@ -27,8 +27,10 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-/*
-*/
 
-/*XXXblythe this file should be deleted*/
-#include <assert.h>
+#ifndef __zlassert_h_
+#define __zlassert_h_
+
+#define assert(EX) ((void)0)
+
+#endif /* __zlassert_h_ */

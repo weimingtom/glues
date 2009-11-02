@@ -50,15 +50,14 @@
 #include "simplemath.h" //min()
 
 /* local preprocessor definitions */
-#define DEF_PATCH_STEPSIZE	.4
+#define DEF_PATCH_STEPSIZE	0.4f
 #define fsizeof(x)		(sizeof(x)/sizeof(REAL))
-
 
 Quilt::Quilt( Mapdesc *_mapdesc )
 {
     mapdesc = _mapdesc;
 }
- 
+
 void
 Quilt::deleteMe( Pool& p )
 {
@@ -85,7 +84,7 @@ Quilt::show( void )
 void
 Quilt::select( REAL *pta, REAL *ptb )
 {
-    int dim = eqspec - qspec; 
+    int dim = (int)(eqspec - qspec);
     int i, j;
     for( i=0; i<dim; i++) {
 	for( j=qspec[i].width-1; j>=0; j-- )

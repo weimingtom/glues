@@ -89,7 +89,7 @@ class OpenGLCurveEvaluator: public BasicCurveEvaluator
          output_triangles=flag;
       }
 #ifdef _WIN32
-      void putCallBack(GLenum which, void (GLAPIENTRY* fn)());
+      void putCallBack(GLenum which, void (APIENTRY* fn)());
 #else
       void putCallBack(GLenum which, _GLUfuncptr fn);
 #endif

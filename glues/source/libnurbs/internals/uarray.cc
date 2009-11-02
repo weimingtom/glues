@@ -72,7 +72,7 @@ long Uarray::init(REAL delta, Arc_ptr lo, Arc_ptr hi)
       assert(uarray!=0);
    }
 
-   uarray[0]=lo->tail()[0]-delta/2.0;
+   uarray[0]=lo->tail()[0]-delta/2.0f;
 
    for (long i=1; i!=ulines; i++)
    {

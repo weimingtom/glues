@@ -81,7 +81,7 @@ class GLUnurbs: public NurbsTessellator
               }
            }
 #ifdef _WIN32
-      void putSurfCallBack(GLenum which, void (GLAPIENTRY* fn)())
+      void putSurfCallBack(GLenum which, void (APIENTRY* fn)())
 #else
       void putSurfCallBack(GLenum which, _GLUfuncptr fn)
 #endif

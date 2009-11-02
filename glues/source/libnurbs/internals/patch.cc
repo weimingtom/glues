@@ -296,10 +296,10 @@ Patch::getstepsize( void )
         } else {
             REAL t1 = mapdesc->getProperty( N_PIXEL_TOLERANCE );
 //	    REAL t2 = mapdesc->getProperty( N_ERROR_TOLERANCE );
-	    pspec[0].minstepsize = ( mapdesc->maxsrate > 0.0 ) ? 
-			(pspec[0].range[2] / mapdesc->maxsrate) : 0.0;
-	    pspec[1].minstepsize = ( mapdesc->maxtrate > 0.0 ) ? 
-			(pspec[1].range[2] / mapdesc->maxtrate) : 0.0;
+	    pspec[0].minstepsize = ( mapdesc->maxsrate > 0.0f ) ? 
+			(pspec[0].range[2] / mapdesc->maxsrate) : 0.0f;
+	    pspec[1].minstepsize = ( mapdesc->maxtrate > 0.0f ) ? 
+			(pspec[1].range[2] / mapdesc->maxtrate) : 0.0f;
 	    if( mapdesc->isParametricDistanceSampling() ||
                 mapdesc->isObjectSpaceParaSampling() ) {       
 
@@ -322,36 +322,36 @@ Patch::getstepsize( void )
 		    REAL ds = sqrtf( 4 * t2 * ttq / ( ss * ttq + st * ssq ) );
 		    REAL dt = sqrtf( 4 * t2 * ssq / ( tt * ssq + st * ttq ) );
 		    pspec[0].stepsize = ( ds < pspec[0].range[2] ) ? ds : pspec[0].range[2];
-		    REAL scutoff = 2.0 * t2 / ( pspec[0].range[2] * pspec[0].range[2]);
+		    REAL scutoff = 2.0f * t2 / ( pspec[0].range[2] * pspec[0].range[2]);
 		    pspec[0].sidestep[0] = (ssv[0] > scutoff) ? sqrtf( 2.0 * t2 / ssv[0] ) : pspec[0].range[2];
 		    pspec[0].sidestep[1] = (ssv[1] > scutoff) ? sqrtf( 2.0 * t2 / ssv[1] ) : pspec[0].range[2];
     
 		    pspec[1].stepsize = ( dt < pspec[1].range[2] ) ? dt : pspec[1].range[2];
-		    REAL tcutoff = 2.0 * t2 / ( pspec[1].range[2] * pspec[1].range[2]);
+		    REAL tcutoff = 2.0f * t2 / ( pspec[1].range[2] * pspec[1].range[2]);
 		    pspec[1].sidestep[0] = (ttv[0] > tcutoff) ? sqrtf( 2.0 * t2 / ttv[0] ) : pspec[1].range[2];
 		    pspec[1].sidestep[1] = (ttv[1] > tcutoff) ? sqrtf( 2.0 * t2 / ttv[1] ) : pspec[1].range[2];
 		} else if( ss != 0.0 ) {
 		    REAL x = pspec[1].range[2] * st;
 		    REAL ds = ( sqrtf( x * x + 8.0 * t2 * ss ) - x ) / ss;
 		    pspec[0].stepsize = ( ds < pspec[0].range[2] ) ? ds : pspec[0].range[2];
-		    REAL scutoff = 2.0 * t2 / ( pspec[0].range[2] * pspec[0].range[2]);
+		    REAL scutoff = 2.0f * t2 / ( pspec[0].range[2] * pspec[0].range[2]);
 		    pspec[0].sidestep[0] = (ssv[0] > scutoff) ? sqrtf( 2.0 * t2 / ssv[0] ) : pspec[0].range[2];
 		    pspec[0].sidestep[1] = (ssv[1] > scutoff) ? sqrtf( 2.0 * t2 / ssv[1] ) : pspec[0].range[2];
 		    pspec[1].singleStep();
-		} else if( tt != 0.0 ) {
+		} else if( tt != 0.0f ) {
 		    REAL x = pspec[0].range[2] * st;
-		    REAL dt = ( sqrtf( x * x + 8.0 * t2 * tt ) - x )  / tt;
+		    REAL dt = ( sqrtf( x * x + 8.0f * t2 * tt ) - x )  / tt;
 		    pspec[0].singleStep();
-		    REAL tcutoff = 2.0 * t2 / ( pspec[1].range[2] * pspec[1].range[2]);
+		    REAL tcutoff = 2.0f * t2 / ( pspec[1].range[2] * pspec[1].range[2]);
 		    pspec[1].stepsize = ( dt < pspec[1].range[2] ) ? dt : pspec[1].range[2];
 		    pspec[1].sidestep[0] = (ttv[0] > tcutoff) ? sqrtf( 2.0 * t2 / ttv[0] ) : pspec[1].range[2];
 		    pspec[1].sidestep[1] = (ttv[1] > tcutoff) ? sqrtf( 2.0 * t2 / ttv[1] ) : pspec[1].range[2];
 		} else {
-		    if( 4.0 * t2  > st * pspec[0].range[2] * pspec[1].range[2] ) {
+		    if( 4.0f * t2  > st * pspec[0].range[2] * pspec[1].range[2] ) {
 			pspec[0].singleStep();
 			pspec[1].singleStep();
 		    } else {
-			REAL area = 4.0 * t2 / st;
+			REAL area = 4.0f * t2 / st;
 			REAL ds = sqrtf( area * pspec[0].range[2] / pspec[1].range[2] );
 			REAL dt = sqrtf( area * pspec[1].range[2] / pspec[0].range[2] );
 			pspec[0].stepsize = ( ds < pspec[0].range[2] ) ? ds : pspec[0].range[2];
@@ -371,13 +371,10 @@ Patch::getstepsize( void )
 		REAL mt = mapdesc->calcPartialVelocity( mtv, &tmp[0][0][0], trstride, tcstride, pspec[0].order, pspec[1].order, 0, 1, pspec[0].range[2], pspec[1].range[2], 1 );
                 REAL side_scale = 1.0;
 
-		if( ms != 0.0 ) {
-		    if( mt != 0.0 ) {
-/*		    REAL d = t1 / ( ms * ms + mt * mt );*/
-/*		    REAL ds = mt * d;*/
-		    REAL ds = t1 / (2.0*ms);
-/*		    REAL dt = ms * d;*/
-		    REAL dt = t1 / (2.0*mt); 
+		if( ms != 0.0f ) {
+		    if( mt != 0.0f ) {
+		    REAL ds = t1 / (2.0f*ms);
+		    REAL dt = t1 / (2.0f*mt); 
 			pspec[0].stepsize = ( ds < pspec[0].range[2] ) ? ds : pspec[0].range[2];
 			pspec[0].sidestep[0] = ( msv[0] * pspec[0].range[2] > t1 ) ? (side_scale* t1 / msv[0]) : pspec[0].range[2];
 			pspec[0].sidestep[1] = ( msv[1] * pspec[0].range[2] > t1 ) ? (side_scale* t1 / msv[1]) : pspec[0].range[2];
@@ -435,9 +432,9 @@ Patch::getstepsize( void )
     }
 
     if( mapdesc->minsavings != N_NOSAVINGSSUBDIVISION ) {
-	REAL savings = 1./(pspec[0].stepsize * pspec[1].stepsize) ;
-	savings-= (2./( pspec[0].sidestep[0] + pspec[0].sidestep[1] )) * 
-		  (2./( pspec[1].sidestep[0] + pspec[1].sidestep[1] ));
+	REAL savings = 1.0f/(pspec[0].stepsize * pspec[1].stepsize) ;
+	savings-= (2.0f/( pspec[0].sidestep[0] + pspec[0].sidestep[1] )) * 
+		  (2.0f/( pspec[1].sidestep[0] + pspec[1].sidestep[1] ));
     
 	savings *= pspec[0].range[2] * pspec[1].range[2];
 	if( savings > mapdesc->minsavings ) {

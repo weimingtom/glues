@@ -77,7 +77,7 @@ void Sorter::qs1(char* a, char* l)
    unsigned int n;
 
 start:
-   if ((n=l-a)<=(unsigned int)es)
+   if ((n=(int)(l-a))<=(unsigned int)es)
    {
       return;
    }

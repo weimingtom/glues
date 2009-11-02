@@ -49,7 +49,7 @@ TrimRegion::TrimRegion(void)
 
 void TrimRegion::setDu(REAL du)
 {
-   oneOverDu=1.0/du;
+   oneOverDu=1.0f/du;
 }
 
 void TrimRegion::init(long npts, Arc_ptr extrema)

@@ -432,8 +432,7 @@ void Subdivider::samplingSplit(Bin& source, Patchlist& patchlist, int subdivisio
       }
 
       Bin left, right;
-      REAL mid=(patchlist.pspec[param].range[0]+
-                patchlist.pspec[param].range[1])*0.5;
+      REAL mid=(patchlist.pspec[param].range[0]+patchlist.pspec[param].range[1])*0.5f;
       split(source, left, right, param, mid);
       Patchlist subpatchlist(patchlist, param, mid);
       samplingSplit(left, subpatchlist, subdivisions-1, param);
@@ -457,8 +456,7 @@ void Subdivider::nonSamplingSplit(Bin& source, Patchlist& patchlist,
       param=1-param;
 
       Bin left, right;
-      REAL mid=(patchlist.pspec[param].range[0]+
-                patchlist.pspec[param].range[1])*0.5;
+      REAL mid=(patchlist.pspec[param].range[0]+patchlist.pspec[param].range[1])*0.5f;
       split(source, left, right, param, mid);
       Patchlist subpatchlist(patchlist, param, mid);
       if (left.isnonempty())

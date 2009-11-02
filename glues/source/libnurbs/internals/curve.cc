@@ -168,12 +168,12 @@ Curve::getstepsize( void )
 	    if( mapdesc->isParametricDistanceSampling() ) {
 		REAL d = mapdesc->calcPartialVelocity( &tmp[0][0], tstride, order, 2, range[2] );
 		stepsize = (d > 0.0) ? sqrtf( 8.0 * t / d ) : range[2];
-		minstepsize = ( mapdesc->maxrate > 0.0 ) ? (range[2] / mapdesc->maxrate) : 0.0;
+		minstepsize = ( mapdesc->maxrate > 0.0f ) ? (range[2] / mapdesc->maxrate) : 0.0f;
 	    } else if( mapdesc->isPathLengthSampling() ) {
 		// t is upper bound on path (arc) length
 		REAL d = mapdesc->calcPartialVelocity( &tmp[0][0], tstride, order, 1, range[2] );
 		stepsize = ( d > 0.0 ) ? (t / d) : range[2];
-		minstepsize = ( mapdesc->maxrate > 0.0 ) ? (range[2] / mapdesc->maxrate) : 0.0;
+		minstepsize = ( mapdesc->maxrate > 0.0f ) ? (range[2] / mapdesc->maxrate) : 0.0f;
 	    } else {
 		// control points cross infinity, therefore partials are undefined
 		setstepsize( mapdesc->maxrate );
