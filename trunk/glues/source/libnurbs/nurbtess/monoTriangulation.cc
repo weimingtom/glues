@@ -1395,25 +1395,33 @@ static Real area(Real A[2], Real B[2], Real C[2])
 }
 */
 
-/*the chain is reflex, and the vertex v is
- *on the other side of the chain, so that
- *we can outout the fan with v as the
- *the center
+/* the chain is reflex, and the vertex v is
+ * on the other side of the chain, so that
+ * we can outout the fan with v as the
+ * the center
  */
 void reflexChain::outputFan(Real v[2], primStream* pStream)
 {
-  Int i;
-  pStream->begin();
-  pStream->insert(v);
-  if(isIncreasing) {
-    for(i=0; i<index_queue; i++)
-      pStream->insert(queue[i]);
-  }
-  else {
-    for(i=index_queue-1; i>=0; i--)
-      pStream->insert(queue[i]);    
-  }
-  pStream->end(PRIMITIVE_STREAM_FAN);
+   Int i;
+
+   pStream->begin();
+   pStream->insert(v);
+
+   if (isIncreasing)
+   {
+      for(i=0; i<index_queue; i++)
+      {
+         pStream->insert(queue[i]);
+      }
+   }
+   else
+   {
+      for(i=index_queue-1; i>=0; i--)
+      {
+         pStream->insert(queue[i]);
+      }
+   }
+   pStream->end(PRIMITIVE_STREAM_FAN);
 }
 
 void reflexChain::processNewVertex(Real v[2], primStream* pStream)
@@ -1435,7 +1443,7 @@ void reflexChain::processNewVertex(Real v[2], primStream* pStream)
       isReflex = (area(queue[i-1], queue[i], v) <= 0.0);
     }
     else /*decreasing*/{
-      isReflex = (area(v, queue[i], queue[i-1]) <= 0.0);	  
+      isReflex = (area(v, queue[i], queue[i-1]) <= 0.0);
     }
     if(isReflex) {
       break;

@@ -44,15 +44,7 @@
 #include "zlassert.h"
 #include "gridWrap.h"
 
-
 /*******************grid structure****************************/
-void gridWrap::print()
-{
-   printf("n_ulines = %i\n", n_ulines);
-   printf("n_vlines = %i\n", n_vlines);
-   printf("u_min=%f, umax=%f, vmin=%f, vmax=%f\n", u_min, u_max, v_min, v_max);
-}
-
 gridWrap::gridWrap(Int nUlines, Real* uvals, Int nVlines, Real* vvals)
 {
    Int i;
@@ -128,64 +120,50 @@ gridWrap::~gridWrap()
   free(v_values);
 }
 
-void gridWrap::draw()
-{
-  int i,j;
-
-  printf("gridWrap::draw()\n");
-// MIKE: TODO
-//  glBegin(GL_POINTS);
-  for(i=0; i<n_ulines; i++)
-  {
-    for(j=0; j<n_vlines; j++)
-    {
-// MIKE: TODO
-//      glVertex2f(get_u_value(i), get_v_value(j));
-    }
-  }
-// MIKE: TODO
-//  glEnd();
-}
-
 void gridWrap::outputFanWithPoint(Int v, Int uleft, Int uright, Real vert[2], primStream* pStream)
 {
-  Int i;
-  if(uleft >= uright) 
-    return; //no triangles to output.
+   Int i;
 
-  pStream->begin();
-  pStream->insert(vert);
+   if (uleft>=uright)
+   {
+      return; // no triangles to output.
+   }
 
-  assert(vert[1] != v_values[v]); //don't output degenerate triangles
+   pStream->begin();
+   pStream->insert(vert);
 
-  if(vert[1] > v_values[v]) //vertex is above this grid line: notice the orientation
-    {
+   assert(vert[1] != v_values[v]); // don't output degenerate triangles
+
+   if(vert[1] > v_values[v]) // vertex is above this grid line: notice the orientation
+   {
       for(i=uleft; i<=uright; i++)
-	pStream->insert(u_values[i], v_values[v]);
-    }
-  else //vertex is below the grid line
-    {
+      {
+         pStream->insert(u_values[i], v_values[v]);
+      }
+   }
+   else // vertex is below the grid line
+   {
       for(i=uright; i>= uleft; i--)
-	pStream->insert(u_values[i], v_values[v]);
-    }	
-  
-  pStream->end(PRIMITIVE_STREAM_FAN);
+      {
+         pStream->insert(u_values[i], v_values[v]);
+      }
+   }
+
+   pStream->end(PRIMITIVE_STREAM_FAN);
 }
 
-
-
-/*each chain stores a number of consecutive 
- *V-lines within a grid. 
- *There is one grid vertex on each V-line.
+/* each chain stores a number of consecutive
+ * V-lines within a grid.
+ * There is one grid vertex on each V-line.
  * The total number of V-lines is:
  *   nVlines.
- * with respect to the grid, the index of the first V-line is 
+ * with respect to the grid, the index of the first V-line is
  *   firstVlineIndex.
- * So with respect to the grid, the index of the ith V-line is 
+ * So with respect to the grid, the index of the ith V-line is
  *   firstVlineIndex-i.
  * the grid-index of the uline at the ith vline (recall that each vline has one grid point)
  * is ulineIndices[i]. The u_value is cached in ulineValues[i], that is,
- *   ulineValues[i] = grid->get_u_value(ulineIndices[i]) 
+ *   ulineValues[i] = grid->get_u_value(ulineIndices[i])
  */
 gridBoundaryChain::gridBoundaryChain(
 				     gridWrap* gr, 
@@ -217,38 +195,6 @@ gridBoundaryChain::gridBoundaryChain(
     vertices[i][0] = gr->get_u_value(ulineIndices[i]);
     vertices[i][1] = gr->get_v_value(first_vline_index-i);
   }
-}
-
-void gridBoundaryChain::draw()
-{
-  printf("gridBoundaryChain::draw()\n");
-  Int i;
-// MIKE: TODO
-//  glBegin(GL_LINE_STRIP);
-  for(i=0; i<nVlines; i++)
-    {
-// MIKE: TODO
-//      glVertex2fv(vertices[i]);
-    }
-// MIKE: TODO
-//  glEnd();
-}
-
-void gridBoundaryChain::drawInner()
-{
-  printf("gridBoundaryChain::drawInner()\n");
-  Int i;
-  for(i=1; i<nVlines; i++)
-    {
-// MIKE: TODO
-//      glBegin(GL_LINE_STRIP);
-// MIKE: TODO
-//      glVertex2f(grid->get_u_value(innerIndices[i]), get_v_value(i-1) );
-// MIKE: TODO
-//      glVertex2f(grid->get_u_value(innerIndices[i]), get_v_value(i) );
-// MIKE: TODO
-//      glEnd();
-    }
 }
 
 Int gridBoundaryChain::lookfor(Real v, Int i1, Int i2)

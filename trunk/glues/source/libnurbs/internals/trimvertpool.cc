@@ -45,6 +45,8 @@
 #include "trimvertpool.h"
 #include "bufpool.h"
 
+#include <stdio.h>
+
 /*----------------------------------------------------------------------------
  * TrimVertexPool::TrimVertexPool
  *----------------------------------------------------------------------------
@@ -110,7 +112,7 @@ TrimVertex* TrimVertexPool::get(int n)
 
    if (n==3)
    {
-      v=(TrimVertex*) pool.new_buffer();
+      v=(TrimVertex*)pool.new_buffer();
    }
    else
    {

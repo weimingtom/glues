@@ -65,7 +65,6 @@ class gridWrap
       gridWrap(Int nUlines, Real* uvals, Int nVlines, Real* vvlas);
       ~gridWrap();
 
-      void print();
       Int get_n_ulines() {return n_ulines;}
       Int get_n_vlines() {return n_vlines;}
       Real get_u_min() {return u_min;}
@@ -84,8 +83,6 @@ class gridWrap
       Real* get_v_values() {return v_values;}
 
       void outputFanWithPoint(Int v, Int uleft, Int uright, Real vert[2], primStream* pStream);
-
-      void draw();
 
       Int isUniform() {return is_uniform;}
 };
@@ -127,8 +124,6 @@ class gridBoundaryChain
       void rightEndFan(Int i, primStream* pStream);
 
       Int lookfor(Real v, Int i1, Int i2); //find i in [i1,i2] so that  vertices[i][1]>= v > vertices[i+1][1]
-      void draw();
-      void drawInner();
 };
 
 #endif /* _GRIDWRAP_H */

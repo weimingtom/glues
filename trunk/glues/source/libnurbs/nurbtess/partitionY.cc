@@ -343,11 +343,7 @@ void findDiagonals(Int total_num_edges, directedLine** sortedVertices, sweepRang
       directedLine* vert =sortedVertices[i];
       directedLine* thisEdge = vert;
       directedLine* prevEdge = vert->getPrev();
-/*
-printf("find i=%i\n", i);            
-printf("the vertex is\n");
-vert->printSingle();
-*/
+
       if(isBelow(vert, thisEdge) && isBelow(vert, prevEdge) && compEdges(prevEdge, thisEdge)<0)
 	{
 	  /*this is an upward interior cusp*/

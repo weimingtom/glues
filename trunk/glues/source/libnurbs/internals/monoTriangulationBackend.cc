@@ -336,6 +336,7 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
          assert(vertices);
          REAL* normals=(REAL*)malloc(sizeof(REAL)*3*(index_queue+1)*3);
          assert(normals);
+         int jt;
 
          /* Enable needed and disable unneeded arrays */
          glEnableClientState(GL_VERTEX_ARRAY);
@@ -426,6 +427,12 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
             }
          }
 
+         for (jt=0; jt<it; jt+=3)
+         {
+            glDrawArrays(GL_LINE_LOOP, jt, 3);
+         }
+
+         /* free the arrays */
          free(normals);
          free(vertices);
       }
@@ -459,7 +466,6 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
             for(k=i; k<=j; k++)
             {
                backend->tmeshvert(queue[k][0], queue[k][1], retPoint, retNormal);
-               /* Store triangle fan center vertex */
                vertices[it*3+0]=retPoint[0];
                vertices[it*3+1]=retPoint[1];
                vertices[it*3+2]=retPoint[2];
@@ -474,7 +480,6 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
             for(k=j; k>=i; k--)
             {
                backend->tmeshvert(queue[k][0], queue[k][1], retPoint, retNormal);
-               /* Store triangle fan center vertex */
                vertices[it*3+0]=retPoint[0];
                vertices[it*3+1]=retPoint[1];
                vertices[it*3+2]=retPoint[2];
@@ -485,25 +490,14 @@ void reflexChain::processNewVertex(Real v[2], Backend* backend)
             }
          }
 
+         glDrawArrays(GL_TRIANGLE_FAN, 0, it);
+
+         /* free the arrays */
          free(normals);
          free(vertices);
       }
 
       backend->endtfan();
-
-      if (backend->get_output_style()==N_MESHLINE)
-      {
-         int jt;
-
-         for (jt=0; jt<it; jt+=3)
-         {
-            glDrawArrays(GL_LINE_LOOP, jt, 3);
-         }
-      }
-      else
-      {
-         glDrawArrays(GL_TRIANGLE_FAN, 0, it);
-      }
 
       /* Disable or re-enable arrays */
       if (vertex_enabled)

@@ -32,6 +32,10 @@
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 **
 */
+/*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -27,6 +27,10 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
+/*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #ifndef _BEZIERPATCH_H
 #define _BEZIERPATCH_H
@@ -71,14 +75,10 @@ bezierPatch* bezierPatchMake2(float umin, float vmin, float umax, float vmax, in
 bezierPatch* bezierPatchInsert(bezierPatch* list, bezierPatch* b);
 void bezierPatchDelete(bezierPatch* b);
 void bezierPatchDeleteList(bezierPatch* b);
-void bezierPatchPrint(bezierPatch* b);
-void bezierPatchPrintList(bezierPatch* list);
 void bezierPatchEval(bezierPatch* b, float u, float v, float ret[]);
 void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float retNormal[]);
 void bezierPatchEval(bezierPatch* b, float u, float v, float ret[]);
 void bezierPatchEvalNormal(bezierPatch* b, float u, float v, float ret[]);
-void bezierPatchDraw(bezierPatch* bpatch, int u_reso, int v_reso);
-void bezierPatchListDraw(bezierPatch* list, int u_reso, int v_reso);
 
 #ifdef __cplusplus
 }

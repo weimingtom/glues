@@ -234,13 +234,11 @@ monoChain* directedLineLoopToMonoChainLoop(directedLine* loop)
       prevCusp = temp;
     }
   firstCusp = prevCusp;
-//printf("first cusp is (%f,%f), (%f,%f), (%f,%f)\n", prevCusp->getPrev()->head()[0], prevCusp->getPrev()->head()[1], prevCusp->head()[0], prevCusp->head()[1], prevCusp->tail()[0], prevCusp->tail()[1]);
 
   for(temp = prevCusp->getNext(); temp != loop; temp = temp->getNext())
     {
       if(isCusp(temp))
 	{
-//printf("the cusp is (%f,%f), (%f,%f), (%f,%f)\n", temp->getPrev()->head()[0], temp->getPrev()->head()[1], temp->head()[0], temp->head()[1], temp->tail()[0], temp->tail()[1]);
 	  if(ret == NULL)
 	    {
 	      ret = new monoChain(prevCusp, temp);

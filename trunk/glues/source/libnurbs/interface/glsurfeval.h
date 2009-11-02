@@ -30,7 +30,7 @@
 /*
  *
  * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
- */
+*/
 
 #ifndef __gluglsurfeval_h_
 #define __gluglsurfeval_h_

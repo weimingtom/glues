@@ -160,23 +160,6 @@ void findGridChains(directedLine* top, directedLine* bot,
 		    gridBoundaryChain*& rightGridChain);
 void toVertexArrays(directedLine* topV, directedLine* botV, vertexArray& leftChain, vertexArray& rightChain);
 
-void drawCorners(
-		 Real* topV, Real* botV,		 
-		 vertexArray* leftChain,
-		 vertexArray* rightChain,
-		 gridBoundaryChain* leftGridChain,
-		 gridBoundaryChain* rightGridChain,
-		 Int gridIndex1,
-		 Int gridIndex2,
-		 Int leftCornerWhere,
-		 Int leftCornerIndex,
-		 Int rightCornerWhere,
-		 Int rightCornerIndex,
-		 Int bot_leftCornerWhere,
-		 Int bot_leftCornerIndex,
-		 Int bot_rightCornerWhere,
-		 Int bot_rightCornerIndex);
-
 Int checkMiddle(vertexArray* chain, Int begin, Int end, 
 		Real vup, Real vbelow);
 

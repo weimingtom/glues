@@ -31,11 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 */
-
 /*
- * glsurfeval.c++
  *
- */
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 /* Polynomial Evaluator Interface */
 #include "glues.h"
@@ -649,14 +648,6 @@ void OpenGLSurfaceEvaluator::bgnmap2f(long)
       normal_flag=0;
       color_flag=0;
       texcoord_flag=0;
-
-// MIKE: TODO
-//    glPushAttrib((GLbitfield)GL_EVAL_BIT);
-   }
-   else
-   {
-// MIKE: TODO
-//      glPushAttrib((GLbitfield)GL_EVAL_BIT);
    }
 }
 

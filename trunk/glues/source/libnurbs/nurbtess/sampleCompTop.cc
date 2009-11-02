@@ -280,8 +280,7 @@ void sampleTopLeftWithGridLinePost(Real* topVertex,
     }
   else //the topVertex forms a fan with the grid points
     grid->outputFanWithPoint(gridV, leftU, rightU, topVertex, pStream);  
-}				   
-				   
+}
 
 void sampleTopLeftWithGridLine(Real* topVertex,
                                 vertexArray* leftChain,

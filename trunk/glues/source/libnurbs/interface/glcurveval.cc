@@ -124,7 +124,6 @@ void OpenGLCurveEvaluator::endline(void)
  */
 void OpenGLCurveEvaluator::disable(long type)
 {
-   printf("OpenGLCurveEvaluator::disable\n");
    gluDisable((GLenum) type);
 }
 
@@ -134,7 +133,6 @@ void OpenGLCurveEvaluator::disable(long type)
  */
 void OpenGLCurveEvaluator::enable(long type)
 {
-   printf("OpenGLCurveEvaluator::enable\n");
    gluEnable((GLenum) type);
 }
 
@@ -174,11 +172,6 @@ void OpenGLCurveEvaluator::bgnmap1f(long)
       texcoord_flag=0;
       // no need to worry about gl states when doing callback
    }
-   else
-   {
-// MIKE: TODO
-//      glPushAttrib((GLbitfield) GL_EVAL_BIT);
-   }
 }
 
 /*-------------------------------------------------------------------------
@@ -190,11 +183,6 @@ void OpenGLCurveEvaluator::endmap1f(void)
    printf("OpenGLCurveEvaluator::endmap1f\n");
    if(output_triangles)
    {
-   }
-   else
-   {
-// MIKE: TODO
-//      glPopAttrib();
    }
 }
 

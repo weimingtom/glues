@@ -93,8 +93,6 @@ class primStream
          insert(C);
          end(PRIMITIVE_STREAM_FAN);
       }
-      void print();
-      void draw();  /* using GL to draw the primitives */
 };
 
 #endif /* _PRIMITIVE_STREAM_H */

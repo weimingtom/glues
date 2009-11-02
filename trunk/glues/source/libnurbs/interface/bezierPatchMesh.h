@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _BEZIERPATCHMESH_H
@@ -79,11 +81,8 @@ void bezierPatchMeshDelete(bezierPatchMesh* bpm);
 void bezierPatchMeshBeginStrip(bezierPatchMesh* bpm, GLenum type);
 void bezierPatchMeshEndStrip(bezierPatchMesh* bpm);
 void bezierPatchMeshInsertUV(bezierPatchMesh* bpm, float u, float v);
-void bezierPatchMeshPrint(bezierPatchMesh* bpm);
 
 bezierPatchMesh* bezierPatchMeshListInsert(bezierPatchMesh* list, bezierPatchMesh* bpm);
-
-void bezierPatchMeshListPrint(bezierPatchMesh* list);
 
 int bezierPatchMeshListTotalStrips(bezierPatchMesh* list);
 
@@ -93,15 +92,12 @@ int bezierPatchMeshListNumTriangles(bezierPatchMesh* list);
 
 void bezierPatchMeshDelDeg(bezierPatchMesh* bpm);
 void bezierPatchMeshEval(bezierPatchMesh* bpm);
-void bezierPatchMeshDraw(bezierPatchMesh* bpm);
-void bezierPatchMeshListDraw(bezierPatchMesh* list);
 void bezierPatchMeshListEval(bezierPatchMesh* list);
 void bezierPatchMeshListCollect(bezierPatchMesh* list, float** vertex_array, float** normal_array, int** length_array, GLenum** type_array, int* num_strips);
 
 void bezierPatchMeshListDelDeg(bezierPatchMesh* list);
 void bezierPatchMeshListDelete(bezierPatchMesh* list);
 bezierPatchMesh* bezierPatchMeshListReverse(bezierPatchMesh* list);
-void drawStrips(float* vertex_array, float* normal_array, int* length_array, GLenum* type_array, int num_strips);
 
 #ifdef __cplusplus
 }

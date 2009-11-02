@@ -49,6 +49,7 @@
 #include "backend.h"
 #include "mesher.h"
 
+#include <stdio.h>
 
 const float Mesher::ZERO = 0.0;
 
@@ -250,6 +251,7 @@ Mesher::move( int x, int y )
 inline void
 Mesher::output( int x )
 {
+printf("Mesher::output()\n");
     backend.tmeshvert( vdata[x] );
 }
 
