@@ -473,7 +473,7 @@ int main(int argc, char** argv)
       render_scene();
       glFinish();
       eglWaitGL();
-      eglSwapBuffers(display,surface);
+      eglSwapBuffers(display, surface);
    } while(1);
 
    return 0;

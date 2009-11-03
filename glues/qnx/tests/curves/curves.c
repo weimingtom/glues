@@ -1,5 +1,5 @@
 /*                                                              */
-/* This test is based on accumaa.c - by Tom McReynolds, SGI and */
+/* This test is based on tess.c from OpenGL Redbook,            */
 /* initialization part on QSSL's egl* demo                      */
 /*                                                              */
 /* // Mike Gorchak, 2009. GLU ES test                           */
@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include <gf/gf.h>
 #include <gf/gf3d.h>
@@ -34,183 +35,106 @@ static EGLint attribute_list[]=
    EGL_NONE
 };
 
-GLfloat rotate=0;
-GLUquadricObj* sphere;
-GLUquadricObj* cone;
+#define order    4          /* make a cubic spline                                  */
+#define cvcount  10         /* number of cvs                                        */
+#define stride   3          /* just refers to the number of float values in each cv */
+#define numknots (cvcount+order)
+#define numcvs   (cvcount*stride)
 
-/* Create a single component texture map */
-GLubyte* make_texture(int maxs, int maxt)
-{
-   int s, t;
-   static GLubyte *texture;
+/* our globals */
+float knots[numknots];      /* somewhere to keep the knots   */
+float cvs[numcvs];          /* somewhere to keep the cvs     */
+int frame=0;                /* for cheezy animation purposes */
 
-   texture=(GLubyte*)malloc(maxs*maxt*sizeof(GLubyte));
-   for (t=0; t<maxt; t++)
-   {
-      for (s=0; s<maxs; s++)
-      {
-         texture[s+maxs*t]=(((s>>4)&0x1)^((t>>4)&0x1))*255;
-      }
-   }
-
-   return texture;
-}
+GLUnurbsObj* mynurbs=NULL;  /* the nurbs tesselator (or rather a pointer to what will be it) */
 
 
 void init_scene(int width, int height)
 {
-   static GLfloat lightpos[4]={50.0f, 50.0f, -320.f, 1.0f};
-   GLubyte* tex;
+   int knot;
 
-   if (height==0)
-   {
-      height=1;
-   }
+   /* Setup our viewport for OpenGL ES */
+   glViewport(0, 0, (GLint)width, (GLint)height);
+   /* Setup our viewport for GLU ES (required when using OpenGL ES 1.0 only) */
+   gluViewport(0, 0, (GLint)width, (GLint)height);
 
-   /* Clear error */
-   glGetError();
-
-   /* draw a perspective scene */
+   /* setup a perspective projection */
    glMatrixMode(GL_PROJECTION);
-   gluPerspective(35.0f, (GLfloat)width/(GLfloat)height, 320.0f, 6000.0f);
+   glLoadIdentity();
+   glFrustumf(-1.0f, 1.0f, -0.75f, 0.75f, 1.0f, 100.0f);
 
+   /* set the modelview matrix */
    glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
 
-   /* turn on features */
-   glEnable(GL_DEPTH_TEST);
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
+   /* set point size for the cv rendering */
+   glPointSize(4.0f);
 
-   /* place light 0 in the right place */
-   glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+   /* set the clear colour to black */
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-   /* enable filtering */
-   glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-   glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   /* no lighting needed */
+   glDisable(GL_LIGHTING);
 
-   tex=make_texture(512, 512);
-   gluBuild2DMipmaps(GL_TEXTURE_2D, GL_LUMINANCE, 512, 512, GL_LUMINANCE,
-                     GL_UNSIGNED_BYTE, tex);
-   free(tex);
+   /* position the camera in the world */
+   glTranslatef(0.0f, 0.0f, -1.0f);
+   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+   glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 
+   /* now, make the nurbs tesselator we are going to use */
+   mynurbs=gluNewNurbsRenderer();
 
-   sphere=gluNewQuadric();
-   gluQuadricDrawStyle(sphere, GLU_FILL);
-   gluQuadricTexture(sphere, GLU_TRUE);
+   /* these lines set how to tesselate the curve -    */
+   /* simply by chopping it up into 100 line segments */
+   gluNurbsProperty(mynurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
+   gluNurbsProperty(mynurbs, GLU_U_STEP, 100);
 
-   cone=gluNewQuadric();
-   gluQuadricDrawStyle(cone, GLU_FILL);
-   gluQuadricTexture(cone, GLU_TRUE);
-
-   if (glGetError())
+   /* set up the knot vector - make it continuous */
+   for (knot=0; knot<numknots; knot++)
    {
-      printf("Oops! I screwed up my OpenGL ES calls somewhere\n");
+      knots[knot]=knot;
    }
 }
 
 void render_scene()
 {
-   /* material properties for objects in scene */
-   static GLfloat wall_mat[4]={1.0f, 1.0f, 1.0f, 1.0f};
-   static GLfloat sphere_mat[4]={1.0f, 0.7f, 0.2f, 1.0f};
-   static GLfloat sphere2_mat[4]={0.2f, 0.7f, 0.2f, 1.0f};
-   static GLfloat sphere3_mat[4]={0.2f, 0.2f, 0.7f, 1.0f};
-   static GLfloat cone_mat[4]={1.0f, 0.2f, 0.2f, 1.0f};
-   GLfloat texcoords[4][2];
-   GLfloat vertices[4][3];
+   int count=0;
+   int u=0;
 
-   glVertexPointer(3, GL_FLOAT, 0, vertices);
-   glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+   glClear(GL_COLOR_BUFFER_BIT);
 
-   /* Enable vertices and texcoords arrays */
+   /* Curve color */
+   glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+
+   /* tells GLU we are going to describe a nurbs curve */
+   gluBeginCurve(mynurbs);
+      /* send it the definition and pointers to cv and knot data */
+      gluNurbsCurve(mynurbs, numknots, knots, stride, cvs, order, GLU_MAP1_VERTEX_3);
+   /* thats all... */
+   gluEndCurve(mynurbs);
+
+   /* Control points color */
+   glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+
+   /* Enable vertex array */
    glEnableClientState(GL_VERTEX_ARRAY);
-   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, cvs);
 
-   glGetError();
-   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-   /* Note: wall verticies are ordered so they are all front facing this lets
-      me do back face culling to speed things up.  */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, wall_mat);
-
-   /* floor */
-   glEnable(GL_TEXTURE_2D);
-
-   glNormal3f(0.f, 1.f, 0.f);
-
-   /* Fill texture coordinates and vertices arrays */
-   texcoords[0][0]=0;
-   texcoords[0][1]=0;
-   vertices[0][0]=-200.f;
-   vertices[0][1]=-100.f;
-   vertices[0][2]=-320.f;
-
-   texcoords[1][0]=1;
-   texcoords[1][1]=0;
-   vertices[1][0]=200.f;
-   vertices[1][1]=-100.f;
-   vertices[1][2]=-320.f;
-
-   texcoords[3][0]=1;
-   texcoords[3][1]=1;
-   vertices[3][0]=200.f;
-   vertices[3][1]=400.f;
-   vertices[3][2]=-2000.f;
-
-   texcoords[2][0]=0;
-   texcoords[2][1]=1;
-   vertices[2][0]=-200.f;
-   vertices[2][1]=400.f;
-   vertices[2][2]=-2000.f;
-
-   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-   /* Draw Sphere */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere_mat);
-   glPushMatrix();
-   glTranslatef(0.0f, 0.0f, -400.f);
-   glRotatef(-90.f, 1.f, 0.f, 0.f);
-   glRotatef(rotate, 1.f, 0.0f, 0.0f);
-   gluSphere(sphere, 24.0f, 30, 30);
-   glPopMatrix();
-
-   /* Draw Sphere 2 */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere2_mat);
-   glPushMatrix();
-   glTranslatef(-50.0f, 50.0f, -550.f);
-   glRotatef(-90.f, 0.f, 1.f, 0.f);
-   glRotatef(rotate, 1.f, 0.0f, 0.0f);
-   gluSphere(sphere, 24.0f, 30, 30);
-   glPopMatrix();
-
-   /* Draw Sphere 3 */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere3_mat);
-   glPushMatrix();
-   glTranslatef(50.0f, 100.0f, -700.f);
-   glRotatef(-90.f, 0.f, 0.f, 1.f);
-   glRotatef(rotate, 1.f, 0.0f, 0.0f);
-   gluSphere(sphere, 24.0f, 30, 30);
-   glPopMatrix();
-
-   /* Draw Cone */
-   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, cone_mat);
-   glPushMatrix();
-   glTranslatef(0.0f, 150.0f, -850.f);
-   glRotatef(-90.f, 1.f, 0.f, 0.f);
-   glRotatef(rotate, 0.0f, 0.0f, 1.0f);
-   gluCylinder(cone, 20.0f, 0.0f, 60.0f, 40, 40);
-   glPopMatrix();
-
-   rotate+=1.0f;
-
-   glDisable(GL_TEXTURE_2D);
-   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   /* render the control vertex positions */
+   glDrawArrays(GL_POINTS, 0, cvcount);
    glDisableClientState(GL_VERTEX_ARRAY);
 
-   if (glGetError())
+   /* Flush all drawings */
+   glFlush();
+
+   /* Update knots */
+   for (u=0; u<cvcount; u++)
    {
-      printf("Oops! I screwed up my OpenGL ES calls somewhere\n");
+      cvs[count++]=0;
+      cvs[count++]=cos(5.2f*sqrt(u*u)+frame*0.01f)*0.5f;
+      cvs[count++]=sin(10.0f*sqrt(u*u)+frame*0.013f)*0.5f;
    }
+   frame++;
 }
 
 int main(int argc, char** argv)
@@ -240,6 +164,9 @@ int main(int argc, char** argv)
       return -1;
    }
 
+   width=disp_info.xres;
+   height=disp_info.yres;
+
    layer_idx=disp_info.main_layer_index;
 
    /* get an EGL display connection */
@@ -249,9 +176,6 @@ int main(int argc, char** argv)
       fprintf(stderr, "eglGetDisplay() failed\n");
       return -1;
    }
-
-   width=disp_info.xres;
-   height=disp_info.yres;
 
    if (gf_layer_attach(&layer, gf_disp, layer_idx, 0)!=GF_ERR_OK)
    {
@@ -340,7 +264,7 @@ int main(int argc, char** argv)
       render_scene();
       glFinish();
       eglWaitGL();
-      eglSwapBuffers(display,surface);
+      eglSwapBuffers(display, surface);
    } while(1);
 
    return 0;

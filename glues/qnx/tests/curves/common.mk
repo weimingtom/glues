@@ -12,7 +12,7 @@ include $(QCONFIG)
 USEFILE=
 
 define PINFO
-PINFO DESCRIPTION=GLU ES NURBS Test
+PINFO DESCRIPTION=GLU ES Nurbs Curves test
 endef
 
 #===== EXTRA_INCVPATH - a space-separated list of directories to search for include files.

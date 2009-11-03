@@ -422,8 +422,6 @@ int main(int argc, char** argv)
       return -1;
    }
 
-//   eglSwapInterval(display, 0);
-
    init_scene(width, height);
 
    do {
