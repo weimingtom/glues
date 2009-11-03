@@ -75,6 +75,7 @@ void init_scene(int width, int height)
    /* simply by chopping it up into 100 line segments */
    gluNurbsProperty(mynurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
    gluNurbsProperty(mynurbs, GLU_U_STEP, 100);
+   gluNurbsProperty(mynurbs, GLU_DISPLAY_MODE, GLU_FILL);
 
    /* set up the knot vector - make it continuous */
    for (knot=0; knot<numknots; knot++)

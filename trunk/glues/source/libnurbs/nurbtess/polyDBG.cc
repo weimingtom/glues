@@ -33,6 +33,8 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include <stdlib.h>
@@ -320,17 +322,9 @@ Int DBG_isCounterclockwise(directedLine* poly)
  */
 Int DBG_rayIntersectEdge(Real v0[2], Real dx, Real dy, Real v10[2], Real v1[2], Real v2[2])
 {
-/*
-if( (v1[1] >= v0[1] && v2[1]<= v0[1] )
-  ||(v2[1] >= v0[1] && v1[1]<= v0[1] )
-   )
-  printf("rayIntersectEdge, *********\n");
-*/
-
   Real denom = (v2[0]-v1[0])*(-dy) - (v2[1]-v1[1]) * (-dx);
   Real nomRay = (v2[0]-v1[0]) * (v0[1] - v1[1]) - (v2[1]-v1[1])*(v0[0]-v1[0]);
   Real nomEdge = (v0[0]-v1[0]) * (-dy) - (v0[1]-v1[1])*(-dx);
-
 
   /*if the ray is parallel to the edge, return 0: not intersect*/
   if(denom == 0.0)
@@ -346,10 +340,6 @@ if( (v1[1] >= v0[1] && v2[1]<= v0[1] )
   if(nomEdge == 0)
     { /*v1 is on the positive or negative ray*/
 
-/*
-      printf("v1 is on the ray\n");
-*/
-
       if(dx*(v1[0]-v0[0])>=0 && dy*(v1[1]-v0[1])>=0) /*v1 on positive ray*/
 	{
 	  if(area(v0, v1, v10) * area(v0, v1, v2) >0)
@@ -363,7 +353,6 @@ if( (v1[1] >= v0[1] && v2[1]<= v0[1] )
 
   /*if v2 is on the ray, always return 0: not intersect*/
   if(nomEdge == denom) {
-/*    printf("v2 is on the ray\n");*/
     return 0;
   }
 

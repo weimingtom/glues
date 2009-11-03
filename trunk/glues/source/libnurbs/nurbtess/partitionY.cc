@@ -308,7 +308,6 @@ static Int compEdges(directedLine *e1, directedLine *e2)
 
   Real Ymax = min(e1_Ymax, e2_Ymax);
   Real Ymin = max(e1_Ymin, e2_Ymin);
-    
   Real y = Real(0.5)*(Ymax + Ymin);
 
 /*  Real x1 = intersectHoriz(e1->head()[0], e1->head()[1], e1->tail()[0], e1->tail()[1], y);
@@ -324,7 +323,7 @@ static Int compEdges(directedLine *e1, directedLine *e2)
   if(x1<= x2) return -1;
   else return 1;
 }
-  
+
 /*used by sort precedures
  */
 static Int compInY(directedLine* v1, directedLine* v2)
@@ -369,11 +368,7 @@ void findDiagonals(Int total_num_edges, directedLine** sortedVertices, sweepRang
 		diagonal_vertices[k++] = sortedVertices[j];
 		break;
 	      }
-/*	  printf("j=%i\n", j);*/
 	  assert(j>=0);
-
-
-
 	}
     }
   num_diagonals = k/2;

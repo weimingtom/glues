@@ -389,47 +389,16 @@ directedLine* monoChain::find(Real y)
   return ret;  
 }
 
-void monoChain::printOneChain()
-{
-  directedLine* temp;
-  for(temp = chainHead; temp != chainTail; temp = temp->getNext())
-    {
-      printf("(%f,%f) ", temp->head()[0], temp->head()[1]);
-    }
-  printf("(%f,%f) \n", chainTail->head()[0], chainTail->head()[1]);  
-}
-
-void monoChain::printChainLoop()
-{
-  monoChain* temp;
-  this->printOneChain();
-  for(temp = next; temp != this; temp = temp->next)
-    {
-      temp->printOneChain();
-    }
-  printf("\n");
-}
-
-void monoChain::printAllLoops()
-{
-  monoChain* temp;
-  for(temp=this; temp != NULL; temp = temp->nextPolygon)
-    temp->printChainLoop();
-}
-
-//return 1 if error occures
+// return 1 if error occures
 Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges)
 {
   Int i;
   Real keyY;
   Int errOccur=0;
-//printf("enter MC_sweepY\n");
-//printf("nVertices=%i\n", nVertices);
   /*for each vertex in the sorted list, update the binary search tree.
    *and store the range information for each vertex.
    */
   treeNode* searchTree = NULL;
-//printf("nVertices=%i\n", nVertices);
   for(i=0; i<nVertices; i++)
     {
       monoChain* vert = sortedVertices[i];
@@ -438,7 +407,6 @@ Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges
       directedLine *dlinePrev = dline->getPrev();
       if(isBelow(dline, dline) && isBelow(dline, dlinePrev))
 	{
-//printf("case 1\n");
 	  //this<v and prev < v
 	  //delete both edges
 	  vert->isKey = 1;
@@ -481,7 +449,6 @@ Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges
 	}
       else if(isAbove(dline, dline) && isAbove(dline, dlinePrev))
 	{
-//printf("case 2\n");
 	  //insert both edges
 	  treeNode* thisNode = TreeNodeMake(vert);
 	  treeNode* prevNode = TreeNodeMake(vert->getPrev());
@@ -498,7 +465,6 @@ Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges
 
 	  if(cuspType(dline) == 1) //interior cusp
 	    {
-//printf("cuspType is 1\n");
 	      treeNode* leftEdge = TreeNodePredecessor(thisNode);
 	      treeNode* rightEdge = TreeNodeSuccessor(prevNode);
               if(leftEdge == NULL || rightEdge == NULL)
@@ -506,23 +472,20 @@ Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges
 		  errOccur = 1;
 		  goto JUMP_HERE;
 		}
-//printf("leftEdge is %i, rightEdge is %i\n", leftEdge, rightEdge);
 	      directedLine* leftEdgeDline = ((monoChain*) leftEdge->key)->find(keyY);
 	      directedLine* rightEdgeDline = ((monoChain*) rightEdge->key)->find(keyY);
 	      ret_ranges[i] = sweepRangeMake( leftEdgeDline, 1, rightEdgeDline, 1);
 	    }
 	  else //exterior cusp
 	    {
-//printf("cuspType is not 1\n");
 	      ret_ranges[i] = sweepRangeMake(dlinePrev, 1, dline, 1);
 	    }
 	}
       else
-	{	  
-//printf("%i,%i\n", isAbove(dline, dline), isAbove(dline, dlinePrev));
+	{
 	  errOccur = 1;
 	  goto JUMP_HERE;
-      
+
 	  fprintf(stderr, "error in MC_sweepY\n");
 	  exit(1);
 	}
@@ -533,7 +496,7 @@ Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges
   TreeNodeDeleteWholeTree(searchTree);
   return errOccur;
 }
-	  
+
 void MC_findDiagonals(Int total_num_edges, monoChain** sortedVertices,
 		   sweepRange** ranges, Int& num_diagonals, 
 		   directedLine** diagonal_vertices)
@@ -543,7 +506,7 @@ void MC_findDiagonals(Int total_num_edges, monoChain** sortedVertices,
   //reset 'current' of all the monoChains
   for(i=0; i<total_num_edges; i++)
     sortedVertices[i]->resetCurrent();
-  
+
   for(i=0; i<total_num_edges; i++)
     {
       directedLine* vert = sortedVertices[i]->getHead();
@@ -616,7 +579,6 @@ void MC_findDiagonals(Int total_num_edges, monoChain** sortedVertices,
 
 directedLine* MC_partitionY(directedLine *polygons, sampledLine **retSampledLines)
 {
-//printf("enter mc_partitionY\n");
   Int total_num_chains = 0;
   monoChain* loopList = directedLineLoopListToMonoChainLoopList(polygons);
   monoChain** array = loopList->toArrayAllLoops(total_num_chains);
@@ -629,10 +591,7 @@ directedLine* MC_partitionY(directedLine *polygons, sampledLine **retSampledLine
       return polygons;
     }
 
-//loopList->printAllLoops();
-//printf("total_num_chains=%i\n", total_num_chains);
   quicksort( (void**)array, 0, total_num_chains-1, (Int (*)(void*, void*))compChainHeadInY);
-//printf("after quicksort\n");  
 
   sweepRange** ranges = (sweepRange**)malloc(sizeof(sweepRange*) * (total_num_chains));
   assert(ranges);
@@ -644,18 +603,13 @@ directedLine* MC_partitionY(directedLine *polygons, sampledLine **retSampledLine
       *retSampledLines = NULL;
       return NULL;
     }
-//printf("after MC_sweepY\n");
-
 
   Int num_diagonals;
   /*number diagonals is < total_num_edges*total_num_edges*/
   directedLine** diagonal_vertices = (directedLine**) malloc(sizeof(directedLine*) * total_num_chains*2/*total_num_edges*/);
   assert(diagonal_vertices);
 
-//printf("before call MC_findDiagonales\n");
-
   MC_findDiagonals(total_num_chains, array, ranges, num_diagonals, diagonal_vertices);
-//printf("after call MC_findDia, num_diagnla=%i\n", num_diagonals);
 
   directedLine* ret_polygons = polygons;
   sampledLine* newSampledLines = NULL;
@@ -663,21 +617,9 @@ directedLine* MC_partitionY(directedLine *polygons, sampledLine **retSampledLine
 
   num_diagonals=deleteRepeatDiagonals(num_diagonals, diagonal_vertices, diagonal_vertices);
 
-
-
-//drawDiagonals(num_diagonals, diagonal_vertices);
-//printf("diagoanls are \n");
-//for(i=0; i<num_diagonals; i++)
-//  {
-//    printf("(%f,%f)\n", diagonal_vertices[2*i]->head()[0], diagonal_vertices[2*i]->head()[1]);
-//    printf("**(%f,%f)\n", diagonal_vertices[2*i+1]->head()[0], diagonal_vertices[2*i+1]->head()[1]);
-//  }
-
   Int *removedDiagonals=(Int*)malloc(sizeof(Int) * num_diagonals);
   for(i=0; i<num_diagonals; i++)
     removedDiagonals[i] = 0;
-//  printf("first pass\n");
-
 
  for(i=0,k=0; i<num_diagonals; i++,k+=2)
     {
@@ -687,16 +629,10 @@ directedLine* MC_partitionY(directedLine *polygons, sampledLine **retSampledLine
       directedLine* v2=diagonal_vertices[k+1];
       directedLine* ret_p1;
       directedLine* ret_p2;
-      
+
       /*we ahve to determine whether v1 and v2 belong to the same polygon before
        *their structure are modified by connectDiagonal().
        */
-/*
-      directedLine *root1 = v1->findRoot();
-      directedLine *root2 = v2->findRoot();
-      assert(root1);      
-      assert(root2);
-*/
 
 directedLine*  root1 = v1->rootLinkFindRoot();
 directedLine*  root2 = v2->rootLinkFindRoot();
@@ -800,27 +736,17 @@ ret_p2->rootLinkSet(root1);
 		    diagonal_vertices[kk+1] = v1->getPrev();
 		  }
 	      }
-	    }					    	       
+	    }
 }/*end if (root1 not equal to root 2)*/
 }
 
   /*second pass,  now all diagoals should belong to the same polygon*/
-//printf("second pass: \n");
-
-//  for(i=0; i<num_diagonals; i++)
-//    printf("%i ", removedDiagonals[i]);
-
 
   for(i=0,k=0; i<num_diagonals; i++, k += 2)
     if(removedDiagonals[i] == 0) 
       {
-
-
 	directedLine* v1=diagonal_vertices[k];
 	directedLine* v2=diagonal_vertices[k+1];
-
-
-
 	directedLine* ret_p1;
 	directedLine* ret_p2;
 
@@ -828,18 +754,7 @@ ret_p2->rootLinkSet(root1);
 	 *their structure are modified by connectDiagonal().
 	 */
 	directedLine *root1 = v1->findRoot();
-/*
-	directedLine *root2 = v2->findRoot();
-
-
-
-	assert(root1);      
-	assert(root2);      
-	assert(root1 == root2);
-  */    
 	sampledLine* generatedLine;
-
-
 
 	v1->connectDiagonal(v1,v2, &ret_p1, &ret_p2, &generatedLine, ret_polygons);
 	newSampledLines = generatedLine->insert(newSampledLines);
@@ -856,7 +771,6 @@ ret_p2->rootLinkSet(root1);
 	  {
 	    if(removedDiagonals[j] ==0)
 	      {
-
 		directedLine* temp1=diagonal_vertices[2*j];
 		directedLine* temp2=diagonal_vertices[2*j+1];
                if(temp1==v1 || temp1==v2 || temp2==v1 || temp2==v2)
@@ -865,9 +779,6 @@ ret_p2->rootLinkSet(root1);
 		    /*if temp1 and temp2 are in different polygons, 
 		     *then one of them must be v1 or v2.
 		     */
-
-
-
 		    assert(temp1==v1 || temp1 == v2 || temp2==v1 || temp2 ==v2);
 		    if(temp1==v1) 
 		      {
@@ -879,7 +790,7 @@ ret_p2->rootLinkSet(root1);
 		      }
 		    if(temp1==v2)
 		      {
-			diagonal_vertices[2*j] = v1->getPrev();		      
+			diagonal_vertices[2*j] = v1->getPrev();
 		      }
 		    if(temp2==v2)
 		      {
@@ -887,10 +798,8 @@ ret_p2->rootLinkSet(root1);
 		      }
 		  }
 	      }
-	  }      
-
+	  }
       }
-
 
   //clean up
   loopList->deleteLoopList();
@@ -902,4 +811,3 @@ ret_p2->rootLinkSet(root1);
   *retSampledLines = newSampledLines;
   return ret_polygons;
 }
-

@@ -33,10 +33,13 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "glues.h"
 #include "glimports.h"
 #include "zlassert.h"
@@ -111,8 +114,6 @@ void sampleCompRight(Real* topVertex, Real* botVertex,
 	}//end of find gridMidIndex2
       }
 
-
-  
   //to interprete the corner information
   Real* cornerTop;
   Real* cornerBot;
@@ -344,13 +345,11 @@ void sampleRightStripRecF(vertexArray* rightChain,
 
   //if rightChain->getVertex(index1)[1] ==secondGridChainV then we can 
   //recurvesively to the rest
-  if(rightChain->getVertex(index1)[1] == secondGridChainV)
-    {
-
-      
+   if(rightChain->getVertex(index1)[1] == secondGridChainV)
+   {
       sampleRightStripRecF(rightChain, index1, botRightIndex, rightGridChain, rightGridChainStartIndex+1, rightGridChainEndIndex, pStream);
-    }
-  else if(index1 < botRightIndex)
+   }
+   else if(index1 < botRightIndex)
     {
       //otherwise, we have rightChain->getVertex(index1)[1] > secondV
       //let the next trim vertex be nextTrimVertex, (which should be strictly
@@ -446,7 +445,7 @@ void sampleRightOneGridStep(vertexArray* rightChain,
 	else
 	  poly->insert(dline);
       }
-    
+
     //the vertical grid line segment
     vert1[0]=vert2[0] = grid->get_u_value(innerInd);
     vert1[1]=upperV;
@@ -457,7 +456,7 @@ void sampleRightOneGridStep(vertexArray* rightChain,
       poly = dline;
     else
       poly->insert(dline);
-    
+
     //the lower grid line
     vert1[1]=vert2[1]=lowerV;
     for(i=innerInd; i<lowerInd; i++)
@@ -466,7 +465,7 @@ void sampleRightOneGridStep(vertexArray* rightChain,
 	vert2[0] = grid->get_u_value(i+1);
 	sline = new sampledLine(vert1, vert2);
 	dline = new directedLine(INCREASING, sline);
-	poly->insert(dline);       
+	poly->insert(dline);
       }
 
     //the edge connecting lower grid to right chain
@@ -474,8 +473,7 @@ void sampleRightOneGridStep(vertexArray* rightChain,
     sline = new sampledLine(vert1, rightChain->getVertex(endRightIndex));
     dline = new directedLine(INCREASING, sline);
     poly->insert(dline);
-    
-    
+
     //the right Chain
     for(i=endRightIndex; i>beginRightIndex; i--)
       {
@@ -633,12 +631,3 @@ void stripOfFanRight(vertexArray* rightChain,
   free(trimVerts);
   free(gridVerts);
 }
-
-
-
-
-
-
-
-
-

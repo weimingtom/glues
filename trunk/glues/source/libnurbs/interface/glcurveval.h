@@ -64,6 +64,8 @@ typedef struct curveEvalMachine
 
 class OpenGLCurveEvaluator: public BasicCurveEvaluator
 {
+   long output_style;       // N_MESHFILL or N_MESHLINE or N_MESHPOINT
+
    public:
       OpenGLCurveEvaluator(void);
       virtual ~OpenGLCurveEvaluator(void);
@@ -113,10 +115,13 @@ class OpenGLCurveEvaluator: public BasicCurveEvaluator
       int global_grid_nu;
 
       void inMap1f(int which, int dimension, REAL ulower, REAL uupper, int ustride, int uorder, REAL* ctlpoints);
+      void inMap1fr(int which, int dimension, REAL ulower, REAL uupper, int ustride, int uorder, REAL* ctlpoints);
       void inPreEvaluate(int order, REAL vprime, REAL* coeff);
       void inDoDomain1(curveEvalMachine* em, REAL u, REAL* retPoint);
       void inDoEvalCoord1(REAL u);
+      void inDoEvalCoord1r(REAL u, REAL* retPoint);
       void inMapMesh1f(int umin, int umax);
+      void inMapMesh1fr(int umin, int umax);
 
       void (APIENTRY* beginCallBackN)(GLenum type);
       void (APIENTRY* endCallBackN)(void);

@@ -27,11 +27,10 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * types.h
  *
- */
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #ifndef __glutypes_h_
 #define __glutypes_h_

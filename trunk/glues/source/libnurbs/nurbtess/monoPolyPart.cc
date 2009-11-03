@@ -296,9 +296,6 @@ directedLine* monoPolyPart(directedLine* polygon)
 		  G = tempV->getPrev();
 		}
 	    } //end of A is below B
-	} //end not u-monotone	
+	} //end not u-monotone
     } //end of main loop
 }
-
-
-

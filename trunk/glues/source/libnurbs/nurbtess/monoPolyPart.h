@@ -39,4 +39,4 @@ class directedLine;
 
 directedLine* monoPolyPart(directedLine* polygon);
 
-#endif
+#endif /* _MONO_POLY_PART_H */

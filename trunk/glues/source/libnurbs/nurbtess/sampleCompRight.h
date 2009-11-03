@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _SAMPLECOMPRIGHT_H
@@ -112,6 +114,4 @@ void sampleRightSingleTrimEdgeRegionGen(Real topVert[2], Real botVert[2],
                                        primStream* pStream);
 #endif
 
-#endif
-
-
+#endif /* _SAMPLECOMPRIGHT_H */

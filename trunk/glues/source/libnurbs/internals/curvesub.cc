@@ -61,8 +61,6 @@ void Subdivider::drawCurves(void)
 
    renderhints.init();
 
-   printf("Subdivider::drawCurves\n");
-
    backend.bgncurv();
    for(int i=bpts.start; i<bpts.end-1; i++)
    {

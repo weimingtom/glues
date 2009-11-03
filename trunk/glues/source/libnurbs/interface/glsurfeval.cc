@@ -48,40 +48,8 @@
 #include "bezierPatchMesh.h"
 #include "gles_evaluator.h"
 
-//use internal evaluator
+/* use internal evaluator */
 #define USE_INTERNAL_EVAL
-
-//#define USE_LOD //for LOD test, have to turn on USE_LOD in insurfeval.c++ too
-
-/**************begin for LOD_eval_list***********/
-void OpenGLSurfaceEvaluator::LOD_eval_list(int level)
-{
-   if (level==0)
-   {
-      LOD_eval_level=1;
-   }
-   else
-   {
-      if (level==1)
-      {
-         LOD_eval_level=2;
-      }
-      else
-      {
-         if (level==2)
-         {
-            LOD_eval_level=4;
-         }
-         else
-         {
-            LOD_eval_level = 8;
-         }
-      }
-   }
-
-   inBPMListEvalEM(global_bpm);
-}
-
 
 OpenGLSurfaceEvaluator::OpenGLSurfaceEvaluator()
 {
@@ -143,10 +111,6 @@ OpenGLSurfaceEvaluator::OpenGLSurfaceEvaluator()
    em_color.vprime=-1.0f;
    em_texcoord.uprime=-1.0f;
    em_texcoord.vprime=-1.0f;
-
-#ifdef USE_LOD
-   LOD_eval_level=1;
-#endif
 }
 
 OpenGLSurfaceEvaluator::~OpenGLSurfaceEvaluator()
@@ -727,16 +691,6 @@ void OpenGLSurfaceEvaluator::mapmesh2f(long style, long umin, long umax, long vm
 #else /* USE_INTERNAL_EVAL */
    if (output_triangles)
    {
-#ifdef USE_LOD
-      bezierPatchMeshBeginStrip(global_bpm, GL_POLYGON);
-      bezierPatchMeshInsertUV(global_bpm, global_grid_u0, global_grid_v0);
-      bezierPatchMeshInsertUV(global_bpm, global_grid_u1, global_grid_v1);
-      bezierPatchMeshInsertUV(global_bpm, (REAL)global_grid_nu, (REAL)global_grid_nv);
-      bezierPatchMeshInsertUV(global_bpm, (REAL)umin, (REAL)vmin);
-      bezierPatchMeshInsertUV(global_bpm, (REAL)umax, (REAL)vmax);
-      bezierPatchMeshEndStrip(global_bpm);
-#else /* USE_LOD */
-
       REAL du, dv;
       long i, j;
 
@@ -785,7 +739,6 @@ void OpenGLSurfaceEvaluator::mapmesh2f(long style, long umin, long umax, long vm
             endqstrip();
          }
       }
-#endif /* USE_LOD */
    }
    else
    {

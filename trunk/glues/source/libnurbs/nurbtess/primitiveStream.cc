@@ -33,6 +33,8 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include "glues.h"
@@ -103,13 +105,13 @@ void primStream::end(Int type)
     assert(temp);
     Int* tempTypes = (Int*) malloc(sizeof(Int) * (2*size_lengths + 2));
     assert(tempTypes);
-    
+
     /*copy*/
     for(i=0; i<index_lengths; i++){
       temp[i] = lengths[i];
       tempTypes[i] = types[i];
     }
-    
+
     free(lengths);
     free(types);
     lengths = temp;
@@ -127,10 +129,10 @@ primStream::primStream(Int sizeLengths, Int sizeVertices)
   assert(lengths);
   types = (Int*)malloc (sizeof(Int) * sizeLengths);
   assert(types);
-  
+
   vertices = (Real*) malloc(sizeof(Real) * sizeVertices);
   assert(vertices);
-  
+
   index_lengths = 0;
   index_vertices = 0;
   size_lengths = sizeLengths;

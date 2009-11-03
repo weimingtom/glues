@@ -251,7 +251,6 @@ Mesher::move( int x, int y )
 inline void
 Mesher::output( int x )
 {
-printf("Mesher::output()\n");
     backend.tmeshvert( vdata[x] );
 }
 

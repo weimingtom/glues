@@ -42,55 +42,49 @@ class monoChain;
 
 class monoChain
 {
-directedLine* chainHead;
-  directedLine* chainTail;
-  monoChain* next;
-  monoChain* prev;
-  monoChain* nextPolygon; //a list of polygons
-  
-  //cached informatin
-  //bounding box
-  Real minX, maxX, minY, maxY;
-  Int isIncrease;
-  
-  //for efficiently comparing two chains
+   directedLine* chainHead;
+   directedLine* chainTail;
+   monoChain* next;
+   monoChain* prev;
+   monoChain* nextPolygon; // a list of polygons
 
-  directedLine* current;
-  
-public:
-  monoChain(directedLine* cHead, directedLine* cTail);
-  ~monoChain() {}
-  
-  inline  void setNext(monoChain* n) {next = n;}
-  inline void setPrev(monoChain* p) {prev = p;}
-  inline void setNextPolygon(monoChain* np) {nextPolygon = np;}
-  inline monoChain* getNext() {return next;}
-  inline monoChain* getPrev() {return prev;}
-  inline directedLine* getHead() {return chainHead;}
-  inline directedLine* getTail() {return chainTail;}
-  
-  inline void resetCurrent() { current = ((isIncrease==1)? chainHead:chainTail);}
+   // cached informatin
+   // bounding box
+   Real minX, maxX, minY, maxY;
+   Int isIncrease;
 
-  void deleteLoop();
-  void deleteLoopList();
+   // for efficiently comparing two chains
+   directedLine* current;
 
-  //insert a new chain between prev and this
-  void insert(monoChain* nc);
+   public:
+      monoChain(directedLine* cHead, directedLine* cTail);
+      ~monoChain() {}
 
-  Int numChainsSingleLoop();
-  Int numChainsAllLoops();
-  monoChain** toArrayAllLoops(Int& num_chains);
-  Int toArraySingleLoop(monoChain** array, Int index);
+      inline  void setNext(monoChain* n) {next = n;}
+      inline void setPrev(monoChain* p) {prev = p;}
+      inline void setNextPolygon(monoChain* np) {nextPolygon = np;}
+      inline monoChain* getNext() {return next;}
+      inline monoChain* getPrev() {return prev;}
+      inline directedLine* getHead() {return chainHead;}
+      inline directedLine* getTail() {return chainTail;}
 
-  Int isKey;
-  Real keyY; //the current horizotal line  
-  Real chainIntersectHoriz(Real y); //updates current incrementally for efficiency
-  directedLine* find(Real y);//find dline so that y intersects dline.
+      inline void resetCurrent() { current=((isIncrease==1)?chainHead:chainTail);}
 
-  void printOneChain();
-  void printChainLoop();
-  void printAllLoops();
-    
+      void deleteLoop();
+      void deleteLoopList();
+
+      // insert a new chain between prev and this
+      void insert(monoChain* nc);
+
+      Int numChainsSingleLoop();
+      Int numChainsAllLoops();
+      monoChain** toArrayAllLoops(Int& num_chains);
+      Int toArraySingleLoop(monoChain** array, Int index);
+
+      Int isKey;
+      Real keyY; // the current horizotal line
+      Real chainIntersectHoriz(Real y); // updates current incrementally for efficiency
+      directedLine* find(Real y); // find dline so that y intersects dline.
 };
 
 monoChain* directedLineLoopToMonoChainLoop(directedLine* loop);
@@ -98,9 +92,9 @@ monoChain* directedLineLoopListToMonoChainLoopList(directedLine* list);
 Int MC_sweepY(Int nVertices, monoChain** sortedVertices, sweepRange** ret_ranges);
 
 void MC_findDiagonals(Int total_num_edges, monoChain** sortedVertices,
-		   sweepRange** ranges, Int& num_diagonals, 
-		   directedLine** diagonal_vertices);
+                      sweepRange** ranges, Int& num_diagonals,
+                      directedLine** diagonal_vertices);
 
-directedLine* MC_partitionY(directedLine *polygons, sampledLine **retSampledLines);
+directedLine* MC_partitionY(directedLine* polygons, sampledLine** retSampledLines);
 
-#endif
+#endif /* _MONO_CHAIN_H */

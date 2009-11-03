@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _SAMPLEDLINE_H
@@ -35,37 +37,33 @@
 
 #include "definitions.h"
 
-class sampledLine{
-  Int npoints;
-  Real2 *points;
+class sampledLine
+{
+   Int npoints;
+   Real2* points;
 
-public:
-  sampledLine(Int n_points);
-  sampledLine(Int n_points, Real  pts[][2]);
-  sampledLine(Real pt1[2], Real pt2[2]);
-  sampledLine(); //special, careful about memory
-  ~sampledLine();
+   public:
+      sampledLine(Int n_points);
+      sampledLine(Int n_points, Real  pts[][2]);
+      sampledLine(Real pt1[2], Real pt2[2]);
+      sampledLine(); // special, careful about memory
+      ~sampledLine();
 
-  void init(Int n_points, Real2 *pts);//special, careful about memory
+      void init(Int n_points, Real2* pts); // special, careful about memory
 
-  void setPoint(Int i, Real p[2]) ;
+      void setPoint(Int i, Real p[2]);
 
-  sampledLine* insert(sampledLine *nline);
-  void deleteList();
+      sampledLine* insert(sampledLine* nline);
+      void deleteList();
 
-  Int get_npoints() {return npoints;}
-  Real2* get_points() {return points;}
+      Int get_npoints() {return npoints;}
+      Real2* get_points() {return points;}
 
-  //u_reso is number of segments (may not be integer) per unit u
-  void tessellate(Real u_reso, Real v_reso);//n segments
-  void tessellateAll(Real u_reso, Real v_reso);
+      // u_reso is number of segments (may not be integer) per unit u
+      void tessellate(Real u_reso, Real v_reso); // n segments
+      void tessellateAll(Real u_reso, Real v_reso);
 
-  void print();
-  
-  sampledLine* next;
+      sampledLine* next;
 };
 
-
-
-
-#endif
+#endif /* _SAMPLEDLINE_H */
