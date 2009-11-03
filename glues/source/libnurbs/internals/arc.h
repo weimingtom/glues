@@ -27,11 +27,10 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * arc.h
  *
- */
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #ifndef __gluarc_h_
 #define __gluarc_h_
@@ -83,8 +82,6 @@ class Arc: public PooledObj
       int                numpts(void);
       void               markverts(void);
       void               getextrema(Arc_ptr[4]);
-      void               print(void);
-      void               show(void);
       void               makeSide(PwlArc*, arc_side);
       inline int         isTessellated() { return pwlArc ? 1 : 0; }
       inline long        isbezier() { return type & bezier_tag; }

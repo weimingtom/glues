@@ -169,9 +169,6 @@ class OpenGLSurfaceEvaluator: public BasicSurfaceEvaluator
          userData=data;
       }
 
-      /**************begin for LOD_eval_list***********/
-      void LOD_eval_list(int level);
-
    private:
       StoredVertex* vertexCache[VERTEX_CACHE_SIZE];
       int tmeshing;
@@ -205,12 +202,6 @@ class OpenGLSurfaceEvaluator: public BasicSurfaceEvaluator
       void texcoordCallBack(const GLfloat* texcoord, void* data);
 
       void* userData; // the opaque pointer for Data callback functions.
-
-      /* LOD evaluation */
-      void LOD_triangle(REAL A[2], REAL B[2], REAL C[2], int level);
-      void LOD_eval(int num_vert, REAL* verts, int type, int level);
-
-      int LOD_eval_level; // set by LOD_eval_list()
 
       /*************begin for internal evaluators*****************/
 

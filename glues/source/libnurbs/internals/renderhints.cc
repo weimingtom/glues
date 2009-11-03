@@ -31,11 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 */
-
 /*
- * renderhints.c++
  *
- */
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #include "glimports.h"
 #include "mystdio.h"
@@ -50,10 +49,10 @@
  */
 Renderhints::Renderhints()
 {
-    display_method 	= N_FILL;
-    errorchecking 	= N_MSG;
-    subdivisions 	= 6.0;
-    tmp1 		= 0.0;
+   display_method=N_FILL;
+   errorchecking=N_MSG;
+   subdivisions=6.0f;
+   tmp1=0.0f;
 }
 
 void
@@ -92,7 +91,7 @@ Renderhints::isProperty( long property )
     }
 }
 
-REAL 
+REAL
 Renderhints::getProperty( long property )
 {
     switch ( property ) {
@@ -106,11 +105,11 @@ Renderhints::getProperty( long property )
 	    return tmp1;
 	default:
 	    abort();
-	    return -1;  //not necessary, needed to shut up compiler
+	    return -1;  // not necessary, needed to shut up compiler
     }
 }
 
-void 
+void
 Renderhints::setProperty( long property, REAL value )
 {
     switch ( property ) {

@@ -391,8 +391,6 @@ int bezierPatchMeshNumTriangles(bezierPatchMesh* bpm)
    int i;
    int sum=0;
 
-   printf("bezierPatchMeshNumTriangles()\n");
-
    for(i=0; i<bpm->index_length_array; i++)
    {
       switch(bpm->type_array[i])

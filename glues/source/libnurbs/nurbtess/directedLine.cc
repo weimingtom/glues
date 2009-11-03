@@ -448,12 +448,6 @@ static Int compInY2(directedLine* v1, directedLine* v2)
 {
   return v1->compInY(v2);
 }
-#ifdef NOT_USED
-static Int compInX(directedLine* v1, directedLine* v2)
-{
-  return v1->compInX(v2);
-}
-#endif
 
 /*sort all the vertices NOT the lines!
  *a vertex is the head of a directed line
@@ -474,7 +468,6 @@ directedLine* directedLine::insertPolygon(directedLine* oldList)
   setRootBit();
   if(oldList == NULL) return this;
   nextPolygon = oldList;
-/*  oldList->prevPolygon = this;*/
   return this;
 }
 
@@ -483,37 +476,46 @@ directedLine* directedLine::insertPolygon(directedLine* oldList)
  */
 directedLine* directedLine::cutoffPolygon(directedLine *p)
 {
-  directedLine* temp;
-  directedLine* prev_polygon  = NULL;
-  if(p == NULL) return this;
+   directedLine* temp;
+   directedLine* prev_polygon  = NULL;
+   if (p==NULL)
+   {
+      return this;
+   }
 
-  for(temp=this; temp != p; temp = temp->nextPolygon)
-    {
-      if(temp == NULL)
-	{
-	  fprintf(stderr, "in cutoffPolygon, not found\n");
-	  exit(1);
-	}
-      prev_polygon = temp;
-    }
+   for (temp=this; temp!=p; temp=temp->nextPolygon)
+   {
+      if (temp==NULL)
+      {
+         fprintf(stderr, "in cutoffPolygon, not found\n");
+         exit(1);
+      }
+      prev_polygon=temp;
+   }
 
-/*  prev_polygon = p->prevPolygon;*/
-
-  p->resetRootBit();
-  if(prev_polygon == NULL) /*this is the one to cutoff*/
-    return nextPolygon;
-  else {
-    prev_polygon->nextPolygon = p->nextPolygon;
-    return this;
-  }
+   p->resetRootBit();
+   if (prev_polygon==NULL) /* this is the one to cutoff */
+   {
+      return nextPolygon;
+   }
+   else
+   {
+      prev_polygon->nextPolygon=p->nextPolygon;
+      return this;
+   }
 }
 
 Int directedLine::numPolygons()
 {
-  if(nextPolygon == NULL) return 1;
-  else return 1+nextPolygon->numPolygons();
+   if (nextPolygon==NULL)
+   {
+      return 1;
+   }
+   else
+   {
+      return 1+nextPolygon->numPolygons();
+   }
 }
-
 
 /*let  array[index ...] denote
  *all the edges in this polygon

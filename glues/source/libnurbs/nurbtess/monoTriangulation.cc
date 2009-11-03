@@ -164,8 +164,7 @@ void monoTriangulationRecGenTBOpt(Real* topVertex, Real* botVertex,
 			  primStream* pStream)
 {
   pStream->triangle(topVertex, inc_chain->getVertex(inc_current), dec_chain->getVertex(dec_current));
-  
-/*printf("**(%f,%f)\n", inc_chain->getArray()[0][0],inc_chain->getArray()[0][1]);*/
+
   triangulateXYMonoTB(inc_end-inc_current+1, inc_chain->getArray()+inc_current,  dec_end-dec_current+1,  dec_chain->getArray()+dec_current, pStream);
 
   pStream->triangle(botVertex, dec_chain->getVertex(dec_end), inc_chain->getVertex(inc_end));
@@ -1155,16 +1154,6 @@ void vertexArray::appendVertex(Real* ptr)
   array[index++] = ptr;
 }
 
-void vertexArray::print()
-{
-  printf("vertex Array:index=%i, size=%i\n", index, size);
-  for(Int i=0; i<index; i++)
-    {
-      printf("(%f,%f) ", array[i][0], array[i][1]);
-    }
-  printf("\n");
-}
-
 /*find the first i such that array[i][1] >= v
  * and array[i+1][1] <v
  * if index == 0 (the array is empty, return -1.
@@ -1455,7 +1444,7 @@ void reflexChain::processNewVertex(Real v[2], primStream* pStream)
    * output triangle fan: 
    *  v, and queue[i], i+1, ..., j
    */
-  if(i<j) 
+  if(i<j)
     {
       pStream->begin();
       pStream->insert(v);
@@ -1467,7 +1456,6 @@ void reflexChain::processNewVertex(Real v[2], primStream* pStream)
 	for(k=j; k>=i; k--)
 	  pStream->insert(queue[k]);
       }
-      
       pStream->end(PRIMITIVE_STREAM_FAN);
     }
 
@@ -1476,14 +1464,4 @@ void reflexChain::processNewVertex(Real v[2], primStream* pStream)
   /*finally insert v at the end of the queue*/
   insert(v);
 
-}
-
-void reflexChain::print()
-{
-  Int i;
-  printf("reflex chain: isIncreasing=%i\n", isIncreasing);
-  for(i=0; i<index_queue; i++) {
-    printf("(%f,%f) ", queue[i][0], queue[i][1]);
-  }
-  printf("\n");
 }

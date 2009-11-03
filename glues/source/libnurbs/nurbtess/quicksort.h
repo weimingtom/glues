@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _QUICKSORT_H
@@ -39,4 +41,4 @@
 void quicksort(void *v[], int left, int right,
 	       int (*comp) (void *, void *));
 
-#endif
+#endif /* _QUICKSORT_H */

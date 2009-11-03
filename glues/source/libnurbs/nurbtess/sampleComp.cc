@@ -6,21 +6,21 @@
 ** this file except in compliance with the License. You may obtain a copy
 ** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
 ** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
+**
 ** http://oss.sgi.com/projects/FreeB
-** 
+**
 ** Note that, as provided in the License, the Software is distributed on an
 ** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
 ** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
 ** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
 ** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
+**
 ** Original Code. The Original Code is: OpenGL Sample Implementation,
 ** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
 ** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
 ** Copyright in any portions created by third parties is as indicated
 ** elsewhere herein. All Rights Reserved.
-** 
+**
 ** Additional Notice Provisions: The application programming interfaces
 ** established by SGI in conjunction with the Original Code are The
 ** OpenGL(R) Graphics System: A Specification (Version 1.2.1), released
@@ -33,6 +33,8 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include <stdlib.h>
@@ -42,8 +44,6 @@
 #include "sampleCompTop.h"
 #include "sampleCompBot.h"
 #include "sampleCompRight.h"
-
-
 
 #define max(a,b) ((a>b)? a:b)
 #define min(a,b) ((a>b)? b:a)
@@ -207,7 +207,7 @@ void sampleCompLeft(Real* topVertex, Real* botVertex,
       cornerLeftStart = leftStartIndex;
       cornerRightUpEnd = up_leftCornerIndex;
     }
-  
+
   if(down_leftCornerWhere == 0) /*left corner is on left chain*/
     {
       cornerBot = leftChain->getVertex(down_leftCornerIndex);
@@ -226,9 +226,6 @@ void sampleCompLeft(Real* topVertex, Real* botVertex,
       cornerLeftEnd = leftEndIndex;
       cornerRightDownStart = down_leftCornerIndex;
     }
-      
-
-
 
   /*sample*/
   if(midIndex2 >= 0) /*there is a trim point inbewteen grid lines*/
@@ -358,14 +355,4 @@ void sampleLeftSingleTrimEdgeRegionGen(Real topVert[2], Real botVert[2],
 			  leftChain, leftStart, leftEnd,
 			  &vArray, 0, vArray.getNumElements()-1,
 			  pStream);
-		     
 }
-
-
-
-
-
-
-
-
-

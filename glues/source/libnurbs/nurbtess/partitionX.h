@@ -52,5 +52,4 @@ Int numInteriorCuspsX(directedLine* polygon);
  */
 directedLine* findDiagonal_singleCuspX(directedLine* cusp);
 
-#endif
-
+#endif /* _PARTITIONX_H */

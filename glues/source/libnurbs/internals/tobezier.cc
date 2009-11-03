@@ -85,7 +85,6 @@ struct Knotspec {		/* knotvector format */
     void		breakpoints( void );
     void		knots( void );
     void		transform( REAL * );
-    void		showpts( REAL * );
     
     void		pt_io_copy( REAL *, INREAL * );
     void		pt_oo_copy( REAL *, REAL * );
@@ -345,25 +344,7 @@ Knotspec::copy( INREAL *inpt, REAL *outpt )
 }
 
 /*-----------------------------------------------------------------------------
- * Knotspec::showpts - print out points before transformation
- *
- * Client: Knotspec::select
- *-----------------------------------------------------------------------------
- */
-void
-Knotspec::showpts( REAL *outpt )
-{
-    if( next ) {
-        for( REAL *lpt=outpt+prewidth; outpt != lpt; outpt += poststride )
-	    next->showpts( outpt );
-    } else {
-        for( REAL *lpt=outpt+prewidth; outpt != lpt; outpt += poststride )
-	    _glu_dprintf(  "show %g %g %g\n", outpt[0], outpt[1], outpt[2] );
-    }
-}
-
-/*-----------------------------------------------------------------------------
- * Knotspec::factors - precompute scale factors 	
+ * Knotspec::factors - precompute scale factors
  *	   - overwrites knot vector, actual new knot vector is NOT produced
  *
  * Client: Knotspec::select

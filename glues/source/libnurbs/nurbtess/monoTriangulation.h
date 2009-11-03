@@ -43,16 +43,16 @@
 class Backend;
 
 class reflexChain{
-  Real2 *queue; 
-  /*the order of the polygon vertices: either q[0],q[1].., or 
+  Real2 *queue;
+  /*the order of the polygon vertices: either q[0],q[1].., or
    * q[n-1], q[n-2], ..., q[0]
    *this order determines the interior of the polygon, so it
    *also used to determines whether a chain is reflex or convex
    */
-  Int isIncreasing; 
+  Int isIncreasing;
   Int index_queue;
   Int size_queue; /*allocated size*/
-  
+
 public:
   reflexChain(Int size, Int isIncreasing);
   ~reflexChain();
@@ -65,8 +65,6 @@ public:
 
   void processNewVertex(Real v[2], Backend* backend);
   void outputFan(Real v[2], Backend* backend);
-
-  void print();
 };
 
 /*dynamic array of pointers to reals.
@@ -96,7 +94,6 @@ public:
   Int skipEqualityFromStart(Real v, Int start, Int end);
   //return i such that fron [i+1, end] is strictly U-monotone (left to right
   Int findDecreaseChainFromEnd(Int begin, Int end);
-  void print();
 };
 
 void monoTriangulation(directedLine* monoPolygon, primStream* pStream);
@@ -162,16 +159,14 @@ void monoTriangulationFun(directedLine* monoPolygon,
 			  Int (*compFun)(Real*, Real*), primStream* pStream);
 
 
-
-
-void monoTriangulationRec(Real* topVertex, Real* botVertex, 
+void monoTriangulationRec(Real* topVertex, Real* botVertex,
 			  vertexArray* inc_chain, Int inc_current,
 			  vertexArray* dec_chain, Int dec_current,
 			  Backend* backend);
 
 void monoTriangulationFunBackend(Arc_ptr loop, Int (*compFun)(Real*, Real*), Backend* backend);
 
-void monoTriangulationRecFunBackend(Real* topVertex, Real* botVertex, 
+void monoTriangulationRecFunBackend(Real* topVertex, Real* botVertex,
 			  vertexArray* inc_chain, Int inc_current,
 			  vertexArray* dec_chain, Int dec_current,
 			  Int  (*compFun)(Real*, Real*),
@@ -179,8 +174,4 @@ void monoTriangulationRecFunBackend(Real* topVertex, Real* botVertex,
 
 void monoTriangulationOpt(directedLine* poly, primStream* pStream);
 
-#endif
-
-
-
-
+#endif /* _MONO_TRIANGULATION_H */

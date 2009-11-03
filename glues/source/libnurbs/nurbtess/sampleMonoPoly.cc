@@ -33,6 +33,8 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include <stdlib.h>
@@ -1046,18 +1048,7 @@ void findRightGridIndices(directedLine* topEdge, Int firstGridIndex, Int lastGri
 	ret_indices[k] = 0;
       else
 	ret_indices[k] = (int)ceil((((uinterc-uMin)/(uMax - uMin)) * (n_ulines-1))) -1;
-/*
-if(ret_indices[k] >= grid->get_n_ulines())
-  {
-  printf("ERROR3\n");
-  exit(0);
-}
-if(ret_indices[k] < 0)    
-  {
-  printf("ERROR4\n");
-  exit(0);
-}
-*/
+
       ret_innerIndices[k] = (int)ceil ((((tempMinU-uMin)/(uMax - uMin)) * (n_ulines-1))) -1;
 
       tempMinU = uinterc;
@@ -1096,17 +1087,9 @@ if(ret_indices[k] < 0)
 
 void sampleMonoPoly(directedLine* polygon, gridWrap* grid, Int ulinear, Int vlinear, primStream* pStream, rectBlockArray* rbArray)
 {
-/*
-{
-grid->print();
-polygon->writeAllPolygons("zloutputFile");
-exit(0);
-}
-*/
-
 if(grid->get_n_ulines() == 2 ||
    grid->get_n_vlines() == 2)
-{ 
+{
   if(ulinear && grid->get_n_ulines() == 2)
     {
       monoTriangulationFun(polygon, compV2InY, pStream);   
@@ -1144,7 +1127,7 @@ if(grid->get_n_ulines() == 2 ||
 
 	  //<other> should NOT be null unless there are self-intersecting
           //trim curves. In that case, we don't want to core dump, instead,
-          //we triangulate anyway, and print out error message.
+          // we triangulate anyway, and print out error message.
 	  if(other == NULL)
 	    {
 	      monoTriangulationFun(polygon, compV2InX, pStream);
@@ -1326,12 +1309,6 @@ void sampleMonoPolyRec(
     {
       /*stop recursion, ...*/
       /*monotone triangulate it...*/
-//      printf("no grid line exists\n");      
-/*
-      monoTriangulationRecOpt(topVertex, botVertex, leftChain, leftStartIndex,
-			   rightChain, rightStartIndex, pStream);
-*/
-
 if(num_skipped_grid_lines <2)
   {
     monoTriangulationRecGenOpt(topVertex, botVertex, leftChain, leftStartIndex,
@@ -2251,8 +2228,3 @@ void stripOfFanLeft(vertexArray* leftChain,
   free(trimVerts);
   free(gridVerts);
 }
-
-  
-
-
-

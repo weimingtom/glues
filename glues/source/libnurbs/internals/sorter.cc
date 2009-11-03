@@ -53,18 +53,15 @@ void Sorter::qsort(void* a, int n)
 
 int Sorter::qscmp(char*, char*)
 {
-   _glu_dprintf("Sorter::qscmp: pure virtual called\n");
    return 0;
 }
 
 void Sorter::qsexc(char*, char*)
 {
-   _glu_dprintf("Sorter::qsexc: pure virtual called\n");
 }
 
 void Sorter::qstexc(char*, char*, char*)
 {
-   _glu_dprintf("Sorter::qstexc: pure virtual called\n");
 }
 
 void Sorter::qs1(char* a, char* l)

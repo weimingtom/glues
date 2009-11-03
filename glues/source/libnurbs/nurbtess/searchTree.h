@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _SEARCHTREE_H
@@ -38,7 +40,7 @@ typedef struct treeNode
    void* key;
    struct treeNode* parent;
    struct treeNode* left;   /* children */
-   struct treeNode* right; 
+   struct treeNode* right;
 } treeNode;
 
 treeNode* TreeNodeMake(void* key);

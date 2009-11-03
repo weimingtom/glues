@@ -31,11 +31,10 @@
 ** published by SGI, but has not been independently verified as being
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 */
-
 /*
- * bin.c++
  *
- */
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #include "glimports.h"
 #include "mystdio.h"
@@ -119,15 +118,6 @@ void Bin::adopt()
 }
 
 /*----------------------------------------------------------------------------
- * show - print out descriptions of the arcs in the bin
- *----------------------------------------------------------------------------
- */
-
-void Bin::show(char* name)
-{
-}
-
-/*----------------------------------------------------------------------------
  * markall - mark all arcs with an identifying tag
  *----------------------------------------------------------------------------
  */
@@ -137,21 +127,5 @@ void Bin::markall()
    for (Arc_ptr jarc=firstarc(); jarc; jarc=nextarc())
    {
       jarc->setmark();
-   }
-}
-
-/*----------------------------------------------------------------------------
- * listBezier - print out all arcs that are untessellated border arcs
- *----------------------------------------------------------------------------
- */
-
-void Bin::listBezier(void)
-{
-   for (Arc_ptr jarc=firstarc(); jarc; jarc=nextarc())
-   {
-      if (jarc->isbezier())
-      {
-         assert(jarc->pwlArc->npts==2);
-      }
    }
 }

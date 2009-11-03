@@ -2492,7 +2492,7 @@ void OpenGLSurfaceEvaluator::inDoEvalCoord2EM(REAL u, REAL v)
          temp_vertex[4]=v;
          vertexCallBack(temp_vertex, userData);
       } /* end if auto_normal */
-      else // no normal map, and no normal callback function
+      else /* no normal map, and no normal callback function */
       {
          if (vertex_flag)
          {
@@ -2519,18 +2519,6 @@ void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
    int ustride;
    int vstride;
 
-#ifdef USE_LOD
-   if (bpm->bpatch!=NULL)
-   {
-      bezierPatch* p=bpm->bpatch;
-      ustride=p->dimension*p->vorder;
-      vstride=p->dimension;
-
-      glMap2f((p->dimension==3)?GLU_MAP2_VERTEX_3:GLU_MAP2_VERTEX_4,
-               p->umin, p->umax, ustride, p->uorder, p->vmin, p->vmax,
-               vstride, p->vorder, p->ctlpoints);
-    }
-#else /* USE_LOD */
    if (bpm->bpatch!=NULL)
    {
       bezierPatch* p=bpm->bpatch;
@@ -2566,55 +2554,22 @@ void OpenGLSurfaceEvaluator::inBPMEvalEM(bezierPatchMesh* bpm)
       inMap2fEM(3, p->dimension, p->umin, p->umax, ustride, p->uorder, p->vmin,
                 p->vmax, vstride, p->vorder, p->ctlpoints);
    }
-#endif /* USE_LOD */
 
    k=0;
 
    for(i=0; i<bpm->index_length_array; i++)
    {
-#ifdef USE_LOD
-      if (bpm->type_array[i]==GL_POLYGON) // a mesh
-      {
-         GLfloat* temp=bpm->UVarray+k;
-         GLfloat u0=temp[0];
-         GLfloat v0=temp[1];
-         GLfloat u1=temp[2];
-         GLfloat v1=temp[3];
-         GLint nu=(GLint)(temp[4]);
-         GLint nv=(GLint)(temp[5]);
-         GLint umin=(GLint)(temp[6]);
-         GLint vmin=(GLint)(temp[7]);
-         GLint umax=(GLint)(temp[8]);
-         GLint vmax=(GLint)(temp[9]);
-
-         glMapGrid2f(LOD_eval_level*nu, u0, u1, LOD_eval_level*nv, v0, v1);
-         glEvalMesh2(GL_FILL, LOD_eval_level*umin, LOD_eval_level*umax, LOD_eval_level*vmin, LOD_eval_level*vmax);
-      }
-      else
-      {
-         LOD_eval(bpm->length_array[i], bpm->UVarray+k, bpm->type_array[i], 0);
-      }
-
-      k+=2*bpm->length_array[i];
-
-#else /* USE_LOD */
-
       beginCallBack(bpm->type_array[i], userData);
 
       for(j=0; j<bpm->length_array[i]; j++)
       {
          u=bpm->UVarray[k];
          v=bpm->UVarray[k+1];
-#ifdef USE_LOD
-         LOD_EVAL_COORD(u, v);
-#else /* USE_LOD */
          inDoEvalCoord2EM(u, v);
-#endif /* USE_LOD */
 
          k+=2;
       }
       endCallBack(userData);
-#endif // USE_LOD
    }
 }
 

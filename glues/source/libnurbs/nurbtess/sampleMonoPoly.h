@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _SAMPLEMONOPOLY_H
@@ -121,12 +123,12 @@ void findUpCorners(Real *topVertex,
 		   Real v,
 		   Real uleft,
 		   Real uright,
-		   Int& ret_leftCornerWhere, 
+		   Int& ret_leftCornerWhere,
 		   Int& ret_leftCornerIndex,
 		   Int& ret_rightCornerWhere,
 		   Int& ret_rightCornerIndex
 		   );
-void findDownCorners(Real *botVertex, 
+void findDownCorners(Real *botVertex,
 		   vertexArray *leftChain, Int leftChainStartIndex, Int leftChainEndIndex,
 		   vertexArray *rightChain, Int rightChainStartIndex, Int rightChainEndIndex,
 		   Real v,
@@ -137,8 +139,8 @@ void findDownCorners(Real *botVertex,
 		   Int& ret_rightCornerWhere,
 		   Int& ret_rightCornerIndex
 		   );
-void findNeck(vertexArray *leftChain, Int botLeftIndex, 
-	      vertexArray *rightChain, Int botRightIndex, 
+void findNeck(vertexArray *leftChain, Int botLeftIndex,
+	      vertexArray *rightChain, Int botRightIndex,
 	      Int& leftLastIndex, /*left point of the neck*/
 	      Int& rightLastIndex /*right point of the neck*/
 	      );
@@ -148,20 +150,19 @@ Int findNeckF(vertexArray *leftChain, Int botLeftIndex,
 	       gridBoundaryChain* leftGridChain,
 	       gridBoundaryChain* rightGridChain,
 	       Int gridStartIndex,
-	       Int& neckLeft, 
+	       Int& neckLeft,
 	       Int& neckRight);
 
 void findTopAndBot(directedLine* polygon, 
 		   directedLine*& topV, 
 		   directedLine*& botV);
-void findGridChains(directedLine* top, directedLine* bot, 
+void findGridChains(directedLine* top, directedLine* bot,
 		    gridWrap* grid,
 		    gridBoundaryChain*& leftGridChain,
 		    gridBoundaryChain*& rightGridChain);
 void toVertexArrays(directedLine* topV, directedLine* botV, vertexArray& leftChain, vertexArray& rightChain);
 
-Int checkMiddle(vertexArray* chain, Int begin, Int end, 
+Int checkMiddle(vertexArray* chain, Int begin, Int end,
 		Real vup, Real vbelow);
 
-#endif
-
+#endif /* _SAMPLEMONOPOLY_H */

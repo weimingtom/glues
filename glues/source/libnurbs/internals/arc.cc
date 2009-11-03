@@ -147,30 +147,6 @@ void Arc::getextrema(Arc_ptr extrema[4])
 }
 
 /*-------------------------------------------------------------------------
- * show - print to the stdout the vertices of a pwl arc
- *-------------------------------------------------------------------------
- */
-
-void Arc::show()
-{
-}
-
-/*-------------------------------------------------------------------------
- * print - print out the vertices of all pwl arcs on a loop
- *-------------------------------------------------------------------------
- */
-
-void Arc::print(void)
-{
-   Arc_ptr jarc=this;
-
-   do {
-      jarc->show();
-      jarc=jarc->next;
-   } while (jarc!=this);
-}
-
-/*-------------------------------------------------------------------------
  * isDisconnected - check if tail of arc and head of prev meet
  *-------------------------------------------------------------------------
  */

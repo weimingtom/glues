@@ -27,11 +27,10 @@
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-
 /*
- * bin.h
  *
- */
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
+*/
 
 #ifndef __glubin_h_
 #define __glubin_h_
@@ -59,8 +58,6 @@ class Bin
       int            numarcs(void);
       void           adopt(void);
       void           markall(void);
-      void           show(char*);
-      void           listBezier(void);
 };
 
 /*----------------------------------------------------------------------------

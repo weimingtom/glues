@@ -33,11 +33,12 @@
 **
 */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #include <stdlib.h>
 #include <stdio.h>
-
 
 static void swap(void *v[], int i, int j)
 {
@@ -65,7 +66,7 @@ void quicksort(void *v[], int left, int right,
   int i, last;
   if(left >= right) /*do nothing if array contains */
     return;         /*fewer than two elements*/
-  
+
   swap(v, left, (left+right)/2);
   last = left;
   for(i=left+1; i<=right; i++)

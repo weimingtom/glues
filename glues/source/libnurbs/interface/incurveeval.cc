@@ -103,11 +103,61 @@ void OpenGLCurveEvaluator::inMap1f(int which,   // 0: vert, 1: norm, 2: color, 3
                                    int uorder,
                                    REAL* ctlpoints)
 {
-   printf("OpenGLCurveEvaluator::inMap1f\n");
    int i, x;
    curveEvalMachine* temp_em;
 
-   switch(which)
+   switch (which)
+   {
+      case 0: // vertex
+           vertex_flag=1;
+           temp_em=&em_vertex;
+           break;
+      case 1: // normal
+           normal_flag=1;
+           temp_em=&em_normal;
+           break;
+      case 2: // color
+           color_flag=1;
+           temp_em=&em_color;
+           break;
+      default:
+           texcoord_flag=1;
+           temp_em=&em_texcoord;
+           break;
+   }
+
+   REAL* data=temp_em->ctlpoints;
+   temp_em->uprime=-1; // initialized
+   temp_em->k=k;
+   temp_em->u1=ulower;
+   temp_em->u2=uupper;
+   temp_em->ustride=ustride;
+   temp_em->uorder=uorder;
+
+   /* copy the control points */
+   for(i=0; i<uorder; i++)
+   {
+      for(x=0; x<k; x++)
+      {
+         data[x]=ctlpoints[x];
+      }
+      ctlpoints+=ustride;
+      data+=k;
+   }
+}
+
+void OpenGLCurveEvaluator::inMap1fr(int which,   // 0: vert, 1: norm, 2: color, 3: tex
+                                   int k,       // dimension
+                                   REAL ulower,
+                                   REAL uupper,
+                                   int ustride,
+                                   int uorder,
+                                   REAL* ctlpoints)
+{
+   int i, x;
+   curveEvalMachine* temp_em;
+
+   switch (which)
    {
       case 0: // vertex
            vertex_flag=1;
@@ -178,20 +228,18 @@ void OpenGLCurveEvaluator::inDoDomain1(curveEvalMachine* em, REAL u, REAL* retPo
    }
 }
 
-void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
+void OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
 {
    REAL temp_vertex[4];
    REAL temp_normal[3];
    REAL temp_color[4];
    REAL temp_texcoord[4];
-   printf("OpenGLCurveEvaluator::inDoEvalCoord1\n");
 
    if (texcoord_flag) // there is a texture map
    {
       inDoDomain1(&em_texcoord, u, temp_texcoord);
       texcoordCallBack(temp_texcoord, userData);
    }
-
    if (color_flag) // there is a color map
    {
       inDoDomain1(&em_color, u, temp_color);
@@ -202,11 +250,16 @@ void  OpenGLCurveEvaluator::inDoEvalCoord1(REAL u)
       inDoDomain1(&em_normal, u, temp_normal);
       normalCallBack(temp_normal, userData);
    }
-   if(vertex_flag)
+   if (vertex_flag)
    {
       inDoDomain1(&em_vertex, u, temp_vertex);
       vertexCallBack(temp_vertex, userData);
    }
+}
+
+void OpenGLCurveEvaluator::inDoEvalCoord1r(REAL u, REAL* retPoint)
+{
+   inDoDomain1(&em_vertex, u, retPoint);
 }
 
 void OpenGLCurveEvaluator::inMapMesh1f(int umin, int umax)
@@ -214,18 +267,117 @@ void OpenGLCurveEvaluator::inMapMesh1f(int umin, int umax)
    REAL du, u;
    int i;
 
-   printf("OpenGLCurveEvaluator::inMapMesh1f\n");
-
    if (global_grid_nu==0)
    {
       return; // no points to output
    }
+
    du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
+
    bgnline();
+
    for(i=umin; i<=umax; i++)
    {
       u=(i==global_grid_nu)?global_grid_u1:global_grid_u0+i*du;
       inDoEvalCoord1(u);
    }
+
    endline();
+}
+
+void OpenGLCurveEvaluator::inMapMesh1fr(int umin, int umax)
+{
+   REAL du, u;
+   REAL retPoint[4];
+   REAL vertices[umax-umin+1][3];
+   int i;
+
+   GLboolean texcoord_enabled;
+   GLboolean normal_enabled;
+   GLboolean vertex_enabled;
+   GLboolean color_enabled;
+
+   if (global_grid_nu==0)
+   {
+      return; // no points to output
+   }
+
+   du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
+
+   bgnline();
+
+   for(i=umin; i<=umax; i++)
+   {
+      u=(i==global_grid_nu)?global_grid_u1:global_grid_u0+i*du;
+      inDoEvalCoord1r(u, retPoint);
+
+      vertices[i-umin][0]=retPoint[0];
+      vertices[i-umin][1]=retPoint[1];
+      vertices[i-umin][2]=retPoint[2];
+   }
+
+   endline();
+
+   /* Store status of enabled arrays */
+   texcoord_enabled=GL_FALSE; /* glIsEnabled(GL_TEXTURE_COORD_ARRAY); */
+   normal_enabled=GL_FALSE;   /* glIsEnabled(GL_NORMAL_ARRAY);        */
+   vertex_enabled=GL_FALSE;   /* glIsEnabled(GL_VERTEX_ARRAY);        */
+   color_enabled=GL_FALSE;    /* glIsEnabled(GL_COLOR_ARRAY);         */
+
+   /* Enable needed and disable unneeded arrays */
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, vertices);
+   glDisableClientState(GL_NORMAL_ARRAY);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+
+   /* Perform rendering */
+   if (output_style==N_MESHPOINT)
+   {
+      /* Output as points */
+      glDrawArrays(GL_POINTS, 0, umax-umin+1);
+   }
+   else
+   {
+      /* Output as line strip */
+      glDrawArrays(GL_LINE_STRIP, 0, umax-umin+1);
+   }
+
+   /* Disable or re-enable arrays */
+   if (vertex_enabled)
+   {
+      /* Re-enable vertex array */
+      glEnableClientState(GL_VERTEX_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_VERTEX_ARRAY);
+   }
+
+   if (texcoord_enabled)
+   {
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   }
+
+   if (normal_enabled)
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_NORMAL_ARRAY);
+   }
+
+   if (color_enabled)
+   {
+      glEnableClientState(GL_COLOR_ARRAY);
+   }
+   else
+   {
+      glDisableClientState(GL_COLOR_ARRAY);
+   }
 }

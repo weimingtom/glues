@@ -111,12 +111,6 @@ class GLUnurbs: public NurbsTessellator
          surfaceEvaluator.set_callback_userData(userData);
       }
 
-      // for LOD
-      void LOD_eval_list(int level)
-      {
-         surfaceEvaluator.LOD_eval_list(level);
-      }
-
       // NEWCALLBACK
       int is_callback()
       {

@@ -93,15 +93,12 @@ Int cuspTypeX(directedLine *v)
   if(! isCuspX(v)) return 0;
   else 
     {
-//printf("isCusp,%f,%f\n", v->head()[0], v->head()[1]);
-      if(isReflexX(v)) 
+      if(isReflexX(v))
 	{
-//	  printf("isReflex\n");
 	  return 1;
 	}
       else
 	{
-//	  printf("not isReflex\n");
 	  return 2;
 	}
     }
@@ -145,7 +142,7 @@ directedLine* findDiagonal_singleCuspX(directedLine* cusp)
     for(temp = cusp->getNext(); temp != cusp; temp = temp->getNext())
       {
 	if(compV2InX(cusp->head(), temp->head()) == 1)
-	  {	   
+	  {
 	    return temp;
 	  }
       }
@@ -153,12 +150,9 @@ directedLine* findDiagonal_singleCuspX(directedLine* cusp)
     for(temp = cusp->getNext(); temp != cusp; temp = temp->getNext())
       {
 	if(compV2InX(cusp->head(), temp->head()) == -1)
-	  {	   
+	  {
 	    return temp;
 	  }
       }
   return NULL;
 }
-      
-
-     

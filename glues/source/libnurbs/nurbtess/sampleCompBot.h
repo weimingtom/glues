@@ -28,6 +28,8 @@
  * Silicon Graphics, Inc.
  */
 /*
+ *
+ * OpenGL ES 1.0 CM port of GLU by Mike Gorchak <mike@malva.ua>
 */
 
 #ifndef _SAMPLECOMPBOT_H
@@ -135,4 +137,4 @@ void sampleCompBotSimple(Real* botVertex,
 		   Int down_rightCornerIndex,
 		   primStream* pStream);
 
-#endif
+#endif /* _SAMPLECOMPBOT_H */
