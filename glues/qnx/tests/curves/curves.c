@@ -267,5 +267,8 @@ int main(int argc, char** argv)
       eglSwapBuffers(display, surface);
    } while(1);
 
+   /* Destroy NURBS renderer */
+   gluDeleteNurbsRenderer(mynurbs);
+
    return 0;
 }
