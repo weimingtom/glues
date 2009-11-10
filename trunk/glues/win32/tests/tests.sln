@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tess", "tess\tess.vcproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nurbs", "nurbs\nurbs.vcproj", "{49D32C22-F96A-463B-8BEA-4D0A778FA0A9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "trim", "trim\trim.vcproj", "{66D74E1A-31FB-43DA-8AA2-299DDFB936A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -43,6 +45,10 @@ Global
 		{49D32C22-F96A-463B-8BEA-4D0A778FA0A9}.Debug|Win32.Build.0 = Debug|Win32
 		{49D32C22-F96A-463B-8BEA-4D0A778FA0A9}.Release|Win32.ActiveCfg = Release|Win32
 		{49D32C22-F96A-463B-8BEA-4D0A778FA0A9}.Release|Win32.Build.0 = Release|Win32
+		{66D74E1A-31FB-43DA-8AA2-299DDFB936A0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{66D74E1A-31FB-43DA-8AA2-299DDFB936A0}.Debug|Win32.Build.0 = Debug|Win32
+		{66D74E1A-31FB-43DA-8AA2-299DDFB936A0}.Release|Win32.ActiveCfg = Release|Win32
+		{66D74E1A-31FB-43DA-8AA2-299DDFB936A0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

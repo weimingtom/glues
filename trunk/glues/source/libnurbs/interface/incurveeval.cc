@@ -289,7 +289,7 @@ void OpenGLCurveEvaluator::inMapMesh1fr(int umin, int umax)
 {
    REAL du, u;
    REAL retPoint[4];
-   REAL vertices[umax-umin+1][3];
+   REAL* vertices=NULL;
    int i;
 
    GLboolean texcoord_enabled;
@@ -304,6 +304,8 @@ void OpenGLCurveEvaluator::inMapMesh1fr(int umin, int umax)
 
    du=(global_grid_u1-global_grid_u0)/(REAL)global_grid_nu;
 
+   vertices=(REAL*)malloc((umax-umin+1)*3*sizeof(REAL));
+
    bgnline();
 
    for(i=umin; i<=umax; i++)
@@ -311,9 +313,9 @@ void OpenGLCurveEvaluator::inMapMesh1fr(int umin, int umax)
       u=(i==global_grid_nu)?global_grid_u1:global_grid_u0+i*du;
       inDoEvalCoord1r(u, retPoint);
 
-      vertices[i-umin][0]=retPoint[0];
-      vertices[i-umin][1]=retPoint[1];
-      vertices[i-umin][2]=retPoint[2];
+      vertices[(i-umin)*3 + 0]=retPoint[0];
+      vertices[(i-umin)*3 + 1]=retPoint[1];
+      vertices[(i-umin)*3 + 2]=retPoint[2];
    }
 
    endline();
@@ -380,4 +382,6 @@ void OpenGLCurveEvaluator::inMapMesh1fr(int umin, int umax)
    {
       glDisableClientState(GL_COLOR_ARRAY);
    }
+
+   free(vertices);
 }
