@@ -74,8 +74,8 @@ void init_scene(int width, int height)
    {
       for (v=0; v<4; v++)
       {
-         ctlpoints[u][v][0]=2.0*((GLfloat)u-1.5);
-         ctlpoints[u][v][1]=2.0*((GLfloat)v-1.5);
+         ctlpoints[u][v][0]=2.0f*((GLfloat)u-1.5f);
+         ctlpoints[u][v][1]=2.0f*((GLfloat)v-1.5f);
 
          if ((u==1 || u==2) && (v==1 || v==2))
          {
