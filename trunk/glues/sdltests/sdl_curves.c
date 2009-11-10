@@ -222,6 +222,9 @@ int main(int argc, char** argv)
       SDL_GL_SwapWindow(window);
    } while(1);
 
+   /* Destroy NURBS renderer */
+   gluDeleteNurbsRenderer(mynurbs);
+
    SDL_GL_DeleteContext(glcontext);
    SDL_DestroyWindow(window);
    SDL_Quit();
